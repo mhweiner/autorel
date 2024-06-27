@@ -1,6 +1,6 @@
 /* eslint-disable max-lines-per-function */
 import {test} from 'hoare';
-import {incrementVersion} from './semver';
+import {incrementVersion, incrMajor, incrMinor, incrPatch, returnHighestVersion} from './semver';
 
 test('incrementVersion: production to production', (assert) => {
 
@@ -65,11 +65,6 @@ test('incrementVersion: prerelease to prerelease (same channel)', (assert) => {
         'if no changes and the channel is the same, it should return the same version'
     );
     assert.equal(
-        incrementVersion('v1.0.0', 'v1.0.1-rc.1', 'patch', 'rc'),
-        'v1.0.1-rc.2',
-        'patch prerelease on a prerelease that is already a patch should should keep version, increment build number'
-    );
-    assert.equal(
         incrementVersion('v1.0.0', 'v1.0.1-rc.5', 'minor', 'rc'),
         'v1.1.0-rc.1',
         'minor prerelease on a prerelease that is patch should increment version, reset build number'
@@ -85,9 +80,29 @@ test('incrementVersion: prerelease to prerelease (same channel)', (assert) => {
         'major prerelease on a prerelease that is minor should increment version, reset build number'
     );
     assert.equal(
+        incrementVersion('v1.0.0', 'v1.0.1-rc.1', 'patch', 'rc'),
+        'v1.0.1-rc.2',
+        'patch prerelease on a prerelease that is already a patch should should keep version, increment build number'
+    );
+    assert.equal(
+        incrementVersion('v1.0.0', 'v1.1.0-rc.1', 'minor', 'rc'),
+        'v1.1.0-rc.2',
+        'minor prerelease on a prerelease that is already a minor should should keep version, increment build number'
+    );
+    assert.equal(
         incrementVersion('v1.0.0', 'v2.0.0-rc.2', 'major', 'rc'),
         'v2.0.0-rc.3',
         'major prerelease on a prerelease that is already major should keep version, increment build number'
+    );
+    assert.equal(
+        incrementVersion('v1.0.0', 'v2.0.0-rc', 'major', 'rc'),
+        'v2.0.0-rc.1',
+        'major prerelease on a prerelease that is already major should keep version, increment build number (default to 0)'
+    );
+    assert.equal(
+        incrementVersion('v1.0.0', 'v2.0.0-rc.1', 'minor', 'rc'),
+        'v2.0.0-rc.2',
+        'minor prerelease on a prerelease that is already major should keep version, increment build number'
     );
 
 });
@@ -124,6 +139,11 @@ test('incrementVersion: prerelease to prerelease (different channel)', (assert) 
         'v2.0.0-alpha.1',
         'major prerelease on a prerelease w/ diff channel that is patch should increment version, change channel, reset build number'
     );
+    assert.equal(
+        incrementVersion('v1.0.0', 'v2.0.0-rc.5', 'patch', 'alpha'),
+        'v2.0.0-alpha.1',
+        'patch prerelease on a prerelease w/ diff channel that is already major should keep version, change channel, reset build number'
+    );
 
 });
 
@@ -136,3 +156,180 @@ test('incrementVersion: prerelease to production', (assert) => {
     );
 
 });
+
+test('incrementVersion: invalid inputs', (assert) => {
+
+    assert.throws(
+        () => incrementVersion('v1.0.0', '1.0.0', 'none'),
+        new Error('lastTag is not a valid semver tag'),
+        'invalid lastTag should throw an error'
+    );
+    assert.throws(
+        () => incrementVersion('1.0.0', 'v1.0.0', 'none'),
+        new Error('lastProductionTag is not a valid semver tag'),
+        'invalid lastProductionTag should throw an error'
+    );
+    assert.throws(
+        () => incrementVersion('v1.0.1', 'v1.0.0', 'none'),
+        new Error('The current version must be greater than or equal to the last production version following SemVer rules.'),
+        'error is thrown if lastTag is less than lastProductionTag'
+    );
+    assert.throws(
+        () => incrementVersion('v1.1.0', 'v1.0.0', 'none'),
+        new Error('The current version must be greater than or equal to the last production version following SemVer rules.'),
+        'error is thrown if lastTag is less than lastProductionTag'
+    );
+    assert.throws(
+        () => incrementVersion('v2.0.0', 'v1.0.0', 'none'),
+        new Error('The current version must be greater than or equal to the last production version following SemVer rules.'),
+        'error is thrown if lastTag is less than lastProductionTag'
+    );
+    assert.throws(
+        () => incrementVersion('v1.0.0', 'v1.0.0-beta', 'none'),
+        new Error('The current version must be greater than or equal to the last production version following SemVer rules.'),
+        'error is thrown if lastTag is less than lastProductionTag'
+    );
+
+});
+
+test('incrPatch', (assert) => {
+
+    assert.equal(
+        incrPatch({major: 1, minor: 0, patch: 0, channel: 'alpha', build: 2}),
+        {major: 1, minor: 0, patch: 1, channel: 'alpha', build: 1},
+        'should increment the patch version and reset the build number if present'
+    );
+    assert.equal(
+        incrPatch({major: 1, minor: 0, patch: 0}),
+        {major: 1, minor: 0, patch: 1},
+        'should increment the patch version and omit the build number if not present'
+    );
+
+});
+
+test('incrMinor', (assert) => {
+
+    assert.equal(
+        incrMinor({major: 1, minor: 0, patch: 0, channel: 'alpha', build: 2}),
+        {major: 1, minor: 1, patch: 0, channel: 'alpha', build: 1},
+        'should increment the patch version and reset the build number if present'
+    );
+    assert.equal(
+        incrMinor({major: 1, minor: 0, patch: 0}),
+        {major: 1, minor: 1, patch: 0},
+        'should increment the patch version and omit the build number if not present'
+    );
+
+});
+
+test('incrMajor', (assert) => {
+
+    assert.equal(
+        incrMajor({major: 1, minor: 0, patch: 0, channel: 'alpha', build: 2}),
+        {major: 2, minor: 0, patch: 0, channel: 'alpha', build: 1},
+        'should increment the major version and reset the build number if present'
+    );
+    assert.equal(
+        incrMajor({major: 1, minor: 0, patch: 0}),
+        {major: 2, minor: 0, patch: 0},
+        'should increment the major version and omit the build number if not present'
+    );
+
+});
+
+test('returnHighestVersion', (assert) => {
+
+    assert.equal(
+        returnHighestVersion(
+            {major: 1, minor: 0, patch: 0, channel: 'alpha', build: 2},
+            {major: 1, minor: 1, patch: 0, channel: 'alpha', build: 2},
+        ),
+        {major: 1, minor: 1, patch: 0, channel: 'alpha', build: 2},
+    );
+    assert.equal(
+        returnHighestVersion(
+            {major: 1, minor: 1, patch: 1, channel: 'alpha', build: 1},
+            {major: 1, minor: 1, patch: 1, channel: 'beta', build: 1},
+        ),
+        {major: 1, minor: 1, patch: 1, channel: 'beta', build: 1},
+    );
+    assert.equal(
+        returnHighestVersion(
+            {major: 1, minor: 1, patch: 1, channel: 'beta', build: 1},
+            {major: 1, minor: 1, patch: 1, channel: 'alpha', build: 1},
+        ),
+        {major: 1, minor: 1, patch: 1, channel: 'beta', build: 1},
+    );
+    assert.equal(
+        returnHighestVersion(
+            {major: 1, minor: 1, patch: 1, channel: 'alpha', build: 1},
+            {major: 1, minor: 1, patch: 1, channel: 'alpha', build: 2},
+        ),
+        {major: 1, minor: 1, patch: 1, channel: 'alpha', build: 2},
+    );
+    assert.equal(
+        returnHighestVersion(
+            {major: 1, minor: 1, patch: 1, channel: 'alpha', build: 1},
+            {major: 1, minor: 1, patch: 1, channel: 'alpha', build: 2},
+        ),
+        {major: 1, minor: 1, patch: 1, channel: 'alpha', build: 2},
+    );
+    assert.equal(
+        returnHighestVersion(
+            {major: 1, minor: 1, patch: 1},
+            {major: 2, minor: 1, patch: 1},
+        ),
+        {major: 2, minor: 1, patch: 1},
+    );
+    assert.equal(
+        returnHighestVersion(
+            {major: 1, minor: 1, patch: 1},
+            {major: 1, minor: 1, patch: 1, channel: 'alpha'},
+        ),
+        {major: 1, minor: 1, patch: 1},
+    );
+    assert.equal(
+        returnHighestVersion(
+            {major: 1, minor: 1, patch: 1, channel: 'alpha'},
+            {major: 1, minor: 1, patch: 1},
+        ),
+        {major: 1, minor: 1, patch: 1},
+    );
+    assert.equal(
+        returnHighestVersion(
+            {major: 1, minor: 1, patch: 1, channel: 'alpha'},
+            {major: 1, minor: 1, patch: 1, channel: 'alpha', build: 1},
+        ),
+        {major: 1, minor: 1, patch: 1, channel: 'alpha', build: 1},
+    );
+    assert.equal(
+        returnHighestVersion(
+            {major: 1, minor: 1, patch: 1, channel: 'alpha', build: 1},
+            {major: 1, minor: 1, patch: 1, channel: 'alpha'},
+        ),
+        {major: 1, minor: 1, patch: 1, channel: 'alpha', build: 1},
+    );
+    assert.equal(
+        returnHighestVersion(
+            {major: 1, minor: 1, patch: 1, channel: 'alpha', build: 2},
+            {major: 1, minor: 1, patch: 1, channel: 'alpha', build: 1},
+        ),
+        {major: 1, minor: 1, patch: 1, channel: 'alpha', build: 2},
+    );
+    assert.equal(
+        returnHighestVersion(
+            {major: 1, minor: 1, patch: 1, channel: 'alpha', build: 6},
+            {major: 1, minor: 1, patch: 2, channel: 'alpha', build: 6},
+        ),
+        {major: 1, minor: 1, patch: 2, channel: 'alpha', build: 6},
+    );
+    assert.equal(
+        returnHighestVersion(
+            {major: 1, minor: 1, patch: 2, channel: 'alpha', build: 6},
+            {major: 1, minor: 1, patch: 1, channel: 'alpha', build: 6},
+        ),
+        {major: 1, minor: 1, patch: 2, channel: 'alpha', build: 6},
+    );
+
+});
+

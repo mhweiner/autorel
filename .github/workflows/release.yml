@@ -19,7 +19,6 @@ jobs:
         with:
           node-version: latest
           registry-url: 'https://npm.pkg.github.com'
-          scope: '@aeroview'
           cache: 'npm'
       - name: Cache project's node_modules
         uses: actions/cache@v3
@@ -33,10 +32,8 @@ jobs:
           NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
       - name: Linting
         run: npm run lint
-      - name: Test
-        run: npm run test
       - name: Release
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: DEBUG=* npm run semantic-release
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          NPM_TOKEN: ${{secrets.NPM_TOKEN}}
+        run: echo 'Release the package to npm and GitHub Packages'

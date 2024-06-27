@@ -1,13 +1,12 @@
 <picture>
-    <source srcset="docs/jsout.svg" media="(prefers-color-scheme: dark)">
-    <source srcset="docs/jsout-dark.svg" media="(prefers-color-scheme: light)">
-    <img src="docs/jsout-dark.svg" alt="Logo" style="margin: 0 0 10px" size="250">
+    <source srcset="docs/autorel.svg" media="(prefers-color-scheme: dark)">
+    <source srcset="docs/autorel-dark.svg" media="(prefers-color-scheme: light)">
+    <img src="docs/autorel-dark.svg" alt="Logo" style="margin: 0 0 10px" size="250">
 </picture>
 
 ---
 
-[![build status](https://github.com/mhweiner/jsout/actions/workflows/release.yml/badge.svg)](https://github.com/mhweiner/jsout/actions)
-[![semantic-release](https://img.shields.io/badge/semantic--release-e10079?logo=semantic-release)](https://github.com/semantic-release/semantic-release)
+[![build status](https://github.com/mhweiner/autorel/actions/workflows/release.yml/badge.svg)](https://github.com/mhweiner/autorel/actions)
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org)
 [![SemVer](https://img.shields.io/badge/SemVer-2.0.0-blue)]()
 
@@ -148,7 +147,7 @@ npm i
 npm test
 ```
 
-## Get better observability with Aeroview
+## Sponors
 
 <picture>
     <source srcset="docs/aeroview-logo-lockup.svg" media="(prefers-color-scheme: dark)">

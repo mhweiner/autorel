@@ -59,12 +59,12 @@ export function incrementVersion(
 
     const lastVersion = fromTag(lastTag);
 
-    if (!lastVersion) throw new Error('lastTag is not a valid semver tag.');
+    if (!lastVersion) throw new Error('lastTag is not a valid semver tag');
 
     const {major, minor, patch, channel, build} = lastVersion;
     const lastProductionVersion = fromTag(lastProductionTag);
 
-    if (!lastProductionVersion) throw new Error('lastProductionTag is not a valid semver tag.');
+    if (!lastProductionVersion) throw new Error('lastProductionTag is not a valid semver tag');
 
     const {major: prodMajor, minor: prodMinor, patch: prodPatch} = lastProductionVersion;
 
@@ -144,25 +144,29 @@ export function incrementVersion(
 
             if (releaseType === 'none') return lastTag; // no changes
 
-            // increment the last production version
-            const nextVersionNaked = incrByType(lastProductionVersion, releaseType);
+            // increment the last production version by the release type
+            const lastProdVersionRootIncr = incrByType(lastProductionVersion, releaseType);
+
+            // get the base version of the last version for comparison
+            const lastVersionRoot = {major, minor, patch};
+
+            // take the highest version of nextVersionNaked and lastVersion
+            const nextVersionRoot = returnHighestVersion(lastProdVersionRootIncr, lastVersionRoot);
 
             // if the version is the same, increment the build number
-            const lastVersionNaked = {major, minor, patch};
-
-            if (toTag(nextVersionNaked) === toTag(lastVersionNaked)) {
+            if (toTag(nextVersionRoot) === toTag(lastVersionRoot)) {
 
                 // increment build number
                 return toTag({
-                    ...lastVersionNaked,
+                    ...nextVersionRoot,
                     channel,
                     build: build ? build + 1 : 1,
                 });
 
             } else {
 
-                // different version
-                return toTag({...nextVersionNaked, channel, build: 1});
+                // it's a new version
+                return toTag({...nextVersionRoot, channel, build: 1});
 
             }
 
@@ -179,11 +183,30 @@ export function incrementVersion(
 
             }
 
-            return toTag(incrByType({
-                ...lastProductionVersion,
-                channel: prereleaseChannel,
-                build: 1,
-            }, releaseType));
+            // increment the last production version by the release type
+            const lastProdVersionRootIncr = incrByType(lastProductionVersion, releaseType);
+
+            // get the base version of the last version for comparison
+            const lastVersionRoot = {major, minor, patch};
+
+            // take the highest version of nextVersionNaked and lastVersion
+            const nextVersionRoot = returnHighestVersion(lastProdVersionRootIncr, lastVersionRoot);
+
+            // if the version is the same, change channel and reset build number
+            if (toTag(nextVersionRoot) === toTag(lastVersionRoot)) {
+
+                return toTag({
+                    ...nextVersionRoot,
+                    channel: prereleaseChannel,
+                    build: 1,
+                });
+
+            } else {
+
+                // it's a new version
+                return toTag({...nextVersionRoot, channel: prereleaseChannel, build: 1});
+
+            }
 
         }
 
@@ -201,7 +224,7 @@ export function incrementVersion(
 
 }
 
-function incrByType(version: Semver, type: 'major' | 'minor' | 'patch'): Semver {
+export function incrByType(version: Semver, type: 'major' | 'minor' | 'patch'): Semver {
 
     switch (type) {
 
@@ -217,15 +240,11 @@ function incrByType(version: Semver, type: 'major' | 'minor' | 'patch'): Semver 
 
             return incrPatch(version);
 
-        default:
-
-            return version;
-
     }
 
 }
 
-function incrPatch(version: Semver): Semver {
+export function incrPatch(version: Semver): Semver {
 
     return {
         ...version,
@@ -237,7 +256,7 @@ function incrPatch(version: Semver): Semver {
 
 }
 
-function incrMinor(version: Semver): Semver {
+export function incrMinor(version: Semver): Semver {
 
     return {
         ...version,
@@ -249,7 +268,7 @@ function incrMinor(version: Semver): Semver {
 
 }
 
-function incrMajor(version: Semver): Semver {
+export function incrMajor(version: Semver): Semver {
 
     return {
         ...version,
@@ -258,5 +277,38 @@ function incrMajor(version: Semver): Semver {
         patch: 0,
         ...(version.build ? {build: 1} : {}),
     };
+
+}
+
+export function returnHighestVersion(version1: Semver, version2: Semver): Semver {
+
+    if (version1.major > version2.major) return version1;
+    if (version1.major < version2.major) return version2;
+
+    if (version1.minor > version2.minor) return version1;
+    if (version1.minor < version2.minor) return version2;
+
+    if (version1.patch > version2.patch) return version1;
+    if (version1.patch < version2.patch) return version2;
+
+    if (version1.channel && !version2.channel) return version2;
+    if (!version1.channel && version2.channel) return version1;
+    if (version1.channel && version2.channel) {
+
+        if (version1.channel > version2.channel) return version1;
+        if (version1.channel < version2.channel) return version2;
+
+    }
+
+    if (version1.build && !version2.build) return version1;
+    if (!version1.build && version2.build) return version2;
+    if (version1.build && version2.build) {
+
+        if (version1.build > version2.build) return version1;
+        if (version1.build < version2.build) return version2;
+
+    }
+
+    return version1;
 
 }

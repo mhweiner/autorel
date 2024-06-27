@@ -1,6 +1,7 @@
 import {inspect} from 'node:util';
 import {ReleaseType} from '.';
-import * as color from './colors';
+import * as color from './lib/colors';
+import output from './output';
 
 export type ConventionalCommit = {
     hash: string
@@ -16,7 +17,7 @@ export type ConventionalCommit = {
 export function parseConventionalCommit(
     commitMessage: string,
     hash: string
-): ConventionalCommit {
+): ConventionalCommit|undefined {
 
     const lines = commitMessage.split('\n');
     const header = lines[0];
@@ -27,7 +28,7 @@ export function parseConventionalCommit(
 
     if (!headerMatch || !headerMatch.groups) {
 
-        throw new Error('Invalid conventional commit message');
+        return undefined;
 
     }
 
@@ -38,7 +39,8 @@ export function parseConventionalCommit(
     const footers: string[] = [];
     let body = '';
 
-    let inFooter = false;
+    let inFooter = false; // Whether we are currently parsing a footer
+    let breakingFooterDetected = false; // Whether we have detected a breaking change footer
     const footerPattern = /^(BREAKING CHANGE(S?)|[a-zA-Z-]+): (.+)$/;
 
     bodyLines.forEach((line) => {
@@ -48,12 +50,21 @@ export function parseConventionalCommit(
             inFooter = true;
             footers.push(line);
 
+            // test for breaking change
+            if (/^BREAKING CHANGE(S)?(.+)$/.test(line)) {
+
+                breakingFooterDetected = true;
+
+            }
+
         } else if (inFooter) {
 
+            // Append to the last footer
             footers[footers.length - 1] += `\n${line}`;
 
         } else {
 
+            // Append to the body
             body = body ? `${body}\n${line}` : line;
 
         }
@@ -64,15 +75,15 @@ export function parseConventionalCommit(
         type,
         scope,
         description,
-        body: body?.trim(),
+        body: body.trim(),
         footers,
-        breaking: !!(breaking || breakingAlt),
+        breaking: !!(breaking || breakingAlt || breakingFooterDetected),
         hash,
     };
 
 }
 
-export function determineCommitReleaseType(
+function determineCommitReleaseType(
     commit: ConventionalCommit,
     commitTypeMap: Map<string, {release: ReleaseType}>
 ): ReleaseType {
@@ -90,7 +101,8 @@ export function determineReleaseType(
 
     const releaseTypes = commits.map((commit) => {
 
-        process.env.AUTOREL_DEBUG && console.log(color.yellow('[autorel debug] Analyzing commit:'), inspect(commit, {
+        output.debug('Analyzing commit:');
+        output.debug(inspect(commit, {
             depth: null,
             colors: true,
         }));
@@ -101,7 +113,7 @@ export function determineReleaseType(
             || (releaseType === 'minor' && color.yellow('minor'))
             || (releaseType === 'patch' && color.green('patch'));
 
-        console.log(`[autorel] Release type: ${releaseTypeStr}`);
+        output.debug(`Release type: ${releaseTypeStr}`);
 
         return releaseType;
 

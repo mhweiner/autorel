@@ -1,9 +1,16 @@
-import {$} from './bash';
+import {$} from './lib/bash';
 
-type Commit = {
+export type Commit = {
     hash: string
     message: string
 };
+
+export function createAndPushTag(tag: string): void {
+
+    $`git tag ${tag}`;
+    $`git push origin ${tag}`;
+
+}
 
 export function getLastTag(): string {
 
