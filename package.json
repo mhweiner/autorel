@@ -1,10 +1,10 @@
 {
   "name": "autorel",
   "version": "0.0.0-autorel",
-  "description": "",
+  "description": "Automate semantic releases based on conventional commits. Similar to semantic-release but much simpler.",
   "license": "MIT",
   "author": "Marc H. Weiner <mhweiner234@gmail.com> (https://mhweiner.com)",
-  "main": "./dist/index.js",
+  "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
     "dist",
@@ -14,6 +14,9 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/mhweiner/autorel.git"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
   },
   "scripts": {
     "prepare": "npm run build",
