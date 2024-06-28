@@ -1,7 +1,7 @@
 import {inspect} from 'node:util';
-import {ReleaseType} from '.';
+import {ReleaseType} from './run';
 import * as color from './lib/colors';
-import output from './output';
+import output from './lib/output';
 
 export type ConventionalCommit = {
     hash: string
@@ -104,7 +104,7 @@ export function determineReleaseType(
         output.debug('Analyzing commit:');
         output.debug(inspect(commit, {
             depth: null,
-            colors: true,
+            colors: false,
         }));
 
         const releaseType = determineCommitReleaseType(commit, commitTypeMap);

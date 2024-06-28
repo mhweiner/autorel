@@ -1,28 +1,23 @@
-import {httpRequest} from './lib/httpRequest';
+import {httpRequest} from '../lib/httpRequest';
 
 interface CreateReleaseParams {
+    token: string
     owner: string
     repository: string
-    tagName: string
-    releaseName: string
+    tag: string
+    name: string
     body: string
     draft?: boolean
     prerelease?: boolean
 }
 
-/**
- * Creates a release on GitHub.
- * @param token The GitHub personal access token.
- * @param params The parameters for creating the release.
- */
-// eslint-disable-next-line max-lines-per-function
-export function createRelease(token: string, params: CreateReleaseParams): Promise<string> {
+export function createRelease(params: CreateReleaseParams): Promise<string> {
 
-    const {owner, repository, tagName, releaseName, body, draft = false, prerelease = false} = params;
+    const {token, owner, repository, tag, name, body, draft = false, prerelease = false} = params;
 
     const postData = JSON.stringify({
-        tag_name: tagName,
-        name: releaseName,
+        tag_name: tag,
+        name,
         body,
         draft,
         prerelease,

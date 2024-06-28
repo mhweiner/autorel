@@ -1,4 +1,4 @@
-import {$} from './lib/bash';
+import {$} from './bash';
 
 export type Commit = {
     hash: string
@@ -14,13 +14,13 @@ export function createAndPushTag(tag: string): void {
 
 export function getLastTag(): string {
 
-    return $`git describe --abbrev=0 --tags` || 'v0.0.0';
+    return $`git tag | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+' | sort -V | tail -n 1` || 'none';
 
 }
 
 export function getLastProdTag(): string {
 
-    return $`git tag --list | grep -E "^v[0-9]+\\.[0-9]+\\.[0-9]+$" | sort -V | tail -n 1` || 'v0.0.0';
+    return $`git tag --list | grep -E "^v[0-9]+\\.[0-9]+\\.[0-9]+$" | sort -V | tail -n 1` || 'none';
 
 }
 
@@ -42,7 +42,9 @@ export function getRepoParts(): {owner: string, repository: string} {
 export function getCommitsSinceLastTag(lastTag: string): Commit[] {
 
     const format = '<commit><hash>%h</hash><message>%B</message></commit>';
-    const rawLog = $`git log --pretty=format:"${format}" ${lastTag}..HEAD`;
+    const rawLog = lastTag !== 'none'
+        ? $`git log --pretty=format:"${format}" ${lastTag}..HEAD`
+        : $`git log --pretty=format:"${format}"`;
     const commitsXml = rawLog.match(/<commit>.*?<\/commit>/gs);
 
     if (!commitsXml) return [];

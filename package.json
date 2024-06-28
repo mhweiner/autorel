@@ -1,6 +1,6 @@
 {
   "name": "autorel",
-  "version": "0.0.0-semantic-release",
+  "version": "0.0.0-autorel",
   "description": "",
   "license": "MIT",
   "author": "Marc H. Weiner <mhweiner234@gmail.com> (https://mhweiner.com)",
@@ -36,6 +36,7 @@
   },
   "dependencies": {
     "@aeroview-io/rtype": "^1.4.2",
+    "commander": "^12.1.0",
     "js-yaml": "^4.1.0"
   }
 }

@@ -1,9 +1,9 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as yaml from 'js-yaml';
-import {CommitType} from '.';
+import {CommitType} from './run';
 import {ValidationError, predicates as p, toResult} from '@aeroview-io/rtype';
-import output from './output';
+import output from './lib/output';
 
 export type Config = {
     breakingChangeTitle: string
@@ -27,12 +27,12 @@ export const defaultConfig: Config = {
 };
 
 const validateConfig = p.object({
-    breakingChangeTitle: p.string(),
-    commitTypes: p.array(p.object({
+    breakingChangeTitle: p.optional(p.string()),
+    commitTypes: p.optional(p.array(p.object({
         type: p.string(),
         title: p.string(),
         release: p.string(),
-    })),
+    }))),
 });
 
 /**
