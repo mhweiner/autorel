@@ -38,4 +38,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
           NPM_TOKEN: ${{secrets.NPM_TOKEN}}
-        run: ./bin/cli.js --publish
+        run: AUTOREL_DEBUG=1 ./bin/cli.js --publish
