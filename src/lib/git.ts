@@ -14,13 +14,13 @@ export function createAndPushTag(tag: string): void {
 
 export function getLastTag(): string {
 
-    return $`git tag | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+' | sort -V | tail -n 1` || 'none';
+    return $`git tag | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+' | sort -V | tail -n 1` || '';
 
 }
 
 export function getLastProdTag(): string {
 
-    return $`git tag --list | grep -E "^v[0-9]+\\.[0-9]+\\.[0-9]+$" | sort -V | tail -n 1` || 'none';
+    return $`git tag --list | grep -E "^v[0-9]+\\.[0-9]+\\.[0-9]+$" | sort -V | tail -n 1` || '';
 
 }
 
@@ -42,7 +42,7 @@ export function getRepoParts(): {owner: string, repository: string} {
 export function getCommitsSinceLastTag(lastTag: string): Commit[] {
 
     const format = '<commit><hash>%h</hash><message>%B</message></commit>';
-    const rawLog = lastTag !== 'none'
+    const rawLog = lastTag !== ''
         ? $`git log --pretty=format:"${format}" ${lastTag}..HEAD`
         : $`git log --pretty=format:"${format}"`;
     const commitsXml = rawLog.match(/<commit>.*?<\/commit>/gs);
@@ -57,6 +57,12 @@ export function getCommitsSinceLastTag(lastTag: string): Commit[] {
         return {hash, message};
 
     });
+
+}
+
+export function getCurrentBranch(): string {
+
+    return $`git rev-parse --abbrev-ref HEAD`;
 
 }
 

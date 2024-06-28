@@ -1,7 +1,9 @@
 import {inspect} from 'node:util';
-import {ReleaseType} from './run';
 import * as color from './lib/colors';
 import output from './lib/output';
+import {CommitType} from './config';
+
+type ReleaseType = 'major' | 'minor' | 'patch' | 'none';
 
 export type ConventionalCommit = {
     hash: string
@@ -85,7 +87,7 @@ export function parseConventionalCommit(
 
 function determineCommitReleaseType(
     commit: ConventionalCommit,
-    commitTypeMap: Map<string, {release: ReleaseType}>
+    commitTypeMap: Map<string, CommitType>
 ): ReleaseType {
 
     if (commit.breaking) return 'major';
@@ -96,7 +98,7 @@ function determineCommitReleaseType(
 
 export function determineReleaseType(
     commits: ConventionalCommit[],
-    commitTypeMap: Map<string, {release: ReleaseType}>
+    commitTypeMap: Map<string, CommitType>
 ): ReleaseType {
 
     const releaseTypes = commits.map((commit) => {

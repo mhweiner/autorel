@@ -1,13 +1,22 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as yaml from 'js-yaml';
-import {CommitType} from './run';
 import {ValidationError, predicates as p, toResult} from '@aeroview-io/rtype';
 import output from './lib/output';
 
+export type CommitType = {
+    type: string
+    title: string
+    release: 'minor' | 'patch' | 'none'
+};
+export type ReleaseBranch = {
+    name: string
+    prereleaseChannel?: string
+};
 export type Config = {
     breakingChangeTitle: string
     commitTypes: CommitType[]
+    branches: ReleaseBranch[]
 };
 
 export const defaultConfig: Config = {
@@ -24,6 +33,12 @@ export const defaultConfig: Config = {
         {type: 'build', title: '🏗 Build System', release: 'none'},
         {type: 'ci', title: '🔧 Continuous Integration', release: 'none'},
     ],
+    branches: [
+        {name: 'main'},
+        {name: 'master'},
+        {name: 'dev', prereleaseChannel: 'alpha'},
+        {name: 'beta', prereleaseChannel: 'beta'},
+    ],
 };
 
 const validateConfig = p.object({
@@ -32,6 +47,10 @@ const validateConfig = p.object({
         type: p.string(),
         title: p.string(),
         release: p.string(),
+    }))),
+    branches: p.optional(p.array(p.object({
+        name: p.string(),
+        prereleaseChannel: p.optional(p.string()),
     }))),
 });
 
