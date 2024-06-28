@@ -19,7 +19,8 @@
     "prepare": "npm run build",
     "test": "npm run build && c8 hoare 'src/**/*.spec.ts' && c8 report -r text -r html",
     "lint": "eslint ./ --ext .js,.ts",
-    "build": "rm -rf ./dist && tsc"
+    "build": "rm -rf ./dist && tsc",
+    "publish": "./bin/cli.js --publish"
   },
   "homepage": "https://github.com/mhweiner/autorel/blob/main/README.md",
   "keywords": [],
