@@ -11,8 +11,6 @@ import {getConfig} from './config';
 import {versionBump} from './versionBump';
 
 export type Args = {
-    githubToken?: string
-    npmToken?: string
     dryRun?: boolean
     postReleaseBashScript?: string
     prereleaseChannel?: string
@@ -43,23 +41,7 @@ export function getPrereleaseChannel(args: Args): string|undefined {
 
 export async function autorel(args: Args): Promise<void> {
 
-    const gitHubToken = args.githubToken || process.env.GITHUB_TOKEN;
-    const npmtoken = args.npmToken || process.env.NPM_TOKEN;
     const prereleaseChannel = getPrereleaseChannel(args);
-
-    if (!gitHubToken) {
-
-        output.error('GitHub Token is required for creating releases. Set the GITHUB_TOKEN environment variable or pass it via --github-token.');
-        throw new Error('INVALID_CONFIGURATION');
-
-    }
-
-    if (!npmtoken && args.publish) {
-
-        output.error('NPM Token is required for publishing to npm. Set the NPM_TOKEN environment variable or pass it via --npm-token.');
-        throw new Error('INVALID_CONFIGURATION');
-
-    }
 
     if (args.dryRun) {
 
@@ -133,7 +115,7 @@ export async function autorel(args: Args): Promise<void> {
     const {owner, repository} = git.getRepo();
 
     !args.noRelease && github.createRelease({
-        token: gitHubToken,
+        token: process.env.GITHUB_TOKEN!,
         owner,
         repository,
         tag: args.tag ? args.tag : nextTag,
@@ -145,7 +127,7 @@ export async function autorel(args: Args): Promise<void> {
     versionBump(nextTag);
 
     // publish package
-    args.publish && npm.publishPackage(gitHubToken, prereleaseChannel);
+    args.publish && npm.publishPackage(prereleaseChannel);
 
 }
 

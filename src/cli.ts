@@ -14,8 +14,6 @@ console.log('----------------------------');
 program
     .version(packageJson.version, '-v, --version')
     .description('An example CLI for managing a directory')
-    .option('--github-token  [value]', 'Provide GitHub Token')
-    .option('--npm-token  [value]', 'Provide NPM Token')
     .option('-d, --dry', 'Do a dry run')
     .option('-p, --pre <value>', 'Pre-release channel. If specified, the release will be marked as a pre-release. Overrides any other configuration.')
     .option('-t, --tag <value>', 'Specify a tag to be used instead of calculating it from commit analysis. Overrides --pre.')
@@ -29,8 +27,6 @@ const options = program.opts();
 output.debug(`Options: ${JSON.stringify(options, null, 2)}`);
 
 autorel({
-    githubToken: options.githubToken,
-    npmToken: options.npmToken,
     dryRun: options.dry,
     postReleaseBashScript: options.run,
     prereleaseChannel: options.pre,
