@@ -18,7 +18,7 @@ test('readAutorelYaml: happy path, with no .autorel.yaml', async (assert) => {
     const configMod: typeof mod = mock('./config', {
         'node:fs': mockFs,
         'node:path': {resolve: (p: string) => p},
-        './output': fakeLogger,
+        './lib/output': fakeLogger,
     });
 
     assert.equal(configMod.getConfig(), mod.defaultConfig, 'should return the default configuration');
@@ -43,7 +43,7 @@ test('readAutorelYaml: happy path, with .autorel.yaml', async (assert) => {
     const configMod: typeof mod = mock('./config', {
         'node:fs': mockFs,
         'node:path': {resolve: (p: string) => p},
-        './output': fakeLogger,
+        './lib/output': fakeLogger,
     });
 
     assert.equal(configMod.getConfig(), {
@@ -52,7 +52,8 @@ test('readAutorelYaml: happy path, with .autorel.yaml', async (assert) => {
             {type: 'test', title: '🧪 Tests', release: 'none'},
             {type: 'build', title: '🏗 Build System', release: 'none'},
         ],
-    }, 'should return the parsed configuration from the .autorel.yaml file');
+        branches: mod.defaultConfig.branches,
+    }, 'should return the parsed configuration');
 
 });
 
@@ -70,11 +71,10 @@ test('readAutorelYaml: invalid configuration', async (assert) => {
     const configMod: typeof mod = mock('./config', {
         'node:fs': mockFs,
         'node:path': {resolve: (p: string) => p},
-        './output': fakeLogger,
+        './lib/output': fakeLogger,
     });
 
     assert.throws(() => configMod.getConfig(), new ValidationError({
-        breakingChangeTitle: 'must be a string',
         'commitTypes.[0]': 'must be an object with keys type, title, release',
         'commitTypes.[1]': 'must be an object with keys type, title, release',
     }), 'should throw ValidationError');
@@ -94,7 +94,7 @@ test('readAutorelYaml: readFile error', async (assert) => {
     const configMod: typeof mod = mock('./config', {
         'node:fs': mockFs,
         'node:path': {resolve: (p: string) => p},
-        './output': fakeLogger,
+        './lib/output': fakeLogger,
     });
 
     assert.throws(() => configMod.getConfig(), new Error('something happened'), 'should re-throw error');
@@ -115,7 +115,7 @@ a:
     const configMod: typeof mod = mock('./config', {
         'node:fs': mockFs,
         'node:path': {resolve: (p: string) => p},
-        './output': fakeLogger,
+        './lib/output': fakeLogger,
     });
 
     const [err] = toResult(() => configMod.getConfig());

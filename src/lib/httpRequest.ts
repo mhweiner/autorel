@@ -42,8 +42,6 @@ export async function httpRequest(
         ...options,
     };
 
-    console.log('body:', body);
-
     const [err, resp] = await toResultAsync(httpRequestPromise(requestOptions, body));
 
     if (err) {

@@ -2,18 +2,23 @@
 import * as semver from './semver';
 import * as convCom from './conventionalcommits';
 import * as git from './lib/git';
+import * as npm from './lib/npm';
 import * as color from './lib/colors';
 import {generateChangelog} from './changelog';
 import * as github from './services/github';
 import output from './lib/output';
 import {getConfig} from './config';
+import {versionBump} from './versionBump';
 
 export type Args = {
     githubToken?: string
+    npmToken?: string
     dryRun?: boolean
     postReleaseBashScript?: string
     prereleaseChannel?: string
     tag?: string
+    noRelease?: boolean
+    publish?: boolean
 };
 
 export function getPrereleaseChannel(args: Args): string|undefined {
@@ -36,25 +41,33 @@ export function getPrereleaseChannel(args: Args): string|undefined {
 
 }
 
-export async function main(props: Args): Promise<void> {
+export async function autorel(args: Args): Promise<void> {
 
-    const token = props.githubToken || process.env.GITHUB_TOKEN;
-    const prereleaseChannel = getPrereleaseChannel(props);
+    const gitHubToken = args.githubToken || process.env.GITHUB_TOKEN;
+    const npmtoken = args.npmToken || process.env.NPM_TOKEN;
+    const prereleaseChannel = getPrereleaseChannel(args);
 
-    if (!token) {
+    if (!gitHubToken) {
 
-        output.error('GitHub Token is required for creating releases. Set the GITHUB_TOKEN environment variable or pass it in the props.');
+        output.error('GitHub Token is required for creating releases. Set the GITHUB_TOKEN environment variable or pass it via --github-token.');
         throw new Error('INVALID_CONFIGURATION');
 
     }
 
-    if (props.dryRun) {
+    if (!npmtoken && args.publish) {
+
+        output.error('NPM Token is required for publishing to npm. Set the NPM_TOKEN environment variable or pass it via --npm-token.');
+        throw new Error('INVALID_CONFIGURATION');
+
+    }
+
+    if (args.dryRun) {
 
         output.warn('Running in dry-run mode. No changes will be made.');
 
     }
 
-    if (prereleaseChannel && !props.tag) {
+    if (prereleaseChannel && !args.tag) {
 
         output.log(`Using prerelease channel: ${color.bold(prereleaseChannel)}`);
 
@@ -83,6 +96,14 @@ export async function main(props: Args): Promise<void> {
 
     output.log(`The release type is: ${releaseTypeStr}`);
 
+    if (releaseType === 'none' && !args.tag) {
+
+        output.log('No release is needed. Have a nice day ^_^');
+
+        return;
+
+    }
+
     const nextTag = semver.incrementVersion(
         lastProdTag || 'v0.0.1',
         lastTag || 'v0.0.1',
@@ -90,9 +111,9 @@ export async function main(props: Args): Promise<void> {
         prereleaseChannel,
     );
 
-    if (props.tag) {
+    if (args.tag) {
 
-        output.log(`The next version would be ${nextTag}, but the tag was set by --tag to be ${color.bold(props.tag)}.`);
+        output.log(`The next version would be ${nextTag}, but the tag was set by --tag to be ${color.bold(args.tag)}.`);
         output.warn('The tag was overriden by the --tag parameter. This may cause the next release to be incorrect. Make sure you know what you are doing. This may fail if the tag already exists.');
 
     } else {
@@ -105,20 +126,26 @@ export async function main(props: Args): Promise<void> {
 
     output.debug(`The changelog is:\n${changelog}`);
 
-    if (props.dryRun) return;
+    if (args.dryRun) return;
 
-    git.createAndPushTag(props.tag ? props.tag : nextTag);
+    git.createAndPushTag(args.tag ? args.tag : nextTag);
 
     const {owner, repository} = git.getRepoParts();
 
-    github.createRelease({
-        token,
+    !args.noRelease && github.createRelease({
+        token: gitHubToken,
         owner,
         repository,
-        tag: props.tag ? props.tag : nextTag,
+        tag: args.tag ? args.tag : nextTag,
         name: nextTag,
         body: changelog,
-    }).catch(console.error);
+    });
+
+    // update package.json
+    versionBump(nextTag);
+
+    // publish package
+    args.publish && npm.publishPackage(gitHubToken, prereleaseChannel);
 
 }
 

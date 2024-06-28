@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "allowJs": true,
-    "target": "ES2015",
+    "target": "ES2020",
     "moduleResolution": "node",
     "module": "CommonJS",
     "declaration": true,
@@ -20,7 +20,6 @@
     "outDir": "dist",
     "baseUrl": "src",
     "noEmitHelpers": false,
-    "resolveJsonModule": true,
     "esModuleInterop": true
   },
   "include":[

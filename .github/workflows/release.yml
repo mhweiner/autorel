@@ -3,7 +3,6 @@ on:
   push:
     branches:
       - main
-      - next
       - alpha
       - beta
 jobs:
@@ -36,4 +35,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
           NPM_TOKEN: ${{secrets.NPM_TOKEN}}
-        run: echo 'Release the package to npm and GitHub Packages'
+        run: ./bin/.cli.js --publish

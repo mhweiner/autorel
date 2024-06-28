@@ -35,9 +35,6 @@ export const defaultConfig: Config = {
     ],
     branches: [
         {name: 'main'},
-        {name: 'master'},
-        {name: 'dev', prereleaseChannel: 'alpha'},
-        {name: 'beta', prereleaseChannel: 'beta'},
     ],
 };
 
