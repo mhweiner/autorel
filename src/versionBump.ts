@@ -37,7 +37,7 @@ export function versionBump(newVersion: string): void {
 
     writeFileSync('./package.json', JSON.stringify({
         ...packageJson,
-        version: newVersion,
+        version: newVersion.replace(/^v/, ''),
     }, null, 2));
 
     output.log('Successfully updated package.json locally');
