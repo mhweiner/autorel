@@ -30,6 +30,7 @@ output.debug(`Options: ${JSON.stringify(options, null, 2)}`);
 
 autorel({
     githubToken: options.githubToken,
+    npmToken: options.npmToken,
     dryRun: options.dry,
     postReleaseBashScript: options.run,
     prereleaseChannel: options.pre,
