@@ -15,9 +15,6 @@
     "type": "git",
     "url": "git+https://github.com/mhweiner/autorel.git"
   },
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com/"
-  },
   "scripts": {
     "prepare": "npm run build",
     "test": "npm run build && c8 hoare 'src/**/*.spec.ts' && c8 report -r text -r html",
