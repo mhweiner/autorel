@@ -84,7 +84,7 @@ export async function autorel(args: Args): Promise<void> {
 
     const commits = git.getCommitsSinceLastTag(lastTag);
 
-    output.log(`Found ${color.bold(commits.length.toString())} commits ${lastTag ? `since ${lastTag}` : 'in the repository'}.`);
+    output.log(`Found ${color.bold(commits.length.toString())} commit(s) ${lastTag ? `since ${lastTag}` : 'in the repository'}.`);
 
     const parsedCommits = commits.map((commit) => convCom.parseConventionalCommit(commit.message, commit.hash))
         .filter((commit) => !!commit) as convCom.ConventionalCommit[];
@@ -130,7 +130,7 @@ export async function autorel(args: Args): Promise<void> {
 
     git.createAndPushTag(args.tag ? args.tag : nextTag);
 
-    const {owner, repository} = git.getRepoParts();
+    const {owner, repository} = git.getRepo();
 
     !args.noRelease && github.createRelease({
         token: gitHubToken,

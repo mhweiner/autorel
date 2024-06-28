@@ -24,7 +24,15 @@ export function getLastProdTag(): string {
 
 }
 
-export function getRepoParts(): {owner: string, repository: string} {
+export function getRepo(): {owner: string, repository: string} {
+
+    if (process.env.GITHUB_REPOSITORY) {
+
+        const [owner, repository] = process.env.GITHUB_REPOSITORY.split('/');
+
+        return {owner, repository};
+
+    }
 
     const url = $`git remote get-url origin`;
     const regex = /^git@github\.com:(.+)\/(.+)\.git$/;
