@@ -10,123 +10,236 @@
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org)
 [![SemVer](https://img.shields.io/badge/SemVer-2.0.0-blue)]()
 
-A DevOps friendly, small, and simple logger for Typescript/Javascript projects. Sponsored by [Aeroview](https://aeroview.io).
+Automate releases based on [SemVer](https://semver.org/) and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/). Like `semantic-release` and `release-please` but much simpler and more flexible.
 
-**Structured Logs 🔒**
-- Supports both human-readable CLI output and JSON output for log aggregation into services like sumologic, New Relic, DataDog, etc.
+Autorel automatically does the following, if appropriate:
 
-**Defensive & Devops Friendly 🛡**
-- Logs are enabled in production mode by default
-- Transport should be handled outside of the process via `STDOUT` and `STDERR`
-- Configuration should also be handled outside of the code
-- Simple configurations make it hard to mess up
-- Minimal dependencies
+- Bumps the version based on the commit messages
+- Creates a new release on GitHub with Release Notes
+- Publishes the release to NPM
+- Any other custom release steps you want to add
 
-**Simple & Easy to Use 😃**
-- Automatic Error serialization
-- Out-of-the-box Typescript support
-- Nice human readable output
+**✅ Conventional Commit and SemVer Compliant**
+- Unlike `semantic-release`, `autorel` is 100% compliant with Conventional Commits and SemVer out of the box, including "!" for breaking changes
 
-**Flexible & Powerful 💪**
-- Easily set configuration using simple CLI overrides
-- Simple and well-defined enough to build custom tooling around, such as custom error handling and logging pipelines.
+**😃 Simple & Easy to Use**
+- No confusing configuration files
+- Works with any CI/CD system, including GitHub Actions
+- Out of the box TypeScript support
 
-## Installation
+**💪 Flexible & Powerful**
+- Use via `npx`, or import as a library
+- If using CLI, supports `yaml` configuration or arguments
+
+# Example Usage (CLI)
 
 ```bash
-npm i jsout
+npx autorel --publish --run "echo 'Hello, World!'"
 ```
- 
-## Example Usage
+
+This will:
+
+1. Bump the version based on the commit messages, push the new tag, and change the package.json version
+2. Create a new release on GitHub with Release Notes
+3. Publish the release to NPM
+4. Run the command `echo 'Hello, World!'` via `bash` and `child_process`
+
+# Example Usage (Library)
+
+1. Install `autorel` as a dependency
+
+    ```bash
+    npm i autorel
+    ```
+
+2. Import and use in your project
+
+    ```typescript
+    import {autorel} from 'autorel';
+
+    autorel({
+      publish: true
+      run: 'echo "Hello, World!"'
+    });
+    ```
+This will do the same as the CLI example above.
+
+# Configuration
+
+Unless otherwise noted, configuration can be done via `yaml`, file, CLI arguments, or any combination of the two. CLI arguments take precedence and will override the `yaml` file. 
+
+You can also use the library in your project, in which case you can pass the options directly to the `autorel` function.
+
+All arguments are optional, but setting `branches` is recommended.
+
+> If using yaml, the file must be named `autorel.yml` and be in the root of your project.
+
+## help (CLI only)
+
+Man page for the CLI
+
+- CLI: `--help`
+
+## publish
+
+Whether to publish the release to NPM. If `true`, you must be authenticated with NPM. To do so via GitHub Actions, see [this](https://docs.github.com/en/actions/guides/publishing-nodejs-packages#publishing-packages-to-the-npm-registry).
+
+- CLI: `--publish`
+- Argument: `publish: boolean`
+- Default: `false`
+
+## dryRun
+
+Whether to run in dry-run mode. This will not push the tag, create the release, publish to NPM, or run the command.
+
+- CLI: `--dry`
+- Argument: `dryRun: boolean`
+- Default: `false`
+
+## noRelease
+
+Whether to skip creating a release on GitHub. If `true`, the release will not be created, but the tag will still be pushed and the package on npm will still be updated, if applicable.
+
+- CLI: `--no-release`
+- Argument: `noRelease: boolean`
+- Default: `false`
+
+## run
+
+A command to run after the release is complete. This will be run via `child_process`.
+
+- CLI: `--run`
+- Argument: `run: string`
+- Default: `undefined`
+
+## runScript (YAML only)
+
+A bash script to run after the release is complete. This will be run via `bash` and `child_process`.
+
+- Argument: `runScript: string`
+- Default: `undefined`
+
+> This requires `bash` to be installed on the system.
+
+You can use the multi-line string syntax in YAML to write a script:
+
+```yaml
+runScript: |
+  echo 'Hello, World!' > hello.txt
+  echo 'Goodbye, World!' > goodbye.txt
+```
+
+## tag
+
+The tag to use for the release. Note that this will skip the commit message analysis and use the tag verbatim. Always results in a release being created unless `noRelease` is `true`. Advanced usage only.
+
+- CLI: `--tag`
+- Argument: `tag: string`
+- Default: `undefined`
+
+## pre-release
+
+The pre-release channel to use. This will be appended to the version number. For example, if the version is `1.0.0` and the pre-release is `alpha`, the version will be `1.0.0-alpha.1`. For "production" releases, leave this blank. In this case, "latest" will be used for the NPM tag/channel.
+
+- CLI: `--pre`
+- Argument: `pre: string`
+- Default: `undefined`
+
+## breakingChangeTitle (YAML only)
+
+The title to use for the breaking changes section in the release notes.
+
+- Argument: `breakingChangeTitle: string`
+- Default: `"🚨 Breaking Changes 🚨"`
+
+## commitTypes (YAML only)
+
+The commit types to use for both the release notes and version bumping. If not provided, the default is:
+
+```yaml
+- {type: 'feat', title: '✨ Features', release: 'minor'}
+- {type: 'fix', title: '🐛 Bug Fixes', release: 'patch'}
+- {type: 'perf', title: '🚀 Performance Improvements', release: 'patch'}
+- {type: 'revert', title: '⏪ Reverts', release: 'patch'}
+- {type: 'docs', title: '📚 Documentation', release: 'none'}
+- {type: 'style', title: '💅 Styles', release: 'none'}
+- {type: 'refactor', title: '🛠 Code Refactoring', release: 'none'}
+- {type: 'test', title: '🧪 Tests', release: 'none'}
+- {type: 'build', title: '🏗 Build System', release: 'none'}
+- {type: 'ci', title: '🔧 Continuous Integration', release: 'none'}
+```
+
+- Argument: `commitTypes: CommitType[]`
+
+## branches (YAML only)
+
+The branches to use for the release along with their channel. If not provided, the default is:
+
+```yaml
+- {name: 'main'}
+```
+
+The above will release to the `latest` channel on NPM. If you want to release to a different channel, you can specify it like so:
+
+```yaml
+branches:
+  - {name: 'main'}
+  - {name: 'develop', channel: 'alpha'}
+  - {name: 'staging', channel: 'beta'}
+```
+
+The above will release to the `latest` channel (production) on NPM for the `main` branch, the `alpha` pre-release channel for the `develop` branch, and the `beta` pre-release channel for the `staging` branch.
+
+- Argument: `branches: ReleaseBranch[]`
+
+# Sample YAML Configuration
+
+<sub>_.autorel.yaml_</sub>
+```yaml
+branches:
+  - {name: main}
+  - {name: next, channel: next}
+  - {name: beta, channel: beta}
+publish: true
+run: echo 'Hello, World!'
+```
+
+# Types
+
+## CommitType
 
 ```typescript
-import {logger} from 'jsout';
-
-logger.info('test message');
-logger.fatal('oops!', new Error(), {foo: 'bar'})
-logger.error('', new Error('test')); //infers "test" as message
+type CommitType = {
+  type: string;
+  title: string;
+  release: 'major' | 'minor' | 'patch' | 'none';
+};
 ```
 
-## Express.js HTTP Request Logger
+## ReleaseBranch
 
-See [jsout-express](https://github.com/mhweiner/jsout-express)
-
-## Configuration
-
-Configuration is set through the CLI environment variables. By default, the logger is set to `info` level, `json` format, and `verbose` verbosity, which is recommended for production.
-
-You can override these settings by setting the following environment variables before running your application.
-
-For example, here is the recommended way to run your application locally:
-
-```bash
-LOG=debug LOG_FORMAT=human LOG_VERBOSITY=terse node /path/to/yourApp.js
+```typescript
+type ReleaseBranch = {
+  name: string;
+  channel?: string;
+};
 ```
 
-### `process.env.LOG`
+## Config
 
-Sets the log level. Any logs lower than this log level are ignored.
-
-**Possible values**: `"trace"`, `"debug"`, `"info"`, `"warn"`, `"error"`, `"fatal"`
-
-**Default**: `"info"` (recommended for production)
-
-### `process.env.LOG_FORMAT`
-
-Set the format for the output to either be human-readable (great for local development in the console), or JSON formatted (great for data aggregation on a server).
-
-**Possible values**: `"human"`, `"json"`
-
-**Default**: `"json"` (recommended for production)
-
-### `process.env.LOG_VERBOSITY`
-
-If verbose, extra metadata is appended to `log.context`. Example:
-
-```json
-{
-  "date": "2021-12-19T06:17:38.147Z",
-  "pid": 71971,
-  "ppid": 71970,
-  "nodeVersion": "v16.13.0"
-}
+```typescript
+type Config = {
+  run?: string;
+  publish?: boolean;
+  dryRun?: boolean;
+  noRelease?: boolean;
+  tag?: string;
+  pre?: string;
+  breakingChangeTitle?: string;
+  commitTypes?: CommitType[];
+  branches?: ReleaseBranch[];
+};
 ```
-
-**Possible values**: `"terse"`, `"verbose"`
-
-**Default**: `"verbose"` (recommended for production)
-
-## API
-
-For all of the following, please note:
-
-- `error` should be an actual `Error` object with stack traces. This is not enforced.
-- `context` should by any information not necessarily directly related to the error, ie. server request information, app component, configurations, etc. This is where the [verbose metadata](#processenvlog_verbosity) is appended (this will override anything in the context object).
-- `data` any object that might be useful to debug the error, or any pertinant information relating to the log message
-
-### `logger.trace(message?: string, data?: any, context?: any)`
-
-Emits a log to `stdout` with a level of `TRACE (10)`
-
-### `logger.debug(message?: string, data?: any, context?: any)`
-
-Emits a log to `stdout` with a level of `DEBUG (20)`
-
-### `logger.info(message?: string, data?: any, context?: any)`
-
-Emits a log to `stdout` with a level of `INFO (30)`
-
-### `logger.warn(message?: string, error?: any, data?: any, context?: any)`
-
-Emits a log to `stderr` with a level of `WARN (40)`
-
-### `logger.error(message?: string, error?: any, data?: any, context?: any)`
-
-Emits a log to `stderr` with a level of `ERROR (50)`
-
-### `logger.fatal(message?: string, error?: any, data?: any, context?: any)`
-
-Emits a log to `stderr` with a level of `FATAL (60)`
 
 ## Contribution
 

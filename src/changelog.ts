@@ -1,4 +1,4 @@
-import {CommitType} from './config';
+import {CommitType} from '.';
 import {ConventionalCommit, filterBreakingCommits, groupCommits} from './conventionalcommits';
 
 export function generateChangelog(

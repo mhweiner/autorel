@@ -3,42 +3,17 @@ import * as path from 'node:path';
 import * as yaml from 'js-yaml';
 import {ValidationError, predicates as p, toResult} from '@aeroview-io/rtype';
 import output from './lib/output';
-
-export type CommitType = {
-    type: string
-    title: string
-    release: 'minor' | 'patch' | 'none'
-};
-export type ReleaseBranch = {
-    name: string
-    prereleaseChannel?: string
-};
-export type Config = {
-    breakingChangeTitle: string
-    commitTypes: CommitType[]
-    branches: ReleaseBranch[]
-};
-
-export const defaultConfig: Config = {
-    breakingChangeTitle: '🚨 Breaking Changes 🚨',
-    commitTypes: [
-        {type: 'feat', title: '✨ Features', release: 'minor'},
-        {type: 'fix', title: '🐛 Bug Fixes', release: 'patch'},
-        {type: 'perf', title: '⚡ Performance Improvements', release: 'patch'},
-        {type: 'revert', title: '⏪ Reverts', release: 'patch'},
-        {type: 'docs', title: '📚 Documentation', release: 'none'},
-        {type: 'style', title: '💅 Styles', release: 'none'},
-        {type: 'refactor', title: '🛠 Code Refactoring', release: 'none'},
-        {type: 'test', title: '🧪 Tests', release: 'none'},
-        {type: 'build', title: '🏗 Build System', release: 'none'},
-        {type: 'ci', title: '🔧 Continuous Integration', release: 'none'},
-    ],
-    branches: [
-        {name: 'main'},
-    ],
-};
+import {Args} from '.';
+import {defaultConfig} from './defaults';
 
 const validateConfig = p.object({
+    dryRun: p.optional(p.boolean()),
+    run: p.optional(p.string()),
+    runScript: p.optional(p.string()),
+    prereleaseChannel: p.optional(p.string()),
+    tag: p.optional(p.string()),
+    noRelease: p.optional(p.boolean()),
+    publish: p.optional(p.boolean()),
     breakingChangeTitle: p.optional(p.string()),
     commitTypes: p.optional(p.array(p.object({
         type: p.string(),
@@ -56,7 +31,7 @@ const validateConfig = p.object({
  * @param filePath The path to the .autorel.yaml file.
  * @returns The parsed JSON object from the YAML file.
  */
-function readAutorelYaml(filePath = '.autorel.yaml'): Config | {} {
+function readAutorelYaml(filePath = '.autorel.yaml'): Args | {} {
 
     const absolutePath = path.resolve(filePath);
 
@@ -95,11 +70,11 @@ function readAutorelYaml(filePath = '.autorel.yaml'): Config | {} {
 
     }
 
-    return parsedData as Config;
+    return parsedData as Args;
 
 }
 
-export function getConfig(): Config {
+export function getConfig(): Args {
 
     const localConfig = readAutorelYaml();
 

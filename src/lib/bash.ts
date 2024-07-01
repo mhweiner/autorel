@@ -13,3 +13,17 @@ export function $(strings: TemplateStringsArray, ...values: any[]): string {
     return output.trim();
 
 }
+
+export function bash(cmd: string): void {
+
+    const escapedCommand = cmd.replace(/(["$`\\])/g, '\\$1').replace(/\n/g, '\\n');
+
+    execSync(`bash -c "${escapedCommand}"`, {encoding: 'utf8', stdio: 'inherit'});
+
+}
+
+export function cmd(cmd: string): void {
+
+    execSync(cmd, {encoding: 'utf8', stdio: 'inherit'});
+
+}

@@ -4,6 +4,7 @@ import {mock} from 'cjs-mock';
 import * as mod from './config';
 import {fakeLogger} from './test_fixtures/fakeLog';
 import {ValidationError, toResult} from '@aeroview-io/rtype';
+import {defaultConfig} from './defaults';
 
 test('readAutorelYaml: happy path, with no .autorel.yaml', async (assert) => {
 
@@ -21,7 +22,7 @@ test('readAutorelYaml: happy path, with no .autorel.yaml', async (assert) => {
         './lib/output': fakeLogger,
     });
 
-    assert.equal(configMod.getConfig(), mod.defaultConfig, 'should return the default configuration');
+    assert.equal(configMod.getConfig(), defaultConfig, 'should return the default configuration');
 
 });
 
@@ -52,7 +53,7 @@ test('readAutorelYaml: happy path, with .autorel.yaml', async (assert) => {
             {type: 'test', title: '🧪 Tests', release: 'none'},
             {type: 'build', title: '🏗 Build System', release: 'none'},
         ],
-        branches: mod.defaultConfig.branches,
+        branches: defaultConfig.branches,
     }, 'should return the parsed configuration');
 
 });

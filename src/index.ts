@@ -9,14 +9,28 @@ import * as github from './services/github';
 import output from './lib/output';
 import {getConfig} from './config';
 import {versionBump} from './versionBump';
+import {bash, cmd} from './lib/bash';
 
+export type CommitType = {
+    type: string
+    title: string
+    release: 'minor' | 'patch' | 'none'
+};
+export type ReleaseBranch = {
+    name: string
+    prereleaseChannel?: string
+};
 export type Args = {
     dryRun?: boolean
-    postReleaseBashScript?: string
+    run?: string
+    runScript?: string
     prereleaseChannel?: string
     tag?: string
     noRelease?: boolean
     publish?: boolean
+    breakingChangeTitle: string
+    commitTypes: CommitType[]
+    branches: ReleaseBranch[]
 };
 
 export function getPrereleaseChannel(args: Args): string|undefined {
@@ -33,7 +47,7 @@ export function getPrereleaseChannel(args: Args): string|undefined {
 
     const matchingBranch = config.branches.find((b) => b.name === branch);
 
-    if (!matchingBranch) throw new Error(`Branch ${branch} is not defined in the configuration.`);
+    if (!matchingBranch) return undefined;
 
     return matchingBranch.prereleaseChannel || undefined;
 
@@ -55,8 +69,7 @@ export async function autorel(args: Args): Promise<void> {
 
     }
 
-    const config = getConfig();
-    const commitTypeMap = new Map(config.commitTypes.map((type) => [type.type, type]));
+    const commitTypeMap = new Map(args.commitTypes.map((type) => [type.type, type]));
 
     const lastTag = git.getLastTag();
     const lastProdTag = git.getLastProdTag();
@@ -104,7 +117,7 @@ export async function autorel(args: Args): Promise<void> {
 
     }
 
-    const changelog = generateChangelog(parsedCommits, commitTypeMap, config.breakingChangeTitle);
+    const changelog = generateChangelog(parsedCommits, commitTypeMap, args.breakingChangeTitle);
 
     output.debug(`The changelog is:\n${changelog}`);
 
@@ -128,6 +141,32 @@ export async function autorel(args: Args): Promise<void> {
 
     // publish package
     args.publish && npm.publishPackage(prereleaseChannel);
+
+    process.env.NEXT_VERSION = nextTag.replace('v', '');
+    process.env.NEXT_TAG = nextTag;
+
+    // run post-release script
+    if (args.run) {
+
+        output.log('Running post-release command:');
+        output.log('');
+        output.log('----------------------------');
+        output.log(args.run);
+        output.log('----------------------------');
+        output.log('');
+        cmd(args.run);
+
+    } else if (args.runScript) {
+
+        output.log('Running post-release bash script:');
+        output.log('');
+        output.log('----------------------------');
+        output.log(args.runScript);
+        output.log('----------------------------');
+        output.log('');
+        bash(args.runScript);
+
+    }
 
 }
 

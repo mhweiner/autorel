@@ -9,3 +9,7 @@ commitTypes:
   - {type: test, title: 🧪 Tests, release: patch}
   - {type: build, title: 🏗 Build System, release: patch}
   - {type: ci, title: 🔧 Continuous Integration, release: patch}
+branches:
+  - {name: main}
+  - {name: next, channel: next}
+  - {name: beta, channel: beta}

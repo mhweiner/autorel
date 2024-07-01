@@ -1,7 +1,7 @@
 import {inspect} from 'node:util';
 import * as color from './lib/colors';
 import output from './lib/output';
-import {CommitType} from './config';
+import {CommitType} from '.';
 
 type ReleaseType = 'major' | 'minor' | 'patch' | 'none';
 

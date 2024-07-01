@@ -1,7 +1,7 @@
 /* eslint-disable max-lines-per-function */
 import {test} from 'hoare';
 import {filterBreakingCommits, determineReleaseType, parseConventionalCommit} from './conventionalcommits';
-import {CommitType} from './config';
+import {CommitType} from '.';
 
 const commitTypes: CommitType[] = [
     {type: 'feat', title: 'Features', release: 'minor'},

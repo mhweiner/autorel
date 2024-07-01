@@ -1,7 +1,7 @@
 import {test} from 'hoare';
 import {generateChangelog} from './changelog';
 import {ConventionalCommit} from './conventionalcommits';
-import {CommitType} from './config';
+import {CommitType} from '.';
 
 const commitTypes: CommitType[] = [
     {type: 'feat', title: 'Features', release: 'minor'},
