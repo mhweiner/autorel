@@ -176,8 +176,8 @@ A command to run after the release is complete. The following environment variab
 
 | Variable | Description |
 | --- | --- |
-| `NEXT_VERSION` | The next version number (without the `v`) |
-| `NEXT_TAG` | The next tag |
+| `NEXT_VERSION` | The new version number (without the `v`) |
+| `NEXT_TAG` | The new tag, ie. v3.1.0 |
 
 - CLI: `--run`
 - Argument: `run: string`
@@ -185,7 +185,7 @@ A command to run after the release is complete. The following environment variab
 
 ## runScript (YAML only)
 
-A bash script to run after the release is complete. Environment variables are available as above.
+A bash script to run after the release is complete. The same environment variables are available as above.
 
 > ❗️ This requires `bash` to be installed on the system.
 
