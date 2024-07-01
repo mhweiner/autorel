@@ -224,9 +224,15 @@ You can find the types defined at [src/index.ts](src/index.ts).
 # Support, Feedback, and Contributions
 
 - Star this repo if you like it!
-- Submit an [issue](https://github.com/mhweiner/jsout/issues) with your problem, feature request or bug report
+- Submit an [issue](https://github.com/mhweiner/autorel/issues) with your problem, feature request or bug report
 - Issue a PR against `main` and request review. Make sure all tests pass and coverage is good.
 - Write about `autorel` in your blog, tweet about it, or share it with your friends!
+
+## License
+
+MIT &copy; Marc H. Weiner
+
+[See full license](LICENSE)
 
 ## Sponsors
 
