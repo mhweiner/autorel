@@ -36,6 +36,7 @@ Autorel automatically does the following, if appropriate:
 
 - [Example Usage (CLI)](#example-usage-cli)
 - [Example Usage (Library)](#example-usage-library)
+- [Usage with GitHub Actions](#usage-with-github-actions)
 - [Configuration](#configuration)
 - [Sample YAML Configuration](#sample-yaml-configuration)
 - [Types](#types)
@@ -81,6 +82,49 @@ autorel --publish
     ```
 This will do the same as the CLI example above.
 
+# Usage with GitHub Actions
+
+You can use `autorel` with GitHub Actions to automate your releases (recommended). 
+
+> ❗️ You must set `fetch-depth: 0` and `fetch-tags: true` in `actions/checkout@v4` to ensure that all tags are fetched.
+
+> ❗️ You must be authenticated with NPM to publish. To do so via GitHub Actions, see [this](https://docs.github.com/en/actions/guides/publishing-nodejs-packages#publishing-packages-to-the-npm-registry).
+
+Here is a sample configuration:
+
+```yaml
+name: Release
+on:
+  push:
+    branches: [main, alpha, beta]
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: latest
+          registry-url: "https://registry.npmjs.org"
+          cache: 'npm'
+      - uses: actions/cache@v3
+        id: cache-node-modules
+        with:
+          path: node_modules
+          key: ${{runner.os}}-node-${{hashFiles('package-lock.json')}}
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run test
+      - env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+        run: npx autorel --publish
+```
+
 # Configuration
 
 When run in CLI mode, `autorel` can be configured via CLI arguments or a `yaml` file. CLI arguments take precedence over the `yaml` file.
@@ -90,12 +134,6 @@ When used as a library, you can pass the configuration directly to the `autorel`
 All arguments are optional, but setting `branches` is recommended.
 
 > ❗️ The `yaml` configuration file must be named `.autorel.yml` and be in the root of your project.
-
-## help (CLI only)
-
-Man page for the CLI
-
-- CLI: `--help`
 
 ## publish
 
