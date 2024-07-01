@@ -23,7 +23,7 @@ Autorel automatically does the following, if appropriate:
 - Unlike some other tools, `autorel` is 100% compliant with Conventional Commits and SemVer out of the box, including "!" for breaking changes
 
 **😃 Simple & Easy to Use**
-- No confusing configuration files
+- No confusing configuration files or complex setup
 - Works with any CI/CD system, including GitHub Actions
 - Out of the box TypeScript support
 
@@ -35,7 +35,7 @@ Autorel automatically does the following, if appropriate:
 # Example Usage (CLI)
 
 ```bash
-npx autorel --publish --run "echo \"Next version is ${NEXT_VERSION}!\""
+npx autorel --publish --run 'echo "Next version is ${NEXT_VERSION}"'
 ```
 
 This will:
@@ -43,7 +43,7 @@ This will:
 1. Bump the version based on the commit messages since the last release (including pushing the tag and updating package.json)
 2. Create a new release on GitHub with Release Notes
 3. Publish the release to NPM
-4. Run the command `echo "Next version is ${NEXT_VERSION}!"`
+4. Run the command `echo "Next version is ${NEXT_VERSION}"`
 
 You can also install `autorel` globally and run it that way:
 
@@ -144,10 +144,12 @@ runScript: |
 
 ## pre-release
 
-The pre-release channel to use. This will be appended to the version number. For example, if the version is `1.0.0` and the pre-release is `alpha`, the version will be `1.0.0-alpha.1`. For "production" releases, leave this blank. In this case, "latest" will be used for the NPM tag/channel.
+The pre-release channel to use. This will be appended to the version number. For example, if the version is `1.0.0` and the pre-release is `alpha`, the version will be `1.0.0-alpha.1`. For "production" releases, the "latest" tag will be used for NPM.
 
-- CLI: `--pre`
-- Argument: `pre: string`
+This is typically set via the `branches` configuration (recommended), but can be overridden here.
+
+- CLI: `--pre-release`
+- Argument: `preRelease: string`
 - Default: `undefined`
 
 ## breakingChangeTitle (YAML only)
@@ -217,7 +219,7 @@ You can find the types defined at [src/index.ts](src/index.ts).
 - Issue a PR against `main` and request review. Make sure all tests pass and coverage is good.
 - Write about `autorel` in your blog, tweet about it, or share it with your friends!
 
-## Sponors
+## Sponsors
 
 <picture>
     <source srcset="docs/aeroview-logo-lockup.svg" media="(prefers-color-scheme: dark)">

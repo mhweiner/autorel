@@ -312,3 +312,9 @@ export function returnHighestVersion(version1: Semver, version2: Semver): Semver
     return version1;
 
 }
+
+export function isValidVersion(ver: string): boolean {
+
+    return !!fromTag(`v${ver}`);
+
+}

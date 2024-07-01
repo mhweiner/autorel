@@ -3,7 +3,7 @@ import * as path from 'node:path';
 import * as yaml from 'js-yaml';
 import {ValidationError, predicates as p, toResult} from '@aeroview-io/rtype';
 import output from './lib/output';
-import {Args} from '.';
+import {Config} from '.';
 import {defaultConfig} from './defaults';
 
 const validateConfig = p.object({
@@ -11,7 +11,7 @@ const validateConfig = p.object({
     run: p.optional(p.string()),
     runScript: p.optional(p.string()),
     prereleaseChannel: p.optional(p.string()),
-    tag: p.optional(p.string()),
+    useVersion: p.optional(p.string()),
     noRelease: p.optional(p.boolean()),
     publish: p.optional(p.boolean()),
     breakingChangeTitle: p.optional(p.string()),
@@ -31,7 +31,7 @@ const validateConfig = p.object({
  * @param filePath The path to the .autorel.yaml file.
  * @returns The parsed JSON object from the YAML file.
  */
-function readAutorelYaml(filePath = '.autorel.yaml'): Args | {} {
+function readAutorelYaml(filePath = '.autorel.yaml'): Config | {} {
 
     const absolutePath = path.resolve(filePath);
 
@@ -40,6 +40,10 @@ function readAutorelYaml(filePath = '.autorel.yaml'): Args | {} {
 
         output.log('.autorel.yaml not found, using default configuration');
         return {};
+
+    } else {
+
+        output.log('Using .autorel.yaml configuration');
 
     }
 
@@ -70,17 +74,18 @@ function readAutorelYaml(filePath = '.autorel.yaml'): Args | {} {
 
     }
 
-    return parsedData as Args;
+    return parsedData as Config;
 
 }
 
-export function getConfig(): Args {
+export function getConfig(overrides?: Partial<Config>): Config {
 
     const localConfig = readAutorelYaml();
 
     return {
         ...defaultConfig,
         ...localConfig,
+        ...overrides,
     };
 
 }

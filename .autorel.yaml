@@ -1,7 +1,7 @@
 commitTypes:
   - {type: feat, title: ✨ Features, release: minor}
   - {type: fix, title: 🐛 Bug Fixes, release: patch}
-  - {type: perf, title: ⚡ Performance Improvements, release: patch}
+  - {type: perf, title: 🚀 Performance Improvements, release: patch}
   - {type: revert, title: ⏪ Reverts, release: patch}
   - {type: docs, title: 📚 Documentation, release: patch}
   - {type: style, title: 💅 Styles, release: patch}

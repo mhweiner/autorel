@@ -7,7 +7,6 @@ import * as color from './lib/colors';
 import {generateChangelog} from './changelog';
 import * as github from './services/github';
 import output from './lib/output';
-import {getConfig} from './config';
 import {versionBump} from './versionBump';
 import {bash, cmd} from './lib/sh';
 
@@ -20,12 +19,12 @@ export type ReleaseBranch = {
     name: string
     prereleaseChannel?: string
 };
-export type Args = {
+export type Config = {
     dryRun?: boolean
     run?: string
     runScript?: string
     prereleaseChannel?: string
-    tag?: string
+    useVersion?: string
     noRelease?: boolean
     publish?: boolean
     breakingChangeTitle: string
@@ -33,15 +32,13 @@ export type Args = {
     branches: ReleaseBranch[]
 };
 
-export function getPrereleaseChannel(args: Args): string|undefined {
+export function getPrereleaseChannel(config: Config): string|undefined {
 
-    if (args.prereleaseChannel) return args.prereleaseChannel;
+    if (config.prereleaseChannel) return config.prereleaseChannel;
 
     const branch = git.getCurrentBranch();
 
     if (!branch) throw new Error('Could not get the current branch.');
-
-    const config = getConfig();
 
     if (!config.branches || !config.branches.length) throw new Error('Branches are not defined in the configuration.');
 
@@ -53,7 +50,7 @@ export function getPrereleaseChannel(args: Args): string|undefined {
 
 }
 
-export async function autorel(args: Args): Promise<void> {
+export async function autorel(args: Config): Promise<void> {
 
     const prereleaseChannel = getPrereleaseChannel(args);
 
@@ -63,7 +60,7 @@ export async function autorel(args: Args): Promise<void> {
 
     }
 
-    if (prereleaseChannel && !args.tag) {
+    if (prereleaseChannel && !args.useVersion) {
 
         output.log(`Using prerelease channel: ${color.bold(prereleaseChannel)}`);
 
@@ -91,39 +88,52 @@ export async function autorel(args: Args): Promise<void> {
 
     output.log(`The release type is: ${releaseTypeStr}`);
 
-    if (releaseType === 'none' && !args.tag) {
+    if (releaseType === 'none' && !args.useVersion) {
 
-        output.log('No release is needed. Have a nice day ^_^');
+        output.log('No release is needed. Have a nice day (^_^)/');
 
         return;
 
     }
 
-    const nextTag = semver.incrementVersion(
+    const nextTagCalculated = semver.incrementVersion(
         lastProdTag || 'v0.0.1',
         lastTag || 'v0.0.1',
         releaseType,
         prereleaseChannel,
     );
 
-    if (args.tag) {
+    if (args.useVersion) {
 
-        output.log(`The next version would be ${nextTag}, but the tag was set by --tag to be ${color.bold(args.tag)}.`);
-        output.warn('The tag was overriden by the --tag parameter. This may cause the next release to be incorrect. Make sure you know what you are doing. This may fail if the tag already exists.');
+        if (/^v(.+)$/.test(args.useVersion)) throw new Error('useVersion should not start with a "v".');
+        if (!semver.isValidVersion(args.useVersion)) throw new Error('useVersion must be a valid SemVer version');
+
+        if (releaseType === 'none') {
+
+            output.warn(`We didn't find any commmits that would create a release, but you have set 'useVersion', which will force a release as: ${color.bold(args.useVersion)}.`);
+
+        } else {
+
+            output.warn(`The next version would be ${nextTagCalculated}, but the version was set by useVersion to be: ${color.bold(args.useVersion)}.`);
+
+        }
+
+        output.warn('I hope you know what you\'re doing. (=^･ω･^=)');
 
     } else {
 
-        output.log(`The next version is: ${color.bold(nextTag)}`);
+        output.log(`The next version is: ${color.bold(nextTagCalculated)}`);
 
     }
 
+    const nextTag = args.useVersion ? `v${args.useVersion}` : nextTagCalculated;
     const changelog = generateChangelog(parsedCommits, commitTypeMap, args.breakingChangeTitle);
 
     output.debug(`The changelog is:\n${changelog}`);
 
     if (args.dryRun) return;
 
-    git.createAndPushTag(args.tag ? args.tag : nextTag);
+    git.createAndPushTag(nextTag);
 
     const {owner, repository} = git.getRepo();
 
@@ -131,7 +141,7 @@ export async function autorel(args: Args): Promise<void> {
         token: process.env.GITHUB_TOKEN!,
         owner,
         repository,
-        tag: args.tag ? args.tag : nextTag,
+        tag: nextTag,
         name: nextTag,
         body: changelog,
     });
@@ -149,11 +159,9 @@ export async function autorel(args: Args): Promise<void> {
     if (args.run) {
 
         output.log('Running post-release command:');
-        output.log('');
         output.log('----------------------------');
         output.log(args.run);
         output.log('----------------------------');
-        output.log('');
         cmd(args.run);
 
     } else if (args.runScript) {

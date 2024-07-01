@@ -1,6 +1,6 @@
-import {Args} from '.';
+import {Config} from '.';
 
-export const defaultConfig: Args = {
+export const defaultConfig: Config = {
     breakingChangeTitle: '🚨 Breaking Changes 🚨',
     commitTypes: [
         {type: 'feat', title: '✨ Features', release: 'minor'},
