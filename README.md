@@ -75,11 +75,11 @@ This will do the same as the CLI example above.
 
 When run in CLI mode, `autorel` can be configured via CLI arguments or a `yaml` file. CLI arguments take precedence over the `yaml` file.
 
-When used as a library, you can pass the configuration directly to the `autorel` function.
+When used as a library, you can pass the configuration directly to the `autorel` function. [See below](#types) for the types of configuration options.
 
 All arguments are optional, but setting `branches` is recommended.
 
-> ❗️ If using yaml, the file must be named `.autorel.yml` and be in the root of your project.
+> ❗️ The `yaml` configuration file must be named `.autorel.yml` and be in the root of your project.
 
 ## help (CLI only)
 
@@ -138,7 +138,7 @@ runScript: |
 
 ## tag
 
-The tag to use for the release. Note that this will skip the commit message analysis and use the tag verbatim. Always results in a release being created unless `noRelease` is `true`. Advanced usage only.
+The tag to use for the release. This will be used verbatim, instead of being generated from the version number. Always results in a release being created unless `noRelease` is `true`. **Advanced usage only.**
 
 - CLI: `--tag`
 - Argument: `tag: string`
