@@ -27,14 +27,9 @@ Autorel automatically does the following, if appropriate:
 - Works with any CI/CD system, including GitHub Actions
 - Built-in TypeScript and bash script support
 
-**💪 Flexible & Powerful**
-- Use via `npx`, or import as a library
-- If using CLI, supports both `yaml` configuration and arguments
-- Highly customizable without being overly complex
-
 **🚀 Fast & Lightweight**
-
 - Minimal dependencies and fast execution
+- Less broken builds and more time to focus on your code!
 
 # Table of Contents
 
@@ -61,7 +56,7 @@ This will:
 3. Publish the release to NPM
 4. Run the command `echo "Next version is ${NEXT_VERSION}"`
 
-You can also install `autorel` globally and run it that way:
+You can also install `autorel` globally and run it directly:
 
 ```bash
 npm i -g autorel
@@ -145,7 +140,7 @@ You can find more examples in the [Conventional Commits](https://www.conventiona
 
 When run in CLI mode, `autorel` can be configured via CLI arguments or a `yaml` file. CLI arguments take precedence over the `yaml` file.
 
-When used as a library, you can pass the configuration directly to the `autorel` function. [See below](#types) for the types of configuration options.
+When used as a library, you can pass the configuration directly to the `autorel` function.
 
 All arguments are optional, but setting `branches` is recommended.
 
