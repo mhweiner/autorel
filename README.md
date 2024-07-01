@@ -10,22 +10,22 @@
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org)
 [![SemVer](https://img.shields.io/badge/SemVer-2.0.0-blue)]()
 
-Automate releases based on [SemVer](https://semver.org/) and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/). Like `semantic-release` and `release-please` but simpler, faster, and more flexible.
+Automate releases based on [SemVer](https://semver.org/) and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/). Like `semantic-release` and `release-please` but simpler and faster.
 
 Autorel automatically does the following, if appropriate:
 
 - Bumps the version based on the commit messages
 - Creates a new release on GitHub with Release Notes
 - Publishes the release to NPM
-- Any other custom release steps you want to add
+- Runs any arbitrary command or bash script after the release is complete
 
 **✅ Conventional Commit and SemVer Compliant**
-- Unlike some other tools, `autorel` is 100% compliant with Conventional Commits and SemVer out of the box, including "!" for breaking changes
+-`autorel` is 100% compliant with Conventional Commits and SemVer out of the box, including "!" for breaking changes
 
 **😃 Simple & Easy to Use**
 - No confusing configuration files or complex setup
 - Works with any CI/CD system, including GitHub Actions
-- Out of the box TypeScript support
+- Built-in TypeScript and bash script support
 
 **💪 Flexible & Powerful**
 - Use via `npx`, or import as a library
@@ -77,7 +77,7 @@ autorel --publish
 
     autorel({
       publish: true
-      run: 'echo "Hello, World!"'
+      run: 'echo "Next version is ${NEXT_VERSION}"'
     });
     ```
 This will do the same as the CLI example above.
