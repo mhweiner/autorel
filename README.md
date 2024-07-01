@@ -30,11 +30,12 @@ Autorel automatically does the following, if appropriate:
 **💪 Flexible & Powerful**
 - Use via `npx`, or import as a library
 - If using CLI, supports both `yaml` configuration and arguments
+- Highly customizable without being overly complex
 
 # Example Usage (CLI)
 
 ```bash
-npx autorel --publish --run "echo 'Hello, World!'"
+npx autorel --publish --run "echo \"Next version is ${NEXT_VERSION}!\""
 ```
 
 This will:
@@ -42,13 +43,13 @@ This will:
 1. Bump the version based on the commit messages since the last release (including pushing the tag and updating package.json)
 2. Create a new release on GitHub with Release Notes
 3. Publish the release to NPM
-4. Run the command `echo 'Hello, World!'`
+4. Run the command `echo "Next version is ${NEXT_VERSION}!"`
 
 You can also install `autorel` globally and run it that way:
 
 ```bash
 npm i -g autorel
-autorel --publish --run "echo 'Hello, World!'"
+autorel --publish
 ```
 
 # Example Usage (Library)
@@ -113,7 +114,12 @@ Whether to skip creating a release on GitHub. If `true`, the release will not be
 
 ## run
 
-A command to run after the release is complete. This will be run via `child_process`.
+A command to run after the release is complete. This will be run via `child_process`. The following environment variables are available:
+
+| Variable | Description |
+| --- | --- |
+| `NEXT_VERSION` | The next version number (without the `v`) |
+| `NEXT_TAG` | The next tag |
 
 - CLI: `--run`
 - Argument: `run: string`
@@ -121,10 +127,7 @@ A command to run after the release is complete. This will be run via `child_proc
 
 ## runScript (YAML only)
 
-A bash script to run after the release is complete. This will be run via `bash` and `child_process`.
-
-- Argument: `runScript: string`
-- Default: `undefined`
+A bash script to run after the release is complete. This will be run via `bash` and `child_process`. Environment variables are available as above.
 
 > This requires `bash` to be installed on the system.
 
@@ -135,6 +138,9 @@ runScript: |
   echo 'Hello, World!' > hello.txt
   echo 'Goodbye, World!' > goodbye.txt
 ```
+
+- Argument: `runScript: string`
+- Default: `undefined`
 
 ## tag
 

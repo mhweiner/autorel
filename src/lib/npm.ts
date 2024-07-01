@@ -1,4 +1,4 @@
-import {$} from './bash';
+import {$} from './sh';
 
 export function publishPackage(channel?: string): void {
 

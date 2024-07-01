@@ -9,7 +9,7 @@ import * as github from './services/github';
 import output from './lib/output';
 import {getConfig} from './config';
 import {versionBump} from './versionBump';
-import {bash, cmd} from './lib/bash';
+import {bash, cmd} from './lib/sh';
 
 export type CommitType = {
     type: string
