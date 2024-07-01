@@ -200,59 +200,14 @@ run: echo 'Hello, World!'
 
 # Types
 
-## CommitType
+You can find the types defined at [src/index.ts](src/index.ts).
 
-```typescript
-type CommitType = {
-  type: string;
-  title: string;
-  release: 'major' | 'minor' | 'patch' | 'none';
-};
-```
+# Support, Feedback, and Contributions
 
-## ReleaseBranch
-
-```typescript
-type ReleaseBranch = {
-  name: string;
-  channel?: string;
-};
-```
-
-## Config
-
-```typescript
-type Config = {
-  run?: string;
-  publish?: boolean;
-  dryRun?: boolean;
-  noRelease?: boolean;
-  tag?: string;
-  pre?: string;
-  breakingChangeTitle?: string;
-  commitTypes?: CommitType[];
-  branches?: ReleaseBranch[];
-};
-```
-
-## Contribution
-
-Please contribute to this project! Issue a PR against `main` and request review. 
-
-- Please test your work thoroughly.
-- Make sure all tests pass with appropriate coverage.
-
-### How to build locally
-
-```bash
-npm i
-```
-
-### Running tests
-
-```shell script
-npm test
-```
+- Star this repo if you like it!
+- Submit an [issue](https://github.com/mhweiner/jsout/issues) with your problem, feature request or bug report
+- Issue a PR against `main` and request review. Make sure all tests pass and coverage is good.
+- Write about `autorel` in your blog, tweet about it, or share it with your friends!
 
 ## Sponors
 
