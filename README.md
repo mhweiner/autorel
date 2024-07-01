@@ -114,7 +114,7 @@ Whether to skip creating a release on GitHub. If `true`, the release will not be
 
 ## run
 
-A command to run after the release is complete. This will be run via `child_process`. The following environment variables are available:
+A command to run after the release is complete. The following environment variables are available:
 
 | Variable | Description |
 | --- | --- |
@@ -127,9 +127,9 @@ A command to run after the release is complete. This will be run via `child_proc
 
 ## runScript (YAML only)
 
-A bash script to run after the release is complete. This will be run via `bash` and `child_process`. Environment variables are available as above.
+A bash script to run after the release is complete. Environment variables are available as above.
 
-> This requires `bash` to be installed on the system.
+> ❗️ This requires `bash` to be installed on the system.
 
 You can use the multi-line string syntax in YAML to write a script:
 
@@ -140,14 +140,6 @@ runScript: |
 ```
 
 - Argument: `runScript: string`
-- Default: `undefined`
-
-## tag
-
-The tag to use for the release. This will be used verbatim, instead of being generated from the version number. Always results in a release being created unless `noRelease` is `true`. **Advanced usage only.**
-
-- CLI: `--tag`
-- Argument: `tag: string`
 - Default: `undefined`
 
 ## pre-release
@@ -191,6 +183,16 @@ branches:
 The above will release to the `latest` channel (production) on NPM for the `main` branch, the `alpha` pre-release channel for the `develop` branch, and the `beta` pre-release channel for the `staging` branch.
 
 - Argument: `branches: ReleaseBranch[]`
+
+## useVersion
+
+The version to use for the release INSTEAD of the version being generated. Always results in a release being created unless `noRelease` is `true`. **Advanced usage only, not recommended for most users.**
+
+- CLI: `--use-version`
+- Argument: `useVersion: string`
+- Default: `undefined`
+
+> ❗️ Must be a valid SemVer version, without the `v`.
 
 # Sample YAML Configuration
 
