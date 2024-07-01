@@ -10,7 +10,7 @@
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org)
 [![SemVer](https://img.shields.io/badge/SemVer-2.0.0-blue)]()
 
-Automate releases based on [SemVer](https://semver.org/) and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/). Like `semantic-release` and `release-please` but much simpler and more flexible.
+Automate releases based on [SemVer](https://semver.org/) and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/). Like `semantic-release` and `release-please` but simpler, faster, and more flexible.
 
 Autorel automatically does the following, if appropriate:
 
@@ -31,6 +31,15 @@ Autorel automatically does the following, if appropriate:
 - Use via `npx`, or import as a library
 - If using CLI, supports both `yaml` configuration and arguments
 - Highly customizable without being overly complex
+
+# Table of Contents
+
+- [Example Usage (CLI)](#example-usage-cli)
+- [Example Usage (Library)](#example-usage-library)
+- [Configuration](#configuration)
+- [Sample YAML Configuration](#sample-yaml-configuration)
+- [Types](#types)
+- [Support, Feedback, and Contributions](#support-feedback-and-contributions)
 
 # Example Usage (CLI)
 
