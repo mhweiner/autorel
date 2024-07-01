@@ -39,12 +39,12 @@ npx autorel --publish --run "echo 'Hello, World!'"
 
 This will:
 
-1. Bump the version based on the commit messages, push the new tag, and change the package.json version
+1. Bump the version based on the commit messages since the last release (including pushing the tag and updating package.json)
 2. Create a new release on GitHub with Release Notes
 3. Publish the release to NPM
-4. Run the command `echo 'Hello, World!'` via `bash` and `child_process`
+4. Run the command `echo 'Hello, World!'`
 
-> If you don't want to use npx, you can also install `autorel` globally and run it that way:
+You can also install `autorel` globally and run it that way:
 
 ```bash
 npm i -g autorel
