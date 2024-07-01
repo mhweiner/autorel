@@ -1,7 +1,7 @@
 <picture>
-    <source srcset="docs/autorel.svg" media="(prefers-color-scheme: dark)">
-    <source srcset="docs/autorel-dark.svg" media="(prefers-color-scheme: light)">
-    <img src="docs/autorel-dark.svg" alt="Logo" style="margin: 0 0 10px" size="250">
+    <source srcset="docs/autorel.svg?1" media="(prefers-color-scheme: dark)">
+    <source srcset="docs/autorel-dark.svg?1" media="(prefers-color-scheme: light)">
+    <img src="docs/autorel-dark.svg?1" alt="Autorel" style="margin: 0 0 10px" size="250">
 </picture>
 
 ---
