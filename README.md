@@ -73,13 +73,13 @@ This will do the same as the CLI example above.
 
 # Configuration
 
-Unless otherwise noted, configuration can be done via `yaml`, file, CLI arguments, or any combination of the two. CLI arguments take precedence and will override the `yaml` file. 
+When run in CLI mode, `autorel` can be configured via CLI arguments or a `yaml` file. CLI arguments take precedence over the `yaml` file.
 
-You can also use the library in your project, in which case you can pass the options directly to the `autorel` function.
+When used as a library, you can pass the configuration directly to the `autorel` function.
 
 All arguments are optional, but setting `branches` is recommended.
 
-> If using yaml, the file must be named `autorel.yml` and be in the root of your project.
+> ❗️ If using yaml, the file must be named `.autorel.yml` and be in the root of your project.
 
 ## help (CLI only)
 
