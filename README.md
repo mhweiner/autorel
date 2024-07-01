@@ -20,7 +20,7 @@ Autorel automatically does the following, if appropriate:
 - Any other custom release steps you want to add
 
 **✅ Conventional Commit and SemVer Compliant**
-- Unlike `semantic-release`, `autorel` is 100% compliant with Conventional Commits and SemVer out of the box, including "!" for breaking changes
+- Unlike some other tools, `autorel` is 100% compliant with Conventional Commits and SemVer out of the box, including "!" for breaking changes
 
 **😃 Simple & Easy to Use**
 - No confusing configuration files
@@ -29,7 +29,7 @@ Autorel automatically does the following, if appropriate:
 
 **💪 Flexible & Powerful**
 - Use via `npx`, or import as a library
-- If using CLI, supports `yaml` configuration or arguments
+- If using CLI, supports both `yaml` configuration and arguments
 
 # Example Usage (CLI)
 
@@ -43,6 +43,13 @@ This will:
 2. Create a new release on GitHub with Release Notes
 3. Publish the release to NPM
 4. Run the command `echo 'Hello, World!'` via `bash` and `child_process`
+
+> If you don't want to use npx, you can also install `autorel` globally and run it that way:
+
+```bash
+npm i -g autorel
+autorel --publish --run "echo 'Hello, World!'"
+```
 
 # Example Usage (Library)
 
@@ -154,20 +161,7 @@ The title to use for the breaking changes section in the release notes.
 
 ## commitTypes (YAML only)
 
-The commit types to use for both the release notes and version bumping. If not provided, the default is:
-
-```yaml
-- {type: 'feat', title: '✨ Features', release: 'minor'}
-- {type: 'fix', title: '🐛 Bug Fixes', release: 'patch'}
-- {type: 'perf', title: '🚀 Performance Improvements', release: 'patch'}
-- {type: 'revert', title: '⏪ Reverts', release: 'patch'}
-- {type: 'docs', title: '📚 Documentation', release: 'none'}
-- {type: 'style', title: '💅 Styles', release: 'none'}
-- {type: 'refactor', title: '🛠 Code Refactoring', release: 'none'}
-- {type: 'test', title: '🧪 Tests', release: 'none'}
-- {type: 'build', title: '🏗 Build System', release: 'none'}
-- {type: 'ci', title: '🔧 Continuous Integration', release: 'none'}
-```
+The commit types to use for both the release notes and version bumping. If not provided, the default commit types can be found in [src/defaults.ts](src/defaults.ts).
 
 - Argument: `commitTypes: CommitType[]`
 
