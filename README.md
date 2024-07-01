@@ -20,7 +20,7 @@ Autorel automatically does the following, if appropriate:
 - Runs any arbitrary command or bash script after the release is complete
 
 **✅ Conventional Commit and SemVer Compliant**
--`autorel` is 100% compliant with Conventional Commits and SemVer out of the box, including "!" for breaking changes
+- 100% compliant with Conventional Commits and SemVer out of the box, including "!" for breaking changes
 
 **😃 Simple & Easy to Use**
 - No confusing configuration files or complex setup
@@ -32,14 +32,20 @@ Autorel automatically does the following, if appropriate:
 - If using CLI, supports both `yaml` configuration and arguments
 - Highly customizable without being overly complex
 
+**🚀 Fast & Lightweight**
+
+- Minimal dependencies and fast execution
+
 # Table of Contents
 
 - [Example Usage (CLI)](#example-usage-cli)
 - [Example Usage (Library)](#example-usage-library)
 - [Usage with GitHub Actions](#usage-with-github-actions)
+- [Example Commit Messages](#example-commit-messages)
 - [Configuration](#configuration)
 - [Sample YAML Configuration](#sample-yaml-configuration)
 - [Types](#types)
+- [Debug Mode](#debug-mode)
 - [Support, Feedback, and Contributions](#support-feedback-and-contributions)
 
 # Example Usage (CLI)
@@ -124,6 +130,16 @@ jobs:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
         run: npx autorel --publish
 ```
+
+# Example Commit Messages
+
+Here are some examples of commit messages and the resulting version bump (default configuration):
+
+- `fix: fix a bug` -> `0.0.1`
+- `feat: add new feature` -> `0.1.0`
+- `feat!: add breaking change` -> `1.0.0`
+
+You can find more examples in the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) documentation.
 
 # Configuration
 
@@ -258,6 +274,16 @@ run: echo 'Hello, World!'
 # Types
 
 You can find the types defined at [src/index.ts](src/index.ts).
+
+# Debug Mode
+
+To enable debug mode, set `AUTOREL_DEBUG=1`:
+
+```bash
+AUTOREL_DEBUG=1 npx autorel
+```
+
+This will output configuration and other debug information.
 
 # Support, Feedback, and Contributions
 
