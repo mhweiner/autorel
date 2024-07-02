@@ -14,8 +14,8 @@ Autorel automatically does the following, if appropriate:
 
 - Bumps the version based on the commit messages
 - Creates a new release on GitHub with Release Notes
-- Publishes the release to NPM
-- Runs any arbitrary command or bash script after the release is complete
+- Publishes the package to NPM
+- Runs any arbitrary command or bash script
 
 **✅ Conventional Commit and SemVer Compliant**
 - 100% compliant with Conventional Commits and SemVer out of the box, including "!" for breaking changes
@@ -23,10 +23,12 @@ Autorel automatically does the following, if appropriate:
 **😃 Simple & Easy to Use**
 - No confusing configuration files or complex setup
 - Works with any CI/CD system, including GitHub Actions
-- Built-in TypeScript and bash script support
+- Built-in bash script support
+- Works with other languages, not just Node.js
 
 **🚀 Fast & Lightweight**
-- Minimal dependencies and fast execution
+- Minimal dependencies and fast execution written in TypeScript
+- Comprehensive test coverage
 - Less broken builds and more time to focus on your code!
 
 # Table of Contents
