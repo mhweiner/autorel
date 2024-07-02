@@ -34,7 +34,6 @@ Autorel automatically does the following, if appropriate:
 
 - [Example Usage (CLI)](#example-usage-cli)
 - [Example Usage (Library)](#example-usage-library)
-- [Quick Start](#quick-start)
 - [Usage with GitHub Actions](#usage-with-github-actions)
 - [Example Commit Messages](#example-commit-messages)
 - [Configuration](#configuration)
@@ -83,28 +82,7 @@ autorel --publish
 
     console.log(`Next version is ${nextVersion}`);
     ```
-# Quick Start
-
-There are many ways to use `autorel`. Here are a few common scenarios:
-
-1. **CLI**: Run `autorel` directly from the command line
-2. **Library**: Import `autorel` into your project and use it as a library
-3. **CI/CD pipeline**: Use `autorel` with GitHub Actions, CircleCI, Jenkins, etc. to automate your releases
-
-You can also use `autorel` with other languages, not just Node.js. Just make sure you have Node.js installed on the system.
-
-If you want to use GitHub Actions to automate your releases, [see here](#usage-with-github-actions) for setup and sample configuration.
-
-It's also recommended you create a `.autorel.yaml` file in the root of your project to [configure](#configuration) `autorel`. Example:
-
-```yaml
-branches:
-  - {name: 'main'}
-  - {name: 'alpha', channel: 'alpha'}
-  - {name: 'beta', channel: 'beta'}
-publish: true
-```
-
+    
 # Usage with GitHub Actions
 
 You can use `autorel` with GitHub Actions to automate your releases (recommended). 
