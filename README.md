@@ -41,7 +41,7 @@ Autorel automatically does the following, if appropriate:
 - [Sample YAML Configuration](#sample-yaml-configuration)
 - [Types](#types)
 - [Debug Mode](#debug-mode)
-- [FAQ](docs/FAQ.md)
+- [FAQ](docs/faq.md)
 - [Support, Feedback, and Contributions](#support-feedback-and-contributions)
 
 # Example Usage (CLI)
