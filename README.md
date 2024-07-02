@@ -85,7 +85,7 @@ This will do the same as the CLI example above.
 
 You can use `autorel` with GitHub Actions to automate your releases (recommended). 
 
-> ❗️ You must set `fetch-depth: 0` and `fetch-tags: true` in `actions/checkout@v4` to ensure that all tags are fetched.
+> ❗️ You must set `fetch-depth: 0` and `fetch-tags: true` in `actions/checkout@v4` (or later) or autorel will not work correctly.
 
 > ❗️ You must be authenticated with NPM to publish. To do so via GitHub Actions, see [this](https://docs.github.com/en/actions/guides/publishing-nodejs-packages#publishing-packages-to-the-npm-registry).
 
