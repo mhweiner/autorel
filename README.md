@@ -258,11 +258,15 @@ The version to use for the release INSTEAD of the version being generated. Alway
 
 <sub>_.autorel.yaml_</sub>
 ```yaml
+# Define the branches and their respective channels
 branches:
-  - {name: main}
-  - {name: next, channel: next}
-  - {name: beta, channel: beta}
+  - {name: 'main'}
+  - {name: 'next', channel: 'next'}
+
+# Enable publishing to NPM
 publish: true
+
+# Run custom script after publish
 runScript: |
   echo "$(date +"%Y-%m-%d") ${NEXT_VERSION}" >> versions.txt
   aws s3 sync . s3://my-bucket
