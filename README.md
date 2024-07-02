@@ -4,8 +4,6 @@
     <img src="docs/autorel-dark.svg?1" alt="Autorel" style="margin: 0 0 10px" size="250">
 </picture>
 
----
-
 [![build status](https://github.com/mhweiner/autorel/actions/workflows/release.yml/badge.svg)](https://github.com/mhweiner/autorel/actions)
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org)
 [![SemVer](https://img.shields.io/badge/SemVer-2.0.0-blue)]()
