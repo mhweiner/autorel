@@ -24,7 +24,6 @@ Autorel automatically does the following, if appropriate:
 - No confusing configuration files or complex setup
 - Works with any CI/CD system, including GitHub Actions
 - Built-in bash script support
-- Works with other languages, not just Node.js
 
 **🚀 Fast & Lightweight**
 - Minimal dependencies and fast execution written in TypeScript
@@ -35,12 +34,14 @@ Autorel automatically does the following, if appropriate:
 
 - [Example Usage (CLI)](#example-usage-cli)
 - [Example Usage (Library)](#example-usage-library)
+- [Quick Start](#quick-start)
 - [Usage with GitHub Actions](#usage-with-github-actions)
 - [Example Commit Messages](#example-commit-messages)
 - [Configuration](#configuration)
 - [Sample YAML Configuration](#sample-yaml-configuration)
 - [Types](#types)
 - [Debug Mode](#debug-mode)
+- [FAQ](docs/FAQ.md)
 - [Support, Feedback, and Contributions](#support-feedback-and-contributions)
 
 # Example Usage (CLI)
@@ -63,6 +64,8 @@ npm i -g autorel
 autorel --publish
 ```
 
+> ❗️ The package.json file's version will be updated in memory before being pushed to npm, as this is the only place where it's actually required. The change will not be pushed to the repository, as it is not necessary and could cause conflicts. See [this post](https://semantic-release.gitbook.io/semantic-release/support/faq)
+
 # Example Usage (Library)
 
 1. Install `autorel` as a dependency
@@ -76,12 +79,31 @@ autorel --publish
     ```typescript
     import {autorel} from 'autorel';
 
-    autorel({
-      publish: true
-      run: 'echo "Next version is ${NEXT_VERSION}"'
-    });
+    const nextVersion = await autorel({publish: true});
+
+    console.log(`Next version is ${nextVersion}`);
     ```
-This will do the same as the CLI example above.
+# Quick Start
+
+There are many ways to use `autorel`. Here are a few common scenarios:
+
+1. **CLI**: Run `autorel` directly from the command line
+2. **Library**: Import `autorel` into your project and use it as a library
+3. **CI/CD pipeline**: Use `autorel` with GitHub Actions, CircleCI, Jenkins, etc. to automate your releases
+
+You can also use `autorel` with other languages, not just Node.js. Just make sure you have Node.js installed on the system.
+
+If you want to use GitHub Actions to automate your releases, [see here](#usage-with-github-actions) for setup and sample configuration.
+
+It's also recommended you create a `.autorel.yaml` file in the root of your project to [configure](#configuration) `autorel`. Example:
+
+```yaml
+branches:
+  - {name: 'main'}
+  - {name: 'alpha', channel: 'alpha'}
+  - {name: 'beta', channel: 'beta'}
+publish: true
+```
 
 # Usage with GitHub Actions
 
@@ -125,6 +147,8 @@ jobs:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
         run: npx autorel --publish
 ```
+
+It's also recommended you create a `.autorel.yaml` file in the root of your project to [configure](#configuration) `autorel`.
 
 # Example Commit Messages
 

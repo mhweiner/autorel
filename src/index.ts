@@ -50,7 +50,7 @@ export function getPrereleaseChannel(config: Config): string|undefined {
 
 }
 
-export async function autorel(args: Config): Promise<void> {
+export async function autorel(args: Config): Promise<string|undefined> {
 
     const prereleaseChannel = getPrereleaseChannel(args);
 
@@ -175,6 +175,8 @@ export async function autorel(args: Config): Promise<void> {
         bash(args.runScript);
 
     }
+
+    return nextTag.replace('v', '');
 
 }
 
