@@ -263,7 +263,9 @@ branches:
   - {name: next, channel: next}
   - {name: beta, channel: beta}
 publish: true
-run: echo 'Hello, World!'
+runScript: |
+  echo "$(date +"%Y-%m-%d") ${NEXT_VERSION}" >> versions.txt
+  aws s3 sync . s3://my-bucket
 ```
 
 # Types
