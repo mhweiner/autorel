@@ -160,6 +160,8 @@ All arguments are optional, but setting `branches` is recommended.
 
 > ❗️ The `yaml` configuration file must be named `.autorel.yml` and be in the root of your project.
 
+[See sample YAML configuration](#sample-yaml-configuration)
+
 ## publish
 
 Whether to publish the release to NPM. If `true`, you must be authenticated with NPM. To do so via GitHub Actions, see [this](https://docs.github.com/en/actions/guides/publishing-nodejs-packages#publishing-packages-to-the-npm-registry).
