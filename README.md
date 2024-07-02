@@ -17,12 +17,15 @@ Autorel automatically does the following, if appropriate:
 - Publishes the package to NPM
 - Runs any arbitrary command or bash script
 
+_Currently only comes with built-in support for `GitHub` and `NPM`, but you can write your own scripts to support other systems._
+
 **✅ Conventional Commit and SemVer Compliant**
 - 100% compliant with Conventional Commits and SemVer out of the box, including "!" for breaking changes
 
 **😃 Simple & Easy to Use**
 - No confusing configuration files or complex setup
 - Works with any CI/CD system, including GitHub Actions
+- Works with any language or platform
 - Built-in bash script support
 
 **🚀 Fast & Lightweight**
@@ -36,6 +39,7 @@ Autorel automatically does the following, if appropriate:
 - [Example Usage (Library)](#example-usage-library)
 - [Usage with GitHub Actions](#usage-with-github-actions)
 - [Example Commit Messages](#example-commit-messages)
+- [Usage with Anything Other Than GitHub](#usage-with-anything-other-than-github)
 - [Configuration](#configuration)
 - [Sample YAML Configuration](#sample-yaml-configuration)
 - [Types](#types)
@@ -51,9 +55,9 @@ npx autorel --publish --run 'echo "Next version is ${NEXT_VERSION}"'
 
 This will:
 
-1. Bump the version based on the commit messages since the last release (including pushing the tag and updating package.json)
+1. Bump the version based on the commit messages since the last release
 2. Create a new release on GitHub with Release Notes
-3. Publish the release to NPM
+3. Update package.json and publish the release to NPM (does not commit the change to the repository, see below)
 4. Run the command `echo "Next version is ${NEXT_VERSION}"`
 
 You can also install `autorel` globally and run it directly:
@@ -82,7 +86,7 @@ autorel --publish
 
     console.log(`Next version is ${nextVersion}`);
     ```
-    
+
 # Usage with GitHub Actions
 
 You can use `autorel` with GitHub Actions to automate your releases (recommended). 
@@ -128,7 +132,9 @@ jobs:
 
 It's also recommended you create a `.autorel.yaml` file in the root of your project to [configure](#configuration) `autorel`.
 
-# Example Commit Messages
+# Commit Messages
+
+Commit messages are parsed to determine the version bump. They must follow the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) specification for automatic version bumping according to semantic versioning.
 
 Here are some examples of commit messages and the resulting version bump (default configuration):
 
@@ -137,6 +143,12 @@ Here are some examples of commit messages and the resulting version bump (defaul
 - `feat!: add breaking change` -> `1.0.0`
 
 You can find more examples in the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) documentation.
+
+# Usage with Anything Other Than GitHub
+
+`autorel` is designed to work with any CI/CD system, not just GitHub Actions. You can use it with GitLab, Bitbucket, Jenkins, or any other system that supports running shell commands.
+
+Simply use the `--no-release` flag (arg: `noRelease: boolean`) to skip creating a release on GitHub. Then, you can use the `--run` flag (arg: `run: string`) to run any command or script after the release is complete.
 
 # Configuration
 

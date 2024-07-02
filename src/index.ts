@@ -7,7 +7,7 @@ import * as color from './lib/colors';
 import {generateChangelog} from './changelog';
 import * as github from './services/github';
 import output from './lib/output';
-import {versionBump} from './versionBump';
+import {updatePackageJsonVersion} from './updatePackageJsonVersion';
 import {bash, cmd} from './lib/sh';
 
 export type CommitType = {
@@ -146,11 +146,13 @@ export async function autorel(args: Config): Promise<string|undefined> {
         body: changelog,
     });
 
-    // update package.json
-    versionBump(nextTag);
+    // publish to npm
+    if (args.publish) {
 
-    // publish package
-    args.publish && npm.publishPackage(prereleaseChannel);
+        updatePackageJsonVersion(nextTag);
+        npm.publishPackage(prereleaseChannel);
+
+    }
 
     process.env.NEXT_VERSION = nextTag.replace('v', '');
     process.env.NEXT_TAG = nextTag;

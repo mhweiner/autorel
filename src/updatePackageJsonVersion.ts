@@ -31,7 +31,7 @@ function readPackageJson(): PackageJson {
 /**
  * Bump the version of the package.json file
  */
-export function versionBump(newVersion: string): void {
+export function updatePackageJsonVersion(newVersion: string): void {
 
     const packageJson = readPackageJson();
 
