@@ -39,7 +39,8 @@ _Currently only comes with built-in support for `GitHub` and `NPM`, but you can 
 - [Example Usage (Library)](#example-usage-library)
 - [Usage with GitHub Actions](#usage-with-github-actions)
 - [Example Commit Messages](#example-commit-messages)
-- [Usage with Anything Other Than GitHub](#usage-with-anything-other-than-github)
+- [Usage with Other Repositories (not GitHub)](#usage-with-other-repositories-not-github)
+- [Usage with Other Languages (not Node.js)](#usage-with-other-languages-not-nodejs)
 - [Configuration](#configuration)
 - [Sample YAML Configuration](#sample-yaml-configuration)
 - [Types](#types)
@@ -144,11 +145,17 @@ Here are some examples of commit messages and the resulting version bump (defaul
 
 You can find more examples in the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) documentation.
 
-# Usage with Anything Other Than GitHub
+# Usage with Other Repositories (not GitHub)
 
 `autorel` is designed to work with any CI/CD system, not just GitHub Actions. You can use it with GitLab, Bitbucket, Jenkins, or any other system that supports running shell commands.
 
-Simply use the `--no-release` flag (arg: `noRelease: boolean`) to skip creating a release on GitHub. Then, you can use the `--run` flag (arg: `run: string`) to run any command or script after the release is complete.
+Simply use the `--no-release` flag (arg: `noRelease: true`) to skip creating a release on GitHub. Then, you can use either the `--run` flag (arg: `run: string`) or `runScript` arg to run any command or script after the version bump with the new version number available as an environment variable [see below](#run).
+
+# Usage with Other Languages (not Node.js)
+
+`autorel` is designed to work with any language or platform. You can use it with Python, Ruby, Go, Java, or any other language.
+
+Simply omit the `--publish` flag (arg: `publish: false`, which is default) to skip publishing to NPM. Then, you can use either the `--run` flag (arg: `run: string`) or `runScript: string` arg to run any command or script after the version bump with the new version number available as an environment variable [see below](#run).
 
 # Configuration
 
