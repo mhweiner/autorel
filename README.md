@@ -125,10 +125,10 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npm run test
-      - env:
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
-          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
-        run: npx autorel --publish
+      - run: npx autorel --publish
+        env:
+            GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+            NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
 ```
 
 It's also recommended you create a `.autorel.yaml` file in the root of your project to [configure](#configuration) `autorel`.
@@ -149,13 +149,17 @@ You can find more examples in the [Conventional Commits](https://www.conventiona
 
 `autorel` is designed to work with any CI/CD system, not just GitHub Actions. You can use it with GitLab, Bitbucket, Jenkins, or any other system that supports running shell commands.
 
-Simply use the `--no-release` flag (arg: `noRelease: true`) to skip creating a release on GitHub. Then, you can use either the `--run` flag (arg: `run: string`) or `runScript` arg to run any command or script after the version bump with the new version number available as an environment variable [see below](#run).
+Simply use the `--skip-release` flag (arg: `skipRelease: true`) to skip creating a release on GitHub. Then, you can use either the `--run` flag (arg: `run: string`) or `runScript` arg to run any command or script after the version bump with the new version number available as an environment variable [see below](#run).
+
+If you're interested in contributing built-in support for other systems, please open an issue or PR.
 
 # Usage with Other Languages (not Node.js)
 
 `autorel` is designed to work with any language or platform. You can use it with Python, Ruby, Go, Java, or any other language.
 
 Simply omit the `--publish` flag (arg: `publish: false`, which is default) to skip publishing to NPM. Then, you can use either the `--run` flag (arg: `run: string`) or `runScript: string` arg to run any command or script after the version bump with the new version number available as an environment variable [see below](#run).
+
+If you're interested in contributing built-in support for other systems, please open an issue or PR.
 
 # Configuration
 
