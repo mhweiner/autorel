@@ -83,9 +83,9 @@ autorel --publish
     ```typescript
     import {autorel} from 'autorel';
 
-    const nextVersion = await autorel({publish: true});
-
-    console.log(`Next version is ${nextVersion}`);
+    autorel({publish: true}).then((nextVersion) => {
+        console.log(`Next version is ${nextVersion}`);
+    });
     ```
 
 # Usage with GitHub Actions
