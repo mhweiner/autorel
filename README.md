@@ -181,16 +181,16 @@ Whether to publish the release to NPM. If `true`, you must be authenticated with
 
 Whether to run in dry-run mode. This will not push the tag, create the release, publish to NPM, or run the command.
 
-- CLI: `--dry`
+- CLI: `--dry-run`
 - Argument: `dryRun: boolean`
 - Default: `false`
 
-## noRelease
+## skipRelease
 
 Whether to skip creating a release on GitHub. If `true`, the release will not be created, but the tag will still be pushed and the package on npm will still be updated, if applicable.
 
-- CLI: `--no-release`
-- Argument: `noRelease: boolean`
+- CLI: `--skip-release`
+- Argument: `skipRelease: boolean`
 - Default: `false`
 
 ## run
@@ -223,11 +223,11 @@ runScript: |
 - Argument: `runScript: string`
 - Default: `undefined`
 
-## pre-release
+## preRelease
+
+> ❗️ This is typically set via the `branches` configuration (recommended), but can be overridden here.
 
 The pre-release channel to use. This will be appended to the version number. For example, if the version is `1.0.0` and the pre-release is `alpha`, the version will be `1.0.0-alpha.1`. For "production" releases, the "latest" tag will be used for NPM.
-
-This is typically set via the `branches` configuration (recommended), but can be overridden here.
 
 - CLI: `--pre-release`
 - Argument: `preRelease: string`
@@ -248,19 +248,19 @@ The commit types to use for both the release notes and version bumping. If not p
 
 ## branches (YAML only)
 
-The branches to use for the release along with their channel. If not provided, the default is:
+The branches to use for the release along with their pre-release channel. If not provided, the default is:
 
 ```yaml
 - {name: 'main'}
 ```
 
-The above will release to the `latest` channel on NPM. If you want to release to a different channel, you can specify it like so:
+The above will release to the `latest` channel on NPM. If you want to release to a different channel (making it a pre-release), you can specify it like so:
 
 ```yaml
 branches:
   - {name: 'main'}
-  - {name: 'develop', channel: 'alpha'}
-  - {name: 'staging', channel: 'beta'}
+  - {name: 'develop', prereleaseChannel: 'alpha'}
+  - {name: 'staging', prereleaseChannel: 'beta'}
 ```
 
 The above will release to the `latest` channel (production) on NPM for the `main` branch, the `alpha` pre-release channel for the `develop` branch, and the `beta` pre-release channel for the `staging` branch.

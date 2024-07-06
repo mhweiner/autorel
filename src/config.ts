@@ -12,7 +12,7 @@ const validateConfig = p.object({
     runScript: p.optional(p.string()),
     prereleaseChannel: p.optional(p.string()),
     useVersion: p.optional(p.string()),
-    noRelease: p.optional(p.boolean()),
+    skipRelease: p.optional(p.boolean()),
     publish: p.optional(p.boolean()),
     breakingChangeTitle: p.optional(p.string()),
     commitTypes: p.optional(p.array(p.object({

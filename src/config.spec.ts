@@ -5,8 +5,9 @@ import * as mod from './config';
 import {fakeLogger} from './test_fixtures/fakeLog';
 import {ValidationError, toResult} from '@aeroview-io/rtype';
 import {defaultConfig} from './defaults';
+import {Config} from '.';
 
-test('readAutorelYaml: happy path, with no .autorel.yaml', async (assert) => {
+test('getConfig: no .autorel.yaml', async (assert) => {
 
     const mockFs = {
         existsSync: () => false,
@@ -26,19 +27,17 @@ test('readAutorelYaml: happy path, with no .autorel.yaml', async (assert) => {
 
 });
 
-test('readAutorelYaml: happy path, with .autorel.yaml', async (assert) => {
+test('getConfig: valid .autorel.yaml', async (assert) => {
 
     const mockFs = {
         existsSync: () => true,
         readFileSync: () => `
-            breakingChangeTitle: 'BREAKING CHANGES'
-            commitTypes:
-              - type: 'test'
-                title: '🧪 Tests'
-                release: 'none'
-              - type: 'build'
-                title: '🏗 Build System'
-                release: 'none'
+            branches:
+                - {name: 'main'}
+                - {name: 'develop', prereleaseChannel: 'beta'}
+            skipRelease: true
+            publish: true
+            dryRun: true
         `,
     };
     const configMod: typeof mod = mock('./config', {
@@ -46,19 +45,22 @@ test('readAutorelYaml: happy path, with .autorel.yaml', async (assert) => {
         'node:path': {resolve: (p: string) => p},
         './lib/output': fakeLogger,
     });
-
-    assert.equal(configMod.getConfig(), {
-        breakingChangeTitle: 'BREAKING CHANGES',
-        commitTypes: [
-            {type: 'test', title: '🧪 Tests', release: 'none'},
-            {type: 'build', title: '🏗 Build System', release: 'none'},
+    const expectedConfig = {
+        ...defaultConfig,
+        branches: [
+            {name: 'main'},
+            {name: 'develop', prereleaseChannel: 'beta'},
         ],
-        branches: defaultConfig.branches,
-    }, 'should return the parsed configuration');
+        skipRelease: true,
+        publish: true,
+        dryRun: true,
+    };
+
+    assert.equal(configMod.getConfig(), expectedConfig, 'should return the parsed configuration');
 
 });
 
-test('readAutorelYaml: invalid configuration', async (assert) => {
+test('getConfig: invalid configuration', async (assert) => {
 
     const mockFs = {
         existsSync: () => true,
@@ -82,7 +84,7 @@ test('readAutorelYaml: invalid configuration', async (assert) => {
 
 });
 
-test('readAutorelYaml: readFile error', async (assert) => {
+test('getConfig: readFile error', async (assert) => {
 
     const mockFs = {
         existsSync: () => true,
@@ -102,7 +104,7 @@ test('readAutorelYaml: readFile error', async (assert) => {
 
 });
 
-test('readAutorelYaml: yaml error', async (assert) => {
+test('getConfig: yaml error', async (assert) => {
 
     const invalidYaml = `
 a:
@@ -122,5 +124,46 @@ a:
     const [err] = toResult(() => configMod.getConfig());
 
     assert.equal(err?.name, 'YAMLException', 'should re-throw error');
+
+});
+
+test('getConfig: valid .autorel.yaml', async (assert) => {
+
+    const mockFs = {
+        existsSync: () => true,
+        readFileSync: () => `
+            branches:
+                - {name: 'main'}
+                - {name: 'develop', prereleaseChannel: 'beta'}
+        `,
+    };
+    const configMod: typeof mod = mock('./config', {
+        'node:fs': mockFs,
+        'node:path': {resolve: (p: string) => p},
+        './lib/output': fakeLogger,
+    });
+    const cliOptions = { // all falsy values are removed
+        run: 'test',
+        prereleaseChannel: 'alpha',
+        useVersion: '1.2.3',
+        publish: true,
+        skipRelease: true,
+        dryRun: true,
+    };
+    const expectedConfig: Config = {
+        ...defaultConfig,
+        branches: [
+            {name: 'main'},
+            {name: 'develop', prereleaseChannel: 'beta'},
+        ],
+        run: 'test',
+        prereleaseChannel: 'alpha',
+        useVersion: '1.2.3',
+        publish: true,
+        skipRelease: true,
+        dryRun: true,
+    };
+
+    assert.equal(configMod.getConfig(cliOptions), expectedConfig, 'should return the parsed configuration');
 
 });

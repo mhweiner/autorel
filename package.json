@@ -28,7 +28,22 @@
     "build": "rm -rf ./dist && tsc"
   },
   "homepage": "https://github.com/mhweiner/autorel/blob/main/README.md",
-  "keywords": [],
+  "keywords": [
+    "semantic-release", 
+    "semantic commits", 
+    "conventional commits",
+    "semantic versioning",
+    "automatic release",
+    "automatic builds",
+    "builds",
+    "ci/cid",
+    "ci-cd",
+    "continuous integration",
+    "continuous deployment",
+    "automation",
+    "release automation",
+    "release-please"
+  ],
   "devDependencies": {
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^17.0.0",

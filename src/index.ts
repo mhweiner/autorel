@@ -25,7 +25,7 @@ export type Config = {
     runScript?: string
     prereleaseChannel?: string
     useVersion?: string
-    noRelease?: boolean
+    skipRelease?: boolean
     publish?: boolean
     breakingChangeTitle: string
     commitTypes: CommitType[]
@@ -137,7 +137,7 @@ export async function autorel(args: Config): Promise<string|undefined> {
 
     const {owner, repository} = git.getRepo();
 
-    !args.noRelease && github.createRelease({
+    !args.skipRelease && github.createRelease({
         token: process.env.GITHUB_TOKEN!,
         owner,
         repository,
