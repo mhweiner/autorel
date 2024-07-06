@@ -284,7 +284,7 @@ The version to use for the release INSTEAD of the version being generated. Alway
 # Define the branches and their respective channels
 branches:
   - {name: 'main'}
-  - {name: 'next', channel: 'next'}
+  - {name: 'next', prereleaseChannel: 'next'}
 
 # Enable publishing to NPM
 publish: true
