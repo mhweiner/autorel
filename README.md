@@ -37,14 +37,15 @@ _Currently only has built-in support for `GitHub` and `NPM`, but you can write y
 
 - [Example Usage (CLI)](#example-usage-cli)
 - [Example Usage (Library)](#example-usage-library)
-- [Usage with GitHub Actions](#usage-with-github-actions)
 - [Example Commit Messages](#example-commit-messages)
+- [Usage with GitHub Actions](#usage-with-github-actions)
 - [Usage with Other Repositories (not GitHub)](#usage-with-other-repositories-not-github)
 - [Usage with Other Languages (not Node.js)](#usage-with-other-languages-not-nodejs)
 - [Configuration](#configuration)
 - [Sample YAML Configuration](#sample-yaml-configuration)
 - [Types](#types)
 - [Debug Mode](#debug-mode)
+- [About package.json versions](#about-packagejson-versions)
 - [FAQ](docs/faq.md)
 - [Support, Feedback, and Contributions](#support-feedback-and-contributions)
 
@@ -68,7 +69,9 @@ npm i -g autorel
 autorel --publish
 ```
 
-> ❗️ The package.json file's version will be updated in memory before being pushed to npm, as this is the only place where it's actually required. The change will not be pushed to the repository, as it is not necessary and could cause conflicts. See [this post](https://semantic-release.gitbook.io/semantic-release/support/faq)
+## Avoiding Breaking Changes
+
+You may want to add the version number to the npx command to prevent breaking changes in the future. For example, `npx autorel@^2 --publish --run 'echo "Next version is ${NEXT_VERSION}"'`
 
 # Example Usage (Library)
 
@@ -87,6 +90,18 @@ autorel --publish
         console.log(`Next version is ${nextVersion}`);
     });
     ```
+
+# Commit Messages
+
+Commit messages are parsed to determine the version bump. They must follow the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) specification for automatic version bumping according to semantic versioning.
+
+Here are some examples of commit messages and the resulting version bump (default configuration):
+
+- `fix: fix a bug` -> `0.0.1`
+- `feat: add new feature` -> `0.1.0`
+- `feat!: add breaking change` -> `1.0.0`
+
+You can find more examples in the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) documentation.
 
 # Usage with GitHub Actions
 
@@ -133,18 +148,6 @@ jobs:
 
 It's also recommended you create a `.autorel.yaml` file in the root of your project to [configure](#configuration) `autorel`.
 
-# Commit Messages
-
-Commit messages are parsed to determine the version bump. They must follow the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) specification for automatic version bumping according to semantic versioning.
-
-Here are some examples of commit messages and the resulting version bump (default configuration):
-
-- `fix: fix a bug` -> `0.0.1`
-- `feat: add new feature` -> `0.1.0`
-- `feat!: add breaking change` -> `1.0.0`
-
-You can find more examples in the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) documentation.
-
 # Usage with Other Repositories (not GitHub)
 
 `autorel` is designed to work with any CI/CD system, not just GitHub Actions. You can use it with GitLab, Bitbucket, Jenkins, or any other system that supports running shell commands.
@@ -163,7 +166,9 @@ If you're interested in contributing built-in support for other systems, please 
 
 # Configuration
 
-When run in CLI mode, `autorel` can be configured via CLI arguments or a `yaml` file. CLI arguments take precedence over the `yaml` file.
+When run in CLI mode, `autorel` can be configured via CLI arguments or a `yaml` file. CLI arguments take precedence over the `yaml` file. 
+
+However, omitting the `--publish` flag will still publish to NPM if `publish: true` is set in the `yaml` file, and the same for other binary flags.
 
 When used as a library, you can pass the configuration directly to the `autorel` function.
 
@@ -312,6 +317,10 @@ AUTOREL_DEBUG=1 npx autorel
 ```
 
 This will output configuration and other debug information.
+
+# About package.json versions
+
+If using our npm publishing feature, the package.json file's version will be updated in memory before being pushed to npm, as this is the only place where it's actually required. The change will not be pushed to the repository, as it is not necessary and could cause conflicts. See [this post](https://semantic-release.gitbook.io/semantic-release/support/faq)
 
 # Support, Feedback, and Contributions
 
