@@ -82,6 +82,8 @@ export function getConfig(overrides?: Partial<Config>): Config {
 
     const localConfig = readAutorelYaml();
 
+    output.debug(`Yaml: ${JSON.stringify(localConfig, null, 2)}`);
+
     return {
         ...defaultConfig,
         ...localConfig,
