@@ -29,8 +29,8 @@
   },
   "homepage": "https://github.com/mhweiner/autorel/blob/main/README.md",
   "keywords": [
-    "semantic-release", 
-    "semantic commits", 
+    "semantic-release",
+    "semantic commits",
     "conventional commits",
     "semantic versioning",
     "automatic release",
@@ -57,7 +57,7 @@
     "typescript": "^4.5.4"
   },
   "dependencies": {
-    "@aeroview-io/rtype": "^1.4.2",
+    "@aeroview-io/rtype": "^1.4.5",
     "commander": "^12.1.0",
     "js-yaml": "^4.1.0"
   }
