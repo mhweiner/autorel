@@ -127,7 +127,7 @@ a:
 
 });
 
-test('getConfig: valid .autorel.yaml', async (assert) => {
+test('getConfig: valid .autorel.yaml with cli overrides', async (assert) => {
 
     const mockFs = {
         existsSync: () => true,
@@ -167,3 +167,60 @@ test('getConfig: valid .autorel.yaml', async (assert) => {
     assert.equal(configMod.getConfig(cliOptions), expectedConfig, 'should return the parsed configuration');
 
 });
+
+test('getConfig: valid .autorel.yaml with empty cli overrides (2)', async (assert) => {
+
+    const mockFs = {
+        existsSync: () => true,
+        readFileSync: () => `
+        commitTypes:
+        - {type: feat, title: ✨ Features, release: minor}
+        - {type: fix, title: 🐛 Bug Fixes, release: patch}
+        - {type: perf, title: ⚡ Performance Improvements, release: patch}
+        - {type: revert, title: ⏪ Reverts, release: patch}
+        - {type: docs, title: 📚 Documentation, release: patch}
+        - {type: style, title: 💅 Styles, release: patch}
+        - {type: refactor, title: 🛠 Code Refactoring, release: patch}
+        - {type: test, title: 🧪 Tests, release: patch}
+        - {type: build, title: 🏗 Build System, release: patch}
+        - {type: ci, title: 🔧 Continuous Integration, release: patch}
+        branches:
+        - {name: main}
+        - {name: next, prereleaseChannel: next}
+        dryRun: true
+        publish: true
+        `,
+    };
+    const configMod: typeof mod = mock('./config', {
+        'node:fs': mockFs,
+        'node:path': {resolve: (p: string) => p},
+        './lib/output': fakeLogger,
+    });
+    const cliOptions = {};
+    const expectedConfig: Config = {
+        ...defaultConfig,
+        commitTypes: [
+            {type: 'feat', title: '✨ Features', release: 'minor'},
+            {type: 'fix', title: '🐛 Bug Fixes', release: 'patch'},
+            {
+                type: 'perf',
+                title: '⚡ Performance Improvements',
+                release: 'patch',
+            },
+            {type: 'revert', title: '⏪ Reverts', release: 'patch'},
+            {type: 'docs', title: '📚 Documentation', release: 'patch'},
+            {type: 'style', title: '💅 Styles', release: 'patch'},
+            {type: 'refactor', title: '🛠 Code Refactoring', release: 'patch'},
+            {type: 'test', title: '🧪 Tests', release: 'patch'},
+            {type: 'build', title: '🏗 Build System', release: 'patch'},
+            {type: 'ci', title: '🔧 Continuous Integration', release: 'patch'},
+        ],
+        branches: [{name: 'main'}, {name: 'next', prereleaseChannel: 'next'}],
+        publish: true,
+        dryRun: true,
+    };
+
+    assert.equal(configMod.getConfig(cliOptions), expectedConfig, 'should return the parsed configuration');
+
+});
+

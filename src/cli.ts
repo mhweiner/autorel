@@ -24,7 +24,7 @@ console.log('----------------------------');
 program
     .version(packageJson.version, '-v, --version')
     .description('An example CLI for managing a directory')
-    .option('--dryRun', 'Do a dry run (arg: dryRun)')
+    .option('--dry-run', 'Do a dry run (arg: dryRun)')
     .option('--pre-release <value>', 'Pre-release channel. If specified, the release will be marked as a pre-release. Overrides branches configuration. (arg: preRelease)')
     .option('--use-version <value>', 'Specify a version to be used instead of calculating it from commit analysis. Must be a valid SemVer version, with no \'v\'. Overrides --pre-release, commitType, and branches configuration. (arg: useVersion)')
     .option('--run <value>', 'Command to run after the release is successful. (arg: run)')
@@ -42,19 +42,20 @@ const cliOptions = {
     skipRelease: options.skipRelease,
 };
 
-const config = getConfig(cliOptions);
+output.debug(`CLI Options: ${JSON.stringify(cliOptions, null, 2)}`);
 
 // remove falsy values from the overrides
-if (config) {
+if (cliOptions) {
 
-    Object.keys(config).forEach((key) => (
+    Object.keys(cliOptions).forEach((key) => (
         // @ts-ignore
-        !config[key] && delete config[key]
+        !cliOptions[key] && delete cliOptions[key]
     ));
 
 }
 
-output.debug(`CLI Options: ${JSON.stringify(cliOptions, null, 2)}`);
+const config = getConfig(cliOptions);
+
 output.debug(`Config: ${JSON.stringify(config, null, 2)}`);
 
 autorel(config);
