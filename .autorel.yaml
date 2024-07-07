@@ -11,5 +11,4 @@ commitTypes:
   - {type: ci, title: 🔧 Continuous Integration, release: patch}
 branches:
   - {name: main}
-  - {name: next, channel: next}
-  - {name: beta, channel: beta}
+  - {name: next, prereleaseChannel: next}
