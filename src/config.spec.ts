@@ -80,6 +80,7 @@ test('getConfig: invalid configuration', async (assert) => {
     assert.throws(() => configMod.getConfig(), new ValidationError({
         'commitTypes.[0]': 'must be an object with keys type, title, release',
         'commitTypes.[1]': 'must be an object with keys type, title, release',
+        breakingChange: 'unknown key',
     }), 'should throw ValidationError');
 
 });
