@@ -1,7 +1,7 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as yaml from 'js-yaml';
-import {ValidationError, predicates as p, toResult} from '@aeroview-io/rtype';
+import {ValidationError, predicates as p, toResult} from 'typura';
 import output from './lib/output';
 import {Config} from '.';
 import {defaultConfig} from './defaults';

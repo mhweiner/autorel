@@ -3,7 +3,7 @@ import {test} from 'hoare';
 import {mock} from 'cjs-mock';
 import * as mod from './config';
 import {fakeLogger} from './test_fixtures/fakeLog';
-import {ValidationError, toResult} from '@aeroview-io/rtype';
+import {ValidationError, toResult} from 'typura';
 import {defaultConfig} from './defaults';
 import {Config} from '.';
 
