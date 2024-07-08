@@ -1,7 +1,7 @@
 <picture>
     <source srcset="docs/autorel.svg?1" media="(prefers-color-scheme: dark)">
     <source srcset="docs/autorel-dark.svg?1" media="(prefers-color-scheme: light)">
-    <img src="docs/autorel-dark.svg?1" alt="Autorel" style="margin: 0 0 15px" size="250">
+    <img src="docs/autorel-dark.svg?1" alt="Autorel" size="250">
 </picture>
 
 [![build status](https://github.com/mhweiner/autorel/actions/workflows/release.yml/badge.svg)](https://github.com/mhweiner/autorel/actions)
