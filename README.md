@@ -174,7 +174,7 @@ When used as a library, you can pass the configuration directly to the `autorel`
 
 All arguments are optional, but setting `branches` is recommended.
 
-> ❗️ The `yaml` configuration file must be named `.autorel.yml` and be in the root of your project.
+> ❗️ The `yaml` configuration file must be named `.autorel.yaml` and be in the root of your project.
 
 [See sample YAML configuration](#sample-yaml-configuration)
 
