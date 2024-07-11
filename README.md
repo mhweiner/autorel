@@ -7,6 +7,7 @@
 [![build status](https://github.com/mhweiner/autorel/actions/workflows/release.yml/badge.svg)](https://github.com/mhweiner/autorel/actions)
 [![SemVer](https://img.shields.io/badge/SemVer-2.0.0-blue)](https://semver.org)
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![autorel](https://raw.githubusercontent.com/mhweiner/autorel/main/badge.svg)](https://github.com/mhweiner/autorel)
 
 Automate releases based on [SemVer](https://semver.org/) and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/). Like `semantic-release` and `release-please` but simpler and faster.
@@ -49,6 +50,7 @@ _Currently only has built-in support for `GitHub` and `NPM`, but you can write y
 - [About package.json versions](#about-packagejson-versions)
 - [FAQ](docs/faq.md)
 - [Support, Feedback, and Contributions](#support-feedback-and-contributions)
+- [License](#license)
 
 # Example Usage (CLI)
 
