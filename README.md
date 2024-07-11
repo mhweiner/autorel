@@ -7,7 +7,7 @@
 [![build status](https://github.com/mhweiner/autorel/actions/workflows/release.yml/badge.svg)](https://github.com/mhweiner/autorel/actions)
 [![SemVer](https://img.shields.io/badge/SemVer-2.0.0-blue)](https://semver.org)
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org)
-[![autorel](docs/badge.svg)](https://github.com/mhweiner/autorel)
+[![autorel](https://raw.githubusercontent.com/mhweiner/autorel/main/badge.svg)](https://github.com/mhweiner/autorel)
 
 Automate releases based on [SemVer](https://semver.org/) and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/). Like `semantic-release` and `release-please` but simpler and faster.
 
@@ -329,6 +329,11 @@ If using our npm publishing feature, the package.json file's version will be upd
 - Submit an [issue](https://github.com/mhweiner/autorel/issues) with your problem, feature request or bug report
 - Issue a PR against `main` and request review. Make sure all tests pass and coverage is good.
 - Write about `autorel` in your blog, tweet about it, or share it with your friends!
+- Support this package by adding our badge to your README:
+
+```markdown
+[![autorel](https://raw.githubusercontent.com/mhweiner/autorel/main/badge.svg)](https://github.com/mhweiner/autorel)
+```
 
 ## License
 
