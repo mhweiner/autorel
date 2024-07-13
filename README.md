@@ -39,7 +39,7 @@ _Currently only has built-in support for `GitHub` and `NPM`, but you can write y
 
 - [Example Usage (CLI)](#example-usage-cli)
 - [Example Usage (Library)](#example-usage-library)
-- [Example Commit Messages](#example-commit-messages)
+- [Commit Messages](#commit-messages)
 - [Usage with GitHub Actions](#usage-with-github-actions)
 - [Usage with Other Repositories (not GitHub)](#usage-with-other-repositories-not-github)
 - [Usage with Other Languages (not Node.js)](#usage-with-other-languages-not-nodejs)
