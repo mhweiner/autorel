@@ -96,9 +96,9 @@ You may want to add the version number to the npx command to prevent breaking ch
 
 # Commit Messages
 
-Commit messages are parsed to determine the version bump. They must follow the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) specification for automatic version bumping according to semantic versioning.
+Commit messages are parsed to determine the version bump. They must follow the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) standard specification.
 
-Here are some examples of commit messages and the resulting version bump (default configuration):
+Here are some examples of commit messages and the resulting [SemVer](https://semver.org) version bump (with default configuration):
 
 - `fix: fix a bug` -> `0.0.1`
 - `feat: add new feature` -> `0.1.0`
