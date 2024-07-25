@@ -7,7 +7,7 @@ export type Commit = {
 
 export function gitFetchTags(): void {
 
-    $`git fetch --tags`;
+    $`git fetch`;
 
 }
 
