@@ -68,6 +68,9 @@ export async function autorel(args: Config): Promise<string|undefined> {
 
     const commitTypeMap = new Map(args.commitTypes.map((type) => [type.type, type]));
 
+    // fetch latest tags
+    git.gitFetchTags();
+
     const lastTag = git.getLastTag();
     const lastProdTag = git.getLastProdTag();
 

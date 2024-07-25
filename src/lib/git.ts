@@ -5,6 +5,12 @@ export type Commit = {
     message: string
 };
 
+export function gitFetchTags(): void {
+
+    $`git fetch --tags`;
+
+}
+
 export function createAndPushTag(tag: string): void {
 
     $`git tag ${tag}`;
