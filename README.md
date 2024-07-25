@@ -21,7 +21,7 @@ Autorel automatically does the following, if appropriate:
 
 _Currently only has built-in support for `GitHub` and `NPM`, but you can write your own scripts to support other systems and languages._
 
-**✅ Conventional Commit and SemVer Compliant**
+**✅ Conventional Commit and SemVer Compliant** 
 - 100% compliant with Conventional Commits and SemVer out of the box, including "!" for breaking changes
 
 **😃 Simple & Easy to Use**
