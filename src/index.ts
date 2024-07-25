@@ -72,7 +72,7 @@ export async function autorel(args: Config): Promise<string|undefined> {
     const lastProdTag = git.getLastProdTag();
 
     output.log(`The last tag is: ${lastTag ? lastTag : color.grey('none')}`);
-    output.log(`The last release tag is: ${lastProdTag ? lastProdTag : color.grey('none')}`);
+    output.log(`The last production tag is: ${lastProdTag ? lastProdTag : color.grey('none')}`);
 
     const commits = git.getCommitsSinceLastTag(lastTag);
 
