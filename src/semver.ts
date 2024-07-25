@@ -69,10 +69,18 @@ export function incrementVersion(
     const {major: prodMajor, minor: prodMinor, patch: prodPatch} = lastProductionVersion;
 
     // some sanity checks
-    if (major < prodMajor) throw new Error('Something must have gone wrong, as the current version is less than the last production version.\n\nTo fix this, we recommend using the --useVersion flag to specify the version you want to use.');
-    if (major === prodMajor && minor < prodMinor) throw new Error('The current version must be greater than or equal to the last production version following SemVer rules.');
-    if (major === prodMajor && minor === prodMinor && patch < prodPatch) throw new Error('The current version must be greater than or equal to the last production version following SemVer rules.');
-    if (!!channel && major === prodMajor && minor === prodMinor && patch === prodPatch) throw new Error('The current version must be greater than or equal to the last production version following SemVer rules.');
+    const lastVersionLessThanLastProdError = 'Something must have gone wrong, as the current version is less than the last production version.\n\nTo fix this, we recommend using the --useVersion flag to specify the version you want to use.';
+
+    if (major < prodMajor) throw new Error(lastVersionLessThanLastProdError);
+    if (major === prodMajor && minor < prodMinor) throw new Error(lastVersionLessThanLastProdError);
+    if (major === prodMajor
+        && minor === prodMinor
+        && patch < prodPatch) throw new Error(lastVersionLessThanLastProdError);
+    if (!!channel
+        && major === prodMajor
+        && minor === prodMinor
+        && patch === prodPatch
+    ) throw new Error(lastVersionLessThanLastProdError);
 
     if (!channel && !prereleaseChannel) {
 

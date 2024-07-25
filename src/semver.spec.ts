@@ -171,22 +171,22 @@ test('incrementVersion: invalid inputs', (assert) => {
     );
     assert.throws(
         () => incrementVersion('v1.0.1', 'v1.0.0', 'none'),
-        new Error('The current version must be greater than or equal to the last production version following SemVer rules.'),
+        new Error('Something must have gone wrong, as the current version is less than the last production version.\n\nTo fix this, we recommend using the --useVersion flag to specify the version you want to use.'),
         'error is thrown if lastTag is less than lastProductionTag'
     );
     assert.throws(
         () => incrementVersion('v1.1.0', 'v1.0.0', 'none'),
-        new Error('The current version must be greater than or equal to the last production version following SemVer rules.'),
+        new Error('Something must have gone wrong, as the current version is less than the last production version.\n\nTo fix this, we recommend using the --useVersion flag to specify the version you want to use.'),
         'error is thrown if lastTag is less than lastProductionTag'
     );
     assert.throws(
         () => incrementVersion('v2.0.0', 'v1.0.0', 'none'),
-        new Error('The current version must be greater than or equal to the last production version following SemVer rules.'),
+        new Error('Something must have gone wrong, as the current version is less than the last production version.\n\nTo fix this, we recommend using the --useVersion flag to specify the version you want to use.'),
         'error is thrown if lastTag is less than lastProductionTag'
     );
     assert.throws(
         () => incrementVersion('v1.0.0', 'v1.0.0-beta', 'none'),
-        new Error('The current version must be greater than or equal to the last production version following SemVer rules.'),
+        new Error('Something must have gone wrong, as the current version is less than the last production version.\n\nTo fix this, we recommend using the --useVersion flag to specify the version you want to use.'),
         'error is thrown if lastTag is less than lastProductionTag'
     );
 
