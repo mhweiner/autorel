@@ -169,7 +169,7 @@ test('incrementVersion: invalid inputs', (assert) => {
         new Error('lastProductionTag is not a valid semver tag'),
         'invalid lastProductionTag should throw an error'
     );
-    const currentLessThanLastTag = 'The current version cannot be less than the last production version (following SemVer).\n\nTo fix this, we recommend using the --useVersion flag to specify the version you want to use.';
+    const currentLessThanLastTag = 'The current version cannot be less than the last production version (following SemVer).\n\nTo fix this, we recommend using the --use-version flag to specify the version you want to use.';
 
     assert.throws(
         () => incrementVersion('v1.0.1', 'v1.0.0', 'none'),

@@ -69,7 +69,7 @@ export function incrementVersion(
     const {major: prodMajor, minor: prodMinor, patch: prodPatch} = lastProductionVersion;
 
     // some sanity checks
-    const lastVersionLessThanLastProdError = 'The current version cannot be less than the last production version (following SemVer).\n\nTo fix this, we recommend using the --useVersion flag to specify the version you want to use.';
+    const lastVersionLessThanLastProdError = 'The current version cannot be less than the last production version (following SemVer).\n\nTo fix this, we recommend using the --use-version flag to specify the version you want to use.';
 
     if (major < prodMajor) throw new Error(lastVersionLessThanLastProdError);
     if (major === prodMajor && minor < prodMinor) throw new Error(lastVersionLessThanLastProdError);
