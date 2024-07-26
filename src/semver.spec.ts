@@ -169,24 +169,26 @@ test('incrementVersion: invalid inputs', (assert) => {
         new Error('lastProductionTag is not a valid semver tag'),
         'invalid lastProductionTag should throw an error'
     );
+    const currentLessThanLastTag = 'The current version cannot be less than the last production version (following SemVer).\n\nTo fix this, we recommend using the --useVersion flag to specify the version you want to use.';
+
     assert.throws(
         () => incrementVersion('v1.0.1', 'v1.0.0', 'none'),
-        new Error('Something must have gone wrong, as the current version is less than the last production version.\n\nTo fix this, we recommend using the --useVersion flag to specify the version you want to use.'),
+        new Error(currentLessThanLastTag),
         'error is thrown if lastTag is less than lastProductionTag'
     );
     assert.throws(
         () => incrementVersion('v1.1.0', 'v1.0.0', 'none'),
-        new Error('Something must have gone wrong, as the current version is less than the last production version.\n\nTo fix this, we recommend using the --useVersion flag to specify the version you want to use.'),
+        new Error(currentLessThanLastTag),
         'error is thrown if lastTag is less than lastProductionTag'
     );
     assert.throws(
         () => incrementVersion('v2.0.0', 'v1.0.0', 'none'),
-        new Error('Something must have gone wrong, as the current version is less than the last production version.\n\nTo fix this, we recommend using the --useVersion flag to specify the version you want to use.'),
+        new Error(currentLessThanLastTag),
         'error is thrown if lastTag is less than lastProductionTag'
     );
     assert.throws(
         () => incrementVersion('v1.0.0', 'v1.0.0-beta', 'none'),
-        new Error('Something must have gone wrong, as the current version is less than the last production version.\n\nTo fix this, we recommend using the --useVersion flag to specify the version you want to use.'),
+        new Error(currentLessThanLastTag),
         'error is thrown if lastTag is less than lastProductionTag'
     );
 
