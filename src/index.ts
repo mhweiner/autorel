@@ -99,12 +99,7 @@ export async function autorel(args: Config): Promise<string|undefined> {
 
     }
 
-    const nextTagCalculated = semver.incrementVersion(
-        lastProdTag || 'v0.0.1',
-        lastTag || 'v0.0.1',
-        releaseType,
-        prereleaseChannel,
-    );
+    let nextTagCalculated = '';
 
     if (args.useVersion) {
 
@@ -117,13 +112,18 @@ export async function autorel(args: Config): Promise<string|undefined> {
 
         } else {
 
-            output.warn(`The next version would be ${nextTagCalculated}, but the version was set by useVersion to be: ${color.bold(args.useVersion)}.`);
+            output.warn(`The next version was set by useVersion to be: ${color.bold(args.useVersion)}.`);
 
         }
 
-        output.warn('I hope you know what you\'re doing. (=^･ω･^=)');
-
     } else {
+
+        nextTagCalculated = semver.incrementVersion(
+            lastProdTag || 'v0.0.1',
+            lastTag || 'v0.0.1',
+            releaseType,
+            prereleaseChannel,
+        );
 
         output.log(`The next version is: ${color.bold(nextTagCalculated)}`);
 
