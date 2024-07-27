@@ -18,9 +18,19 @@ export function createAndPushTag(tag: string): void {
 
 }
 
+/**
+ * Get the last tag. It does this by:
+ * 1. Getting all tags
+ * 2. Filtering out tags that are not in the format v1.2.3
+ * 3. Sorting the tags by version number by tricking the sort -V command by appending an
+ *   underscore to tags that do not have a hyphen in them (i.e. they are not pre-release tags)
+ *   Thanks to this StackOverflow answer: https://stackoverflow.com/questions/40390957/how-to-sort-semantic-versions-in-bash
+ * 4. Removing the underscore from the sorted tags
+ * 5. Getting the last tag
+ */
 export function getLastTag(): string {
 
-    return $`git tag | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+' | sort -V | tail -n 1` || '';
+    return $`git tag | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+' | sed '/-/!s/$/_/' | sort -V | sed 's/_$//' | tail -n 1` || '';
 
 }
 
