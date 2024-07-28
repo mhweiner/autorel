@@ -12,12 +12,18 @@ By automating your releases, you can save time and reduce human error. The relea
 
 `semantic-release` was the inspiration for this project, after using it for the past 7+ years. I have much respect and appreciation for the authors and contributors of `semantic-release`.
 
-However, it has not aged well. I would often find myself frustrated with its complexity, slow execution, and frustrating configuration. I've wasted many hours debugging broken builds and trying to get it to work the way I wanted.
+However, it has some major issues.
 
-It has a very steep learning curve and requires a lot of setup with very confusing and spread out documentation across several repositories.
+The tl;dr is:
 
-It's also not 100% compliant with Conventional Commits and SemVer out of the box, which can lead to incorrect versioning and release notes.
+- Semantic Release is complex, slow, and frustrating to configure.
+- It has a steep learning curve and requires a lot of setup.
+- It's not 100% compliant with Conventional Commits and SemVer out of the box, which can lead to incorrect versioning and release notes.
+- It has way too many dependencies (500+ across common plugins), which can lead to security vulnerabilities, broken builds, and other issues.
+- It doesn't do enough validation of configuration, which can lead to broken releases.
 
-`semantic-release`, together with its required plugins, is a massive and somewhat outdated codebase (written in ES5 Javascript) and has many dependencies (which themselves have many dependencies), which can lead to security vulnerabilities, broken builds, and other issues.
+On the other hand, `autorel` is simple, fast, safe, and easy to use. It's written in TypeScript and has only 3 dependencies, with comprehensive test coverage.
 
-`autorel` is a fresh take on the concept, with a focus on simplicity, speed, and compliance with Conventional Commits and SemVer. It's written in TypeScript and has minimal dependencies, with comprehensive test coverage.
+Any automation tool comes with a risk/reward profile, and `autorel` is designed to minimize the risk while maximizing the reward.
+
+For further reading, I wrote an article this: [Simplify Your Automated Releases with Autorel](https://medium.com/@mhweiner/introducing-autorel-simplifying-automated-releases-5ce5255e3a24)

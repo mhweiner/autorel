@@ -35,6 +35,8 @@ _Currently only has built-in support for `GitHub` and `NPM`, but you can write y
 - Comprehensive test coverage
 - Less broken builds and more time to focus on your code!
 
+[Read our FAQ on why you should use `autorel` and how it compares to other tools](docs/faq.md)
+
 # Table of Contents
 
 - [Example Usage (CLI)](#example-usage-cli)
@@ -74,7 +76,9 @@ autorel --publish
 
 ## Avoiding Breaking Changes
 
-You may want to add the version number to the npx command to prevent breaking changes in the future. For example, `npx autorel@^2 --publish --run 'echo "Next version is ${NEXT_VERSION}"'`
+If using the `npx` command, you may want to append the version number to prevent breaking changes in the future. You can do this by appending `@^` followed by the major version number.
+
+Example: `npx autorel@^2`
 
 # Example Usage (Library)
 
