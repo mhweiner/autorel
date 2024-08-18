@@ -29,6 +29,9 @@ jobs:
           path: ~/.npm
           key: ${{steps.npm-cache-key.outputs.key}}
           restore-keys: npm-cache-${{ runner.os }}-node-
+      - run: npm ci
+      - run: npm test
+      - run: npm run lint
       - run: AUTOREL_DEBUG=1 ./bin/cli.js
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
