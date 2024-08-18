@@ -8,7 +8,7 @@ import {generateChangelog} from './changelog';
 import * as github from './services/github';
 import output from './lib/output';
 import {updatePackageJsonVersion} from './updatePackageJsonVersion';
-import {bash, cmd} from './lib/sh';
+import {bash} from './lib/sh';
 
 export type CommitType = {
     type: string
@@ -22,6 +22,7 @@ export type ReleaseBranch = {
 export type Config = {
     dryRun?: boolean
     run?: string
+    preRun?: string
     runScript?: string
     prereleaseChannel?: string
     useVersion?: string
@@ -136,6 +137,16 @@ export async function autorel(args: Config): Promise<string|undefined> {
 
     if (args.dryRun) return;
 
+    if (args.preRun) {
+
+        output.log('Running pre-release bash script:');
+        output.log('----------------------------');
+        output.log(args.preRun);
+        output.log('----------------------------');
+        bash(args.preRun);
+
+    }
+
     git.createAndPushTag(nextTag);
 
     const {owner, repository} = git.getRepo();
@@ -160,16 +171,23 @@ export async function autorel(args: Config): Promise<string|undefined> {
     process.env.NEXT_VERSION = nextTag.replace('v', '');
     process.env.NEXT_TAG = nextTag;
 
-    // run post-release script
+    // run post-release bash script
     if (args.run) {
 
-        output.log('Running post-release command:');
+        output.log('Running post-release bash script/command:');
         output.log('----------------------------');
         output.log(args.run);
         output.log('----------------------------');
-        cmd(args.run);
+        bash(args.run);
 
     } else if (args.runScript) {
+
+        // TODO: delete this block in the next major version
+
+        output.warn('----------------------------');
+        output.warn('🚨 The "runScript" option is deprecated. Please use "run" instead. 🚨');
+        output.warn('🚨 The "runScript" option will be removed in the next major version. 🚨');
+        output.warn('----------------------------');
 
         output.log('Running post-release bash script:');
         output.log('');

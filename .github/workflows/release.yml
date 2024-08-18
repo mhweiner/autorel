@@ -1,10 +1,7 @@
 name: Release
 on:
   push:
-    branches:
-      - main
-      - alpha
-      - beta
+    branches: [main, next]
 jobs:
   release:
     name: Release
@@ -20,17 +17,19 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: latest
-          registry-url: "https://registry.npmjs.org"
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@aeroview'
           cache: 'npm'
-      - uses: actions/cache@v3
-        id: cache-node-modules
+      - name: Determine npm cache key
+        id: npm-cache-key
+        run: echo "key=npm-cache-${{runner.os}}-node-${{hashFiles('package-lock.json')}}" >> $GITHUB_OUTPUT
+      - name: Cache npm dependencies
+        uses: actions/cache@v4
         with:
-          path: node_modules
-          key: ${{runner.os}}-node-${{hashFiles('package-lock.json')}}
-      - run: npm ci
-      - run: npm run lint
-      - run: npm run test
-      - run: AUTOREL_DEBUG=1 ./bin/cli.js --publish
+          path: ~/.npm
+          key: ${{steps.npm-cache-key.outputs.key}}
+          restore-keys: npm-cache-${{ runner.os }}-node-
+      - run: AUTOREL_DEBUG=1 ./bin/cli.js
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}

@@ -9,6 +9,7 @@ import {defaultConfig} from './defaults';
 const validateConfig = p.object({
     dryRun: p.optional(p.boolean()),
     run: p.optional(p.string()),
+    preRun: p.optional(p.string()),
     runScript: p.optional(p.string()),
     prereleaseChannel: p.optional(p.string()),
     useVersion: p.optional(p.string()),
