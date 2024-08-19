@@ -32,6 +32,6 @@ export function bash(cmd: string): void {
 
     const escapedCommand = cmd.replace(/(["$`\\])/g, '\\$1');
 
-    execSync(`bash -c "${escapedCommand}"`, {encoding: 'utf8', stdio: 'inherit'});
+    execSync(`bash -e -c "${escapedCommand}"`, {encoding: 'utf8', stdio: 'inherit'});
 
 }
