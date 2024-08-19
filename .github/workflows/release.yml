@@ -17,18 +17,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: latest
-          registry-url: 'https://npm.pkg.github.com'
-          scope: '@aeroview'
-          cache: 'npm'
-      - name: Determine npm cache key
-        id: npm-cache-key
-        run: echo "key=npm-cache-${{runner.os}}-node-${{hashFiles('package-lock.json')}}" >> $GITHUB_OUTPUT
-      - name: Cache npm dependencies
-        uses: actions/cache@v4
-        with:
-          path: ~/.npm
-          key: ${{steps.npm-cache-key.outputs.key}}
-          restore-keys: npm-cache-${{ runner.os }}-node-
+          registry-url: "https://registry.npmjs.org"
+          cache: "npm"
       - run: npm ci
       - run: npm test
       - run: npm run lint
