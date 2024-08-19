@@ -253,7 +253,7 @@ This could save you time and money by not running unnecessary steps in your CI/C
 
 This is run *after* determining the new version number but *before* pushing tags, creating the release on GitHub, updating the package.json, or publishing to NPM. 
 
-Example YAML usage:
+Example YAML usage: 
 
 ```yaml
 preRun: |
