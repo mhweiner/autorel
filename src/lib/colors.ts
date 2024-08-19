@@ -27,3 +27,9 @@ export function bold(text: string): string {
     return `\x1b[1m${text}\x1b[0m`;
 
 }
+
+export function blue(text: string): string {
+
+    return `\x1b[34m${text}\x1b[0m`;
+
+}
