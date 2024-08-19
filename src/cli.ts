@@ -20,7 +20,7 @@ const program = new Command();
 
 console.log('------------------------------');
 console.log(`${bold('autorel')} ${grey(`v${packageJson.version}`)}`);
-console.log('');
+console.log('------------------------------');
 
 program
     .version(packageJson.version, '-v, --version')
