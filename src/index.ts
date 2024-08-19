@@ -139,10 +139,7 @@ export async function autorel(args: Config): Promise<string|undefined> {
 
     if (args.preRun) {
 
-        output.log('Running pre-release bash script:');
-        output.log('----------------------------');
-        output.log(args.preRun);
-        output.log('----------------------------');
+        output.log('Running pre-release bash script...');
         bash(args.preRun);
 
     }
@@ -174,10 +171,7 @@ export async function autorel(args: Config): Promise<string|undefined> {
     // run post-release bash script
     if (args.run) {
 
-        output.log('Running post-release bash script/command:');
-        output.log('----------------------------');
-        output.log(args.run);
-        output.log('----------------------------');
+        output.log('Running post-release bash script...');
         bash(args.run);
 
     } else if (args.runScript) {
@@ -189,12 +183,7 @@ export async function autorel(args: Config): Promise<string|undefined> {
         output.warn('🚨 The "runScript" option will be removed in the next major version. 🚨');
         output.warn('----------------------------');
 
-        output.log('Running post-release bash script:');
-        output.log('');
-        output.log('----------------------------');
-        output.log(args.runScript);
-        output.log('----------------------------');
-        output.log('');
+        output.log('Running post-release bash script...');
         bash(args.runScript);
 
     }
