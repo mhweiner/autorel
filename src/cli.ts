@@ -1,5 +1,5 @@
 import {Command} from 'commander';
-import {blue, bold} from './lib/colors';
+import {bold, grey} from './lib/colors';
 import {autorel} from '.';
 import output from './lib/output';
 import {getConfig} from './config';
@@ -18,9 +18,9 @@ export type CliFlags = {
 const packageJson = require('../package.json');
 const program = new Command();
 
-console.log('============================');
-console.log(`${bold(`${blue('auto')}rel`)} v${packageJson.version}`);
-console.log('============================');
+console.log('------------------------------');
+console.log(`${bold('autorel')} ${grey(`v${packageJson.version}`)}`);
+console.log('');
 
 program
     .version(packageJson.version, '-v, --version')

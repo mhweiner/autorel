@@ -33,3 +33,9 @@ export function blue(text: string): string {
     return `\x1b[34m${text}\x1b[0m`;
 
 }
+
+export function white(text: string): string {
+
+    return `\x1b[37m${text}\x1b[0m`;
+
+}
