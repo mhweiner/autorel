@@ -39,3 +39,9 @@ export function white(text: string): string {
     return `\x1b[37m${text}\x1b[0m`;
 
 }
+
+export function strikethrough(text: string): string {
+
+    return `\x1b[9m${text}\x1b[0m`;
+
+}

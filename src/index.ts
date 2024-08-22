@@ -74,7 +74,15 @@ export async function autorel(args: Config): Promise<string|undefined> {
 
     if (prereleaseChannel && !args.useVersion) {
 
-        output.log(`Using prerelease channel: ${color.bold(prereleaseChannel)}`);
+        const stmt = `Using prerelease channel: ${color.bold(prereleaseChannel)}`;
+
+        output.log(!args.useVersion ? stmt : color.strikethrough(stmt));
+
+    } else {
+
+        const stmt = 'This is a production release.';
+
+        output.log(!args.useVersion ? stmt : color.strikethrough(stmt));
 
     }
 
