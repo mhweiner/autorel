@@ -61,12 +61,6 @@ export async function autorel(args: Config): Promise<string|undefined> {
 
     }
 
-    if (prereleaseChannel && !args.useVersion) {
-
-        output.log(`Using prerelease channel: ${color.bold(prereleaseChannel)}`);
-
-    }
-
     const commitTypeMap = new Map(args.commitTypes.map((type) => [type.type, type]));
 
     // fetch latest tags
@@ -78,9 +72,25 @@ export async function autorel(args: Config): Promise<string|undefined> {
     output.log(`The last tag is: ${lastTag ? color.bold(lastTag) : color.grey('none')}`);
     output.log(`The last production tag is: ${lastProdTag ? color.bold(lastProdTag) : color.grey('none')}`);
 
-    const commits = git.getCommitsSinceLastTag(lastTag);
+    if (prereleaseChannel && !args.useVersion) {
 
-    output.log(`Found ${color.bold(commits.length.toString())} commit(s) ${lastTag ? `since ${lastTag}` : 'in the repository'}.`);
+        output.log(`Using prerelease channel: ${color.bold(prereleaseChannel)}`);
+
+    }
+
+    if (prereleaseChannel) {
+
+        output.log(`Fetching commits since ${lastTag || 'the beginning of the repository'}...`);
+
+    } else {
+
+        output.log(`Fetching commits since ${lastProdTag || 'the beginning of the repository'}...`);
+
+    }
+
+    const commits = git.getCommitsSinceLastTag(prereleaseChannel ? lastTag : lastProdTag);
+
+    output.log(`Found ${color.bold(commits.length.toString())} commit(s).`);
 
     const parsedCommits = commits.map((commit) => convCom.parseConventionalCommit(commit.message, commit.hash))
         .filter((commit) => !!commit) as convCom.ConventionalCommit[];
