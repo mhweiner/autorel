@@ -12,3 +12,4 @@ commitTypes:
 branches:
   - {name: main}
   - {name: next, prereleaseChannel: next}
+publish: true

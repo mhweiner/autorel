@@ -2,7 +2,7 @@
     <source srcset="docs/autorel.svg" media="(prefers-color-scheme: dark)">
     <source srcset="docs/autorel-dark.svg" media="(prefers-color-scheme: light)">
     <img src="docs/autorel-dark.svg" alt="Autorel" size="250">
-</picture>
+</picture> 
 
 [![build status](https://github.com/mhweiner/autorel/actions/workflows/release.yml/badge.svg)](https://github.com/mhweiner/autorel/actions)
 [![SemVer](https://img.shields.io/badge/SemVer-2.0.0-blue)](https://semver.org)
@@ -41,6 +41,7 @@ _Currently only has built-in support for `GitHub` and `NPM`, but you can write y
 
 - [Example Usage (CLI)](#example-usage-cli)
 - [Example Usage (Library)](#example-usage-library)
+- [System Requirements](#system-requirements)
 - [Commit Messages](#commit-messages)
 - [Usage with GitHub Actions](#usage-with-github-actions)
 - [Usage with Other Repositories (not GitHub)](#usage-with-other-repositories-not-github)
@@ -98,6 +99,14 @@ Example: `npx autorel@^2`
     });
     ```
 
+# System Requirements
+
+- Linux or MacOS (Windows is not officially supported)
+- Node.js 14+
+- NPM 7+
+- Git 2.13+
+- Bash
+
 # Commit Messages
 
 Commit messages are parsed to determine the version bump. They must follow the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) standard specification.
@@ -139,15 +148,7 @@ jobs:
           node-version: latest
           registry-url: "https://registry.npmjs.org"
           cache: 'npm'
-      - uses: actions/cache@v3
-        id: cache-node-modules
-        with:
-          path: node_modules
-          key: ${{runner.os}}-node-${{hashFiles('package-lock.json')}}
-      - run: npm ci
-      - run: npm run lint
-      - run: npm run test
-      - run: npx autorel --publish
+      - run: npx autorel@^2
         env:
             GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
             NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
@@ -159,7 +160,7 @@ It's also recommended you create a `.autorel.yaml` file in the root of your proj
 
 `autorel` is designed to work with any CI/CD system, not just GitHub Actions. You can use it with GitLab, Bitbucket, Jenkins, or any other system that supports running shell commands.
 
-Simply use the `--skip-release` flag (arg: `skipRelease: true`) to skip creating a release on GitHub. Then, you can use either the `--run` flag (arg: `run: string`) or `runScript` arg to run any command or script after the version bump with the new version number available as an environment variable [see below](#run).
+Simply use the `--skip-release` flag (arg: `skipRelease: true`) to skip creating a release on GitHub. Then, you can use the `--run` flag (arg: `run: string`) to run any command or script after the version bump with the new version number available as an environment variable [see below](#run).
 
 If you're interested in contributing built-in support for other systems, please open an issue or PR.
 
@@ -177,9 +178,9 @@ When run in CLI mode, `autorel` can be configured via CLI arguments or a `yaml` 
 
 However, omitting the `--publish` flag will still publish to NPM if `publish: true` is set in the `yaml` file, and the same for other binary flags.
 
-When used as a library, you can pass the configuration directly to the `autorel` function.
+When used as a library, you pass the configuration directly to the `autorel` function.
 
-All arguments are optional, but setting `branches` is recommended.
+All arguments are optional.
 
 > ❗️ The `yaml` configuration file must be named `.autorel.yaml` and be in the root of your project.
 
@@ -211,32 +212,59 @@ Whether to skip creating a release on GitHub. If `true`, the release will not be
 
 ## run
 
-A command to run after the release is complete. The following environment variables are available:
+A `bash` command/script to run after the release is complete. All scripts are run in "-e" mode, meaning they will exit on the first error.
+
+The following environment variables are available:
 
 | Variable | Description |
 | --- | --- |
 | `NEXT_VERSION` | The new version number (without the `v`) |
 | `NEXT_TAG` | The new tag, ie. v3.1.0 |
 
-- CLI: `--run`
-- Argument: `run: string`
-- Default: `undefined`
+Example CLI usage:
 
-## runScript (YAML only)
+```bash
+npx autorel --run 'echo "Next version is ${NEXT_VERSION}"'
+```
 
-A bash script to run after the release is complete. The same environment variables are available as above.
+Example YAML usage:
 
-> ❗️ This requires `bash` to be installed on the system.
+```yaml
+run: echo "Next version is ${NEXT_VERSION}"
+```
 
 You can use the multi-line string syntax in YAML to write a script:
 
 ```yaml
-runScript: |
-  echo 'Hello, World!' > hello.txt
-  echo 'Goodbye, World!' > goodbye.txt
+run: |
+  echo "$(date +"%Y-%m-%d") ${NEXT_VERSION}" >> versions.txt
+  aws s3 sync . s3://my-bucket
 ```
 
-- Argument: `runScript: string`
+- CLI: `--run`
+- Argument: `run: string`
+- Default: `undefined`
+
+## preRun
+
+A `bash` command/script to run before the release is started. All scripts are run in "-e" mode, meaning they will exit on the first error. Here's where you can do things like run tests or do build steps.
+
+This could save you time and money by not running unnecessary steps in your CI/CD pipeline. It will not run if no release is determined to be necessary, and it will not run in dry-run mode.
+
+This is run *after* determining the new version number but *before* pushing tags, creating the release on GitHub, updating the package.json, or publishing to NPM. 
+
+Example YAML usage: 
+
+```yaml
+preRun: |
+  npm ci
+  npm run build
+  npm run test
+  npm run lint
+```
+
+- CLI: `--pre-run`
+- Argument: `preRun: string`
 - Default: `undefined`
 
 ## preRelease
@@ -249,20 +277,21 @@ The pre-release channel to use. This will be appended to the version number. For
 - Argument: `preRelease: string`
 - Default: `undefined`
 
-## breakingChangeTitle (YAML only)
+## breakingChangeTitle (YAML/library only)
 
 The title to use for the breaking changes section in the release notes.
 
 - Argument: `breakingChangeTitle: string`
 - Default: `"🚨 Breaking Changes 🚨"`
 
-## commitTypes (YAML only)
+## commitTypes (YAML/library only)
 
-The commit types to use for both the release notes and version bumping. If not provided, the default commit types can be found in [src/defaults.ts](src/defaults.ts).
+The commit types to use for both the release notes and version bumping.
 
 - Argument: `commitTypes: CommitType[]`
+- Defaults: [src/defaults.ts](src/defaults.ts)
 
-## branches (YAML only)
+## branches (YAML/library only)
 
 The branches to use for the release along with their pre-release channel. If not provided, the default is:
 
@@ -306,7 +335,7 @@ branches:
 publish: true
 
 # Run custom script after publish
-runScript: |
+run: |
   echo "$(date +"%Y-%m-%d") ${NEXT_VERSION}" >> versions.txt
   aws s3 sync . s3://my-bucket
 ```
@@ -329,11 +358,12 @@ This will output configuration and other debug information.
 
 If using our npm publishing feature, the package.json file's version will be updated in memory before being pushed to npm, as this is the only place where it's actually required. The change will not be pushed to the repository, as it is not necessary and could cause conflicts. See [this post](https://semantic-release.gitbook.io/semantic-release/support/faq)
 
-# Support, Feedback, and Contributions
+If you need access to the new version number in your CI/CD pipeline, you can use the `NEXT_VERSION` or `NEXT_TAG` environment variables.
+
+# Support & Feedback
 
 - Star this repo if you like it!
 - Submit an [issue](https://github.com/mhweiner/autorel/issues) with your problem, feature request or bug report
-- Issue a PR against `main` and request review. Make sure all tests pass and coverage is good.
 - Write about `autorel` in your blog, tweet about it, or share it with your friends!
 - Support this package by adding our badge to your README:
 
@@ -341,18 +371,13 @@ If using our npm publishing feature, the package.json file's version will be upd
 [![autorel](https://raw.githubusercontent.com/mhweiner/autorel/main/badge.svg)](https://github.com/mhweiner/autorel)
 ```
 
+# Contributors & Maintainers Wanted!
+
+We are looking for contributors and maintainers to help with the project. If you are interested, please open an issue or PR. Together we can help bring automated releases to everyone!
+
 ## License
 
 MIT &copy; Marc H. Weiner
 
 [See full license](LICENSE)
 
-## Sponsors
-
-<picture>
-    <source srcset="docs/aeroview-logo-lockup.svg" media="(prefers-color-scheme: dark)">
-    <source srcset="docs/aeroview-logo-lockup-dark.svg" media="(prefers-color-scheme: light)">
-    <img src="docs/aeroview-logo-lockup-dark.svg" alt="Logo" style="max-width: 150px;margin: 0 0 10px">
-</picture>
-
-Aeroview is a developer-friendly, AI-powered observability platform that helps you monitor, troubleshoot, and optimize your applications. Get started for free at [https://aeroview.io](https://aeroview.io).

@@ -8,7 +8,7 @@ import {generateChangelog} from './changelog';
 import * as github from './services/github';
 import output from './lib/output';
 import {updatePackageJsonVersion} from './updatePackageJsonVersion';
-import {bash, cmd} from './lib/sh';
+import {bash} from './lib/sh';
 
 export type CommitType = {
     type: string
@@ -22,6 +22,7 @@ export type ReleaseBranch = {
 export type Config = {
     dryRun?: boolean
     run?: string
+    preRun?: string
     runScript?: string
     prereleaseChannel?: string
     useVersion?: string
@@ -60,12 +61,6 @@ export async function autorel(args: Config): Promise<string|undefined> {
 
     }
 
-    if (prereleaseChannel && !args.useVersion) {
-
-        output.log(`Using prerelease channel: ${color.bold(prereleaseChannel)}`);
-
-    }
-
     const commitTypeMap = new Map(args.commitTypes.map((type) => [type.type, type]));
 
     // fetch latest tags
@@ -74,12 +69,36 @@ export async function autorel(args: Config): Promise<string|undefined> {
     const lastTag = git.getLastTag();
     const lastProdTag = git.getLastProdTag();
 
-    output.log(`The last tag is: ${lastTag ? lastTag : color.grey('none')}`);
-    output.log(`The last production tag is: ${lastProdTag ? lastProdTag : color.grey('none')}`);
+    output.log(`The last tag is: ${lastTag ? color.bold(lastTag) : color.grey('none')}`);
+    output.log(`The last production tag is: ${lastProdTag ? color.bold(lastProdTag) : color.grey('none')}`);
 
-    const commits = git.getCommitsSinceLastTag(lastTag);
+    if (prereleaseChannel && !args.useVersion) {
 
-    output.log(`Found ${color.bold(commits.length.toString())} commit(s) ${lastTag ? `since ${lastTag}` : 'in the repository'}.`);
+        const stmt = `Using prerelease channel: ${color.bold(prereleaseChannel)}`;
+
+        output.log(!args.useVersion ? stmt : color.strikethrough(stmt));
+
+    } else {
+
+        const stmt = 'This is a production release.';
+
+        output.log(!args.useVersion ? stmt : color.strikethrough(stmt));
+
+    }
+
+    if (prereleaseChannel) {
+
+        output.log(`Fetching commits since ${lastTag || 'the beginning of the repository'}...`);
+
+    } else {
+
+        output.log(`Fetching commits since ${lastProdTag || 'the beginning of the repository'}...`);
+
+    }
+
+    const commits = git.getCommitsSinceLastTag(prereleaseChannel ? lastTag : lastProdTag);
+
+    output.log(`Found ${color.bold(commits.length.toString())} commit(s).`);
 
     const parsedCommits = commits.map((commit) => convCom.parseConventionalCommit(commit.message, commit.hash))
         .filter((commit) => !!commit) as convCom.ConventionalCommit[];
@@ -136,6 +155,13 @@ export async function autorel(args: Config): Promise<string|undefined> {
 
     if (args.dryRun) return;
 
+    if (args.preRun) {
+
+        output.log('Running pre-release bash script...');
+        bash(args.preRun);
+
+    }
+
     git.createAndPushTag(nextTag);
 
     const {owner, repository} = git.getRepo();
@@ -160,23 +186,22 @@ export async function autorel(args: Config): Promise<string|undefined> {
     process.env.NEXT_VERSION = nextTag.replace('v', '');
     process.env.NEXT_TAG = nextTag;
 
-    // run post-release script
+    // run post-release bash script
     if (args.run) {
 
-        output.log('Running post-release command:');
-        output.log('----------------------------');
-        output.log(args.run);
-        output.log('----------------------------');
-        cmd(args.run);
+        output.log('Running post-release bash script...');
+        bash(args.run);
 
     } else if (args.runScript) {
 
-        output.log('Running post-release bash script:');
-        output.log('');
-        output.log('----------------------------');
-        output.log(args.runScript);
-        output.log('----------------------------');
-        output.log('');
+        // TODO: delete this block in the next major version
+
+        output.warn('----------------------------');
+        output.warn('🚨 The "runScript" option is deprecated. Please use "run" instead. 🚨');
+        output.warn('🚨 The "runScript" option will be removed in the next major version. 🚨');
+        output.warn('----------------------------');
+
+        output.log('Running post-release bash script...');
         bash(args.runScript);
 
     }
