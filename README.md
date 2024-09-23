@@ -4,6 +4,8 @@
     <img src="docs/autorel-dark.svg" alt="Autorel" size="250">
 </picture> 
 
+---
+
 [![build status](https://github.com/mhweiner/autorel/actions/workflows/release.yml/badge.svg)](https://github.com/mhweiner/autorel/actions)
 [![SemVer](https://img.shields.io/badge/SemVer-2.0.0-blue)](https://semver.org)
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org)
@@ -375,9 +377,19 @@ If you need access to the new version number in your CI/CD pipeline, you can use
 
 We are looking for contributors and maintainers to help with the project. If you are interested, please open an issue or PR. Together we can help bring automated releases to everyone!
 
-## License
+# Sponsorship
+
+Want to sponsor this project? [Reach out to me via email](mailto:mhweiner234@gmail.com?subject=I%20want%20to%20sponsor%20cjs-mock).
+
+<picture>
+    <source srcset="docs/aeroview-logo-lockup-dark.svg" media="(prefers-color-scheme: dark)">
+    <source srcset="docs/aeroview-logo-lockup.svg" media="(prefers-color-scheme: light)">
+    <img src="docs/aeroview-logo-lockup.svg" alt="Logo" style="max-width: 150px;margin: 0 0 10px">
+</picture>
+
+Aeroview is a lightning-fast, developer-friendly, and AI-powered logging IDE. Get started for free at [https://aeroview.io](https://aeroview.io).
+
+# License
 
 MIT &copy; Marc H. Weiner
-
 [See full license](LICENSE)
-
