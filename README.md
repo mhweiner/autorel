@@ -1,8 +1,8 @@
 <picture>
-    <source srcset="docs/autorel.svg" media="(prefers-color-scheme: dark)">
-    <source srcset="docs/autorel-dark.svg" media="(prefers-color-scheme: light)">
-    <img src="docs/autorel-dark.svg" alt="Autorel" size="250">
-</picture> 
+    <source srcset="docs/autorel-white.svg" media="(prefers-color-scheme: dark)">
+    <source srcset="docs/autorel-black.svg" media="(prefers-color-scheme: light)">
+    <img src="docs/autorel-black.svg" alt="Autorel" size="250">
+</picture>
 
 ---
 
@@ -362,34 +362,34 @@ If using our npm publishing feature, the package.json file's version will be upd
 
 If you need access to the new version number in your CI/CD pipeline, you can use the `NEXT_VERSION` or `NEXT_TAG` environment variables.
 
-# Support & Feedback
+# Support, feedback, and contributions
 
 - Star this repo if you like it!
 - Submit an [issue](https://github.com/mhweiner/autorel/issues) with your problem, feature request or bug report
-- Write about `autorel` in your blog, tweet about it, or share it with your friends!
-- Support this package by adding our badge to your README:
-
-```markdown
-[![Static Badge](https://img.shields.io/badge/v2-autorel?label=autorel&labelColor=0ab5fc&color=grey&link=https%3A%2F%2Fgithub.com%2Fmhweiner%2Fautorel)](https://github.com/mhweiner/autorel)
-```
-
-# Contributors & Maintainers Wanted!
-
-We are looking for contributors and maintainers to help with the project. If you are interested, please open an issue or PR. Together we can help bring automated releases to everyone!
+- Issue a PR against `main` and request review. Make sure all tests pass and coverage is good.
+- Write about this project in your blog, tweet about it, or share it with your friends!
 
 # Sponsorship
-
-Want to sponsor this project? [Reach out to me via email](mailto:mhweiner234@gmail.com?subject=I%20want%20to%20sponsor%20cjs-mock).
-
+<br>
 <picture>
-    <source srcset="docs/aeroview-logo-lockup-dark.svg" media="(prefers-color-scheme: dark)">
-    <source srcset="docs/aeroview-logo-lockup.svg" media="(prefers-color-scheme: light)">
-    <img src="docs/aeroview-logo-lockup.svg" alt="Logo" style="max-width: 150px;margin: 0 0 10px">
+    <source srcset="docs/aeroview-white.svg" media="(prefers-color-scheme: dark)">
+    <source srcset="docs/aeroview-black.svg" media="(prefers-color-scheme: light)">
+    <img src="docs/aeroview-black.svg" alt="Logo" height="20">
 </picture>
+<br>
 
 Aeroview is a lightning-fast, developer-friendly, and AI-powered logging IDE. Get started for free at [https://aeroview.io](https://aeroview.io).
 
+Want to sponsor this project? [Reach out](mailto:mhweiner234@gmail.com?subject=I%20want%20to%20sponsor%20autorel).
+
+# Other useful libraries
+
+- [brek](https://github.com/mhweiner/brek): powerful yet simple configuration library for Node.js. It’s structured, typed, and designed for dynamic configuration loading, making it perfect for securely managing secrets (e.g., AWS Secrets Manager).
+- [hoare](https://github.com/mhweiner/hoare): An easy-to-use, fast, and defensive JS/TS test runner designed to help you to write simple, readable, and maintainable tests.
+- [jsout](https://github.com/mhweiner/jsout): A Syslog-compatible, small, and simple logger for Typescript/Javascript projects.
+- [cjs-mock](https://github.com/mhweiner/cjs-mock): NodeJS module mocking for CJS (CommonJS) modules for unit testing purposes.
+- [typura](https://github.com/aeroview/typura): Simple and extensible runtime input validation for TS/JS, written in TS.
+
 # License
 
-MIT &copy; Marc H. Weiner
-[See full license](LICENSE)
+[MIT](LICENSE)

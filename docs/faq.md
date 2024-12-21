@@ -18,12 +18,12 @@ The tl;dr is:
 
 - Semantic Release is complex, slow, and frustrating to configure.
 - It has a steep learning curve and requires a lot of setup.
-- It's not 100% compliant with Conventional Commits and SemVer out of the box, which can lead to incorrect versioning and release notes.
-- It has way too many dependencies (500+ across common plugins), which can lead to security vulnerabilities, broken builds, and other issues.
-- It doesn't do enough validation of configuration, which can lead to broken releases.
+- It's not 100% compliant with Conventional Commits and SemVer out of the box, which can lead to incorrect versioning and releases.
+- It has way too many dependencies (500+ across common plugins), which leads to slow installs, large node_modules, and potential security vulnerabilities. Also leads to broken builds when dependencies are updated.
+- It doesn't do enough validation of configuration, which can lead to broken/failed releases.
 
 On the other hand, `autorel` is simple, fast, safe, and easy to use. It's written in TypeScript and has only 3 dependencies, with comprehensive test coverage.
 
 Any automation tool comes with a risk/reward profile, and `autorel` is designed to minimize the risk while maximizing the reward.
 
-For further reading, I wrote an article this: [Simplify Your Automated Releases with Autorel](https://medium.com/@mhweiner/introducing-autorel-simplifying-automated-releases-5ce5255e3a24)
+For further reading, I wrote an article about this: [Simplify Your Automated Releases with Autorel](https://medium.com/@mhweiner/introducing-autorel-simplifying-automated-releases-5ce5255e3a24)
