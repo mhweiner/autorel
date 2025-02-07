@@ -89,18 +89,18 @@ export async function autorel(args: Config): Promise<string|undefined> {
     if (lastChannelTag && !highestTag) throw new Error('Last channel tag exists, but highest tag does not.');
 
     const tagFromWhichToFindCommits = prereleaseChannel && lastChannelTag
-        ? semver.highestVersion(
+        ? semver.toTag(semver.highestVersion(
             semver.fromTag(lastChannelTag) as semver.SemVer,
             semver.fromTag(lastStableTag ?? 'v0.0.0') as semver.SemVer,
-        )
+        ))
         : lastStableTag;
 
     !!lastChannelTag && output.log(`The last pre-release channel version (${prereleaseChannel}) is: ${color.bold(lastChannelTag)}`);
     output.log(`The last stable/production version is: ${lastStableTag ? color.bold(lastStableTag) : color.grey('none')}`);
     output.log(`The current/highest version is: ${highestTag ? color.bold(highestTag) : color.grey('none')}`);
-    output.log(`Fetching commits since ${tagFromWhichToFindCommits || 'the beginning of the repository'}...`);
+    output.log(`Fetching commits since ${tagFromWhichToFindCommits ?? 'the beginning of the repository'}...`);
 
-    const commits = git.getCommitsSinceLastTag(prereleaseChannel ? lastChannelTag : lastStableTag);
+    const commits = git.getCommitsFromTag(tagFromWhichToFindCommits);
 
     output.log(`Found ${color.bold(commits.length.toString())} commit(s).`);
 

@@ -59,11 +59,11 @@ export function getRepo(): {owner: string, repository: string} {
 
 }
 
-export function getCommitsSinceLastTag(lastTag?: string): Commit[] {
+export function getCommitsFromTag(tag?: string): Commit[] {
 
     const format = '<commit><hash>%h</hash><message>%B</message></commit>';
-    const rawLog = lastTag
-        ? $`git log --pretty=format:"${format}" ${lastTag}..HEAD`
+    const rawLog = tag
+        ? $`git log --pretty=format:"${format}" ${tag}..HEAD`
         : $`git log --pretty=format:"${format}"`;
     const commitsXml = rawLog.match(/<commit>.*?<\/commit>/gs);
 
