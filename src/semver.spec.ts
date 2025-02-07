@@ -1,198 +1,16 @@
 /* eslint-disable max-lines-per-function */
 import {test} from 'hoare';
-import {incrementVersion, incrMajor, incrMinor, incrPatch, returnHighestVersion} from './semver';
-
-test('incrementVersion: production to production', (assert) => {
-
-    assert.equal(
-        incrementVersion('v1.0.0', 'v1.0.0', 'none'),
-        'v1.0.0',
-        'no changes should return the same version'
-    );
-    assert.equal(
-        incrementVersion('v1.0.0', 'v1.0.0', 'patch'),
-        'v1.0.1',
-        'patch release on a production version should increment the patch version'
-    );
-    assert.equal(
-        incrementVersion('v1.0.5', 'v1.0.5', 'patch'),
-        'v1.0.6',
-        'patch release on a production version should increment the patch version'
-    );
-    assert.equal(
-        incrementVersion('v1.0.5', 'v1.0.5', 'minor'),
-        'v1.1.0',
-        'minor release on a production version should increment the minor version'
-    );
-    assert.equal(
-        incrementVersion('v1.0.5', 'v1.0.5', 'major'),
-        'v2.0.0',
-        'major release on a production version should increment the major version and reset minor/patch'
-    );
-
-});
-
-test('incrementVersion: production to prerelease', (assert) => {
-
-    assert.equal(
-        incrementVersion('v1.0.0', 'v1.0.0', 'none', 'alpha'),
-        'v1.0.0',
-        'a no-changes prerelease should return the same version'
-    );
-    assert.equal(
-        incrementVersion('v1.0.1', 'v1.0.1', 'patch', 'rc'),
-        'v1.0.2-rc.1',
-        'patch prerelease on production version should increment patch version and add prerelease channel'
-    );
-    assert.equal(
-        incrementVersion('v1.0.1', 'v1.0.1', 'minor', 'rc'),
-        'v1.1.0-rc.1',
-        'minor prerelease on production version should increment minor version, reset patch, add prerelease channel'
-    );
-    assert.equal(
-        incrementVersion('v1.0.1', 'v1.0.1', 'major', 'rc'),
-        'v2.0.0-rc.1',
-        'major prerelease on production version should increment major version, reset minor/patch, add prerelease channel'
-    );
-
-});
-
-test('incrementVersion: prerelease to prerelease (same channel)', (assert) => {
-
-    assert.equal(
-        incrementVersion('v1.0.0', 'v1.0.1-alpha.1', 'none', 'alpha'),
-        'v1.0.1-alpha.1',
-        'if no changes and the channel is the same, it should return the same version'
-    );
-    assert.equal(
-        incrementVersion('v1.0.0', 'v1.0.1-rc.5', 'minor', 'rc'),
-        'v1.1.0-rc.1',
-        'minor prerelease on a prerelease that is patch should increment version, reset build number'
-    );
-    assert.equal(
-        incrementVersion('v1.0.0', 'v1.0.1-rc.5', 'major', 'rc'),
-        'v2.0.0-rc.1',
-        'major prerelease on a prerelease that is patch should increment version, reset build number'
-    );
-    assert.equal(
-        incrementVersion('v1.0.0', 'v1.1.0-rc.2', 'major', 'rc'),
-        'v2.0.0-rc.1',
-        'major prerelease on a prerelease that is minor should increment version, reset build number'
-    );
-    assert.equal(
-        incrementVersion('v1.0.0', 'v1.0.1-rc.1', 'patch', 'rc'),
-        'v1.0.1-rc.2',
-        'patch prerelease on a prerelease that is already a patch should should keep version, increment build number'
-    );
-    assert.equal(
-        incrementVersion('v1.0.0', 'v1.1.0-rc.1', 'minor', 'rc'),
-        'v1.1.0-rc.2',
-        'minor prerelease on a prerelease that is already a minor should should keep version, increment build number'
-    );
-    assert.equal(
-        incrementVersion('v1.0.0', 'v2.0.0-rc.2', 'major', 'rc'),
-        'v2.0.0-rc.3',
-        'major prerelease on a prerelease that is already major should keep version, increment build number'
-    );
-    assert.equal(
-        incrementVersion('v1.0.0', 'v2.0.0-rc', 'major', 'rc'),
-        'v2.0.0-rc.1',
-        'major prerelease on a prerelease that is already major should keep version, increment build number (default to 0)'
-    );
-    assert.equal(
-        incrementVersion('v1.0.0', 'v2.0.0-rc.1', 'minor', 'rc'),
-        'v2.0.0-rc.2',
-        'minor prerelease on a prerelease that is already major should keep version, increment build number'
-    );
-
-});
-
-test('incrementVersion: prerelease to prerelease (different channel)', (assert) => {
-
-    assert.equal(
-        incrementVersion('v1.0.0', 'v1.0.1-alpha.5', 'none', 'beta'),
-        'v1.0.1-beta.1',
-        'if no changes but the channel is different, it should transition to the new channel and reset the build number'
-    );
-    assert.equal(
-        incrementVersion('v1.0.0', 'v1.0.1-rc.5', 'patch', 'alpha'),
-        'v1.0.1-alpha.1',
-        'patch prerelease on a prerelease w/ diff channel that is patch should keep version, change channel, reset build number'
-    );
-    assert.equal(
-        incrementVersion('v1.0.0', 'v1.1.0-rc.5', 'minor', 'alpha'),
-        'v1.1.0-alpha.1',
-        'minor prerelease on a prerelease w/ diff channel that is minor should keep version, change channel, reset build number'
-    );
-    assert.equal(
-        incrementVersion('v1.0.0', 'v2.0.0-rc.5', 'major', 'alpha'),
-        'v2.0.0-alpha.1',
-        'major prerelease on a prerelease w/ diff channel that is minor should increment version, change channel, reset build number'
-    );
-    assert.equal(
-        incrementVersion('v1.0.0', 'v1.0.1-rc.5', 'minor', 'alpha'),
-        'v1.1.0-alpha.1',
-        'minor prerelease on a prerelease w/ diff channel that is patch should increment version, change channel, reset build number'
-    );
-    assert.equal(
-        incrementVersion('v1.0.0', 'v1.0.1-rc.5', 'major', 'alpha'),
-        'v2.0.0-alpha.1',
-        'major prerelease on a prerelease w/ diff channel that is patch should increment version, change channel, reset build number'
-    );
-    assert.equal(
-        incrementVersion('v1.0.0', 'v2.0.0-rc.5', 'patch', 'alpha'),
-        'v2.0.0-alpha.1',
-        'patch prerelease on a prerelease w/ diff channel that is already major should keep version, change channel, reset build number'
-    );
-
-});
-
-test('incrementVersion: prerelease to production', (assert) => {
-
-    assert.equal(
-        incrementVersion('v1.0.0', 'v1.0.1-rc.1', 'none'),
-        'v1.0.1',
-        'prerelease to production should remove the prerelease'
-    );
-
-});
-
-test('incrementVersion: invalid inputs', (assert) => {
-
-    assert.throws(
-        () => incrementVersion('v1.0.0', '1.0.0', 'none'),
-        new Error('lastTag is not a valid semver tag'),
-        'invalid lastTag should throw an error'
-    );
-    assert.throws(
-        () => incrementVersion('1.0.0', 'v1.0.0', 'none'),
-        new Error('lastProductionTag is not a valid semver tag'),
-        'invalid lastProductionTag should throw an error'
-    );
-    const currentLessThanLastTag = 'The current version cannot be less than the last production version (following SemVer).\n\nTo fix this, we recommend using the --use-version flag to specify the version you want to use.';
-
-    assert.throws(
-        () => incrementVersion('v1.0.1', 'v1.0.0', 'none'),
-        new Error(currentLessThanLastTag),
-        'error is thrown if lastTag is less than lastProductionTag'
-    );
-    assert.throws(
-        () => incrementVersion('v1.1.0', 'v1.0.0', 'none'),
-        new Error(currentLessThanLastTag),
-        'error is thrown if lastTag is less than lastProductionTag'
-    );
-    assert.throws(
-        () => incrementVersion('v2.0.0', 'v1.0.0', 'none'),
-        new Error(currentLessThanLastTag),
-        'error is thrown if lastTag is less than lastProductionTag'
-    );
-    assert.throws(
-        () => incrementVersion('v1.0.0', 'v1.0.0-beta', 'none'),
-        new Error(currentLessThanLastTag),
-        'error is thrown if lastTag is less than lastProductionTag'
-    );
-
-});
+import {
+    incrMajor,
+    incrMinor,
+    incrPatch,
+    highestVersion,
+    incrVer,
+    outOfOrderErr,
+    stableVerNotValid,
+    lastChannelVerNotSameChannel,
+    lastChannelVerTooLarge,
+} from './semver';
 
 test('incrPatch', (assert) => {
 
@@ -239,98 +57,289 @@ test('incrMajor', (assert) => {
 
 });
 
-test('returnHighestVersion', (assert) => {
+test('highestVersion', (assert) => {
 
     assert.equal(
-        returnHighestVersion(
+        highestVersion(
+            {major: 1, minor: 1, patch: 1, channel: 'beta', build: 1},
+            {major: 1, minor: 1, patch: 1, channel: 'beta', build: 1},
+        ),
+        {major: 1, minor: 1, patch: 1, channel: 'beta', build: 1},
+        'returns the same version if they are equal',
+    );
+    assert.equal(
+        highestVersion(
             {major: 1, minor: 0, patch: 0, channel: 'alpha', build: 2},
             {major: 1, minor: 1, patch: 0, channel: 'alpha', build: 2},
         ),
         {major: 1, minor: 1, patch: 0, channel: 'alpha', build: 2},
+        'v1.1.0-alpha.2 should be higher than v1.0.0-alpha.2',
     );
     assert.equal(
-        returnHighestVersion(
+        highestVersion(
             {major: 1, minor: 1, patch: 1, channel: 'alpha', build: 1},
             {major: 1, minor: 1, patch: 1, channel: 'beta', build: 1},
         ),
         {major: 1, minor: 1, patch: 1, channel: 'beta', build: 1},
+        'v1.1.1-beta.1 should be higher than v1.1.1-alpha.1',
     );
     assert.equal(
-        returnHighestVersion(
-            {major: 1, minor: 1, patch: 1, channel: 'beta', build: 1},
-            {major: 1, minor: 1, patch: 1, channel: 'alpha', build: 1},
-        ),
-        {major: 1, minor: 1, patch: 1, channel: 'beta', build: 1},
-    );
-    assert.equal(
-        returnHighestVersion(
+        highestVersion(
             {major: 1, minor: 1, patch: 1, channel: 'alpha', build: 1},
             {major: 1, minor: 1, patch: 1, channel: 'alpha', build: 2},
         ),
         {major: 1, minor: 1, patch: 1, channel: 'alpha', build: 2},
+        'v1.1.1-alpha.2 should be higher than v1.1.1-alpha.1',
     );
     assert.equal(
-        returnHighestVersion(
-            {major: 1, minor: 1, patch: 1, channel: 'alpha', build: 1},
-            {major: 1, minor: 1, patch: 1, channel: 'alpha', build: 2},
-        ),
-        {major: 1, minor: 1, patch: 1, channel: 'alpha', build: 2},
-    );
-    assert.equal(
-        returnHighestVersion(
+        highestVersion(
             {major: 1, minor: 1, patch: 1},
             {major: 2, minor: 1, patch: 1},
         ),
         {major: 2, minor: 1, patch: 1},
+        'v2.1.1 should be higher than v1.1.1',
     );
     assert.equal(
-        returnHighestVersion(
+        highestVersion(
             {major: 1, minor: 1, patch: 1},
             {major: 1, minor: 1, patch: 1, channel: 'alpha'},
         ),
         {major: 1, minor: 1, patch: 1},
+        'v1.1.1 should be higher than v1.1.1-alpha (rhs)',
     );
     assert.equal(
-        returnHighestVersion(
+        highestVersion(
             {major: 1, minor: 1, patch: 1, channel: 'alpha'},
             {major: 1, minor: 1, patch: 1},
         ),
         {major: 1, minor: 1, patch: 1},
+        'v1.1.1 should be higher than v1.1.1-alpha (lhs)',
     );
     assert.equal(
-        returnHighestVersion(
+        highestVersion(
             {major: 1, minor: 1, patch: 1, channel: 'alpha'},
             {major: 1, minor: 1, patch: 1, channel: 'alpha', build: 1},
         ),
         {major: 1, minor: 1, patch: 1, channel: 'alpha', build: 1},
+        'v1.1.1-alpha.1 should be equal to v1.1.1-alpha',
     );
     assert.equal(
-        returnHighestVersion(
+        highestVersion(
             {major: 1, minor: 1, patch: 1, channel: 'alpha', build: 1},
             {major: 1, minor: 1, patch: 1, channel: 'alpha'},
         ),
         {major: 1, minor: 1, patch: 1, channel: 'alpha', build: 1},
+        'v1.1.1-alpha.1 should be equal to v1.1.1-alpha',
     );
     assert.equal(
-        returnHighestVersion(
-            {major: 1, minor: 1, patch: 1, channel: 'alpha', build: 2},
-            {major: 1, minor: 1, patch: 1, channel: 'alpha', build: 1},
-        ),
-        {major: 1, minor: 1, patch: 1, channel: 'alpha', build: 2},
-    );
-    assert.equal(
-        returnHighestVersion(
+        highestVersion(
             {major: 1, minor: 1, patch: 1, channel: 'alpha', build: 6},
             {major: 1, minor: 1, patch: 2, channel: 'alpha', build: 6},
         ),
         {major: 1, minor: 1, patch: 2, channel: 'alpha', build: 6},
+        'v1.1.2-alpha.6 should be higher than v1.1.1-alpha.6',
+    );
+
+});
+
+test('incrVer: invalid inputs', (assert) => {
+
+    assert.throws(
+        () => incrVer({
+            highestVer: {major: 1, minor: 0, patch: 0},
+            lastStableVer: {major: 2, minor: 0, patch: 0},
+            releaseType: 'patch',
+        }),
+        new Error(outOfOrderErr),
+        'throws an error if current version is less than stable version'
+    );
+    assert.throws(
+        () => incrVer({
+            highestVer: {major: 1, minor: 0, patch: 0, channel: 'rc'},
+            lastStableVer: {major: 1, minor: 0, patch: 0},
+            releaseType: 'patch',
+        }),
+        new Error(outOfOrderErr),
+        'throws an error if current version is less than stable version (1)'
+    );
+    assert.throws(
+        () => incrVer({
+            highestVer: {major: 1, minor: 0, patch: 0, channel: 'rc', build: 1},
+            lastStableVer: {major: 1, minor: 0, patch: 0},
+            releaseType: 'patch',
+        }),
+        new Error(outOfOrderErr),
+        'throws an error if current version is less than stable version (2)'
+    );
+    assert.throws(
+        () => incrVer({
+            highestVer: {major: 1, minor: 0, patch: 0},
+            lastStableVer: {major: 1, minor: 0, patch: 0, channel: 'rc'},
+            releaseType: 'patch',
+        }),
+        new Error(stableVerNotValid),
+        'throws an error if lastStableVer is not a stable/production version'
+    );
+    assert.throws(
+        () => incrVer({
+            highestVer: {major: 2, minor: 0, patch: 0, channel: 'beta'},
+            lastStableVer: {major: 1, minor: 0, patch: 0},
+            releaseType: 'patch',
+            prereleaseChannel: 'next',
+            lastChannelVer: {major: 1, minor: 0, patch: 0},
+        }),
+        new Error(lastChannelVerNotSameChannel),
+        'throws an error if lastChannelVer is not a prerelease'
+    );
+    assert.throws(
+        () => incrVer({
+            highestVer: {major: 2, minor: 0, patch: 0, channel: 'beta'},
+            lastStableVer: {major: 1, minor: 0, patch: 0},
+            releaseType: 'patch',
+            prereleaseChannel: 'next',
+            lastChannelVer: {major: 2, minor: 0, patch: 0, channel: 'beta'},
+        }),
+        new Error(lastChannelVerNotSameChannel),
+        'throws an error if lastChannelVer is not a prerelease with the same channel as prereleaseChannel'
+    );
+    assert.throws(
+        () => incrVer({
+            highestVer: {major: 1, minor: 6, patch: 4, channel: 'beta'},
+            lastStableVer: {major: 1, minor: 0, patch: 0},
+            releaseType: 'patch',
+            prereleaseChannel: 'beta',
+            lastChannelVer: {major: 2, minor: 0, patch: 0, channel: 'beta'},
+        }),
+        new Error(lastChannelVerTooLarge),
+        'throws an error if lastChannelVer is higher than highestVer'
+    );
+
+});
+
+test('incrVer: no changes', (assert) => {
+
+    assert.equal(
+        incrVer({
+            highestVer: {major: 1, minor: 0, patch: 0},
+            lastStableVer: {major: 1, minor: 0, patch: 0},
+            releaseType: 'none',
+        }),
+        {major: 1, minor: 0, patch: 0},
+        'no changes should return the same version'
     );
     assert.equal(
-        returnHighestVersion(
-            {major: 1, minor: 1, patch: 2, channel: 'alpha', build: 6},
-            {major: 1, minor: 1, patch: 1, channel: 'alpha', build: 6},
-        ),
-        {major: 1, minor: 1, patch: 2, channel: 'alpha', build: 6},
+        incrVer({
+            highestVer: {major: 1, minor: 1, patch: 1, channel: 'beta', build: 1},
+            lastStableVer: {major: 1, minor: 1, patch: 1, channel: 'beta', build: 1},
+            releaseType: 'none',
+        }),
+        {major: 1, minor: 1, patch: 1, channel: 'beta', build: 1},
+        'no changes should return the same version (1)'
+    );
+
+});
+
+test('incrVer: prod to prod', (assert) => {
+
+    assert.equal(
+        incrVer({
+            highestVer: {major: 1, minor: 0, patch: 0},
+            lastStableVer: {major: 1, minor: 0, patch: 0},
+            releaseType: 'patch',
+        }),
+        {major: 1, minor: 0, patch: 1},
+        'patch release should increment the patch version'
+    );
+    assert.equal(
+        incrVer({
+            highestVer: {major: 1, minor: 0, patch: 1},
+            lastStableVer: {major: 1, minor: 0, patch: 1},
+            releaseType: 'patch',
+        }),
+        {major: 1, minor: 0, patch: 2},
+        'patch release should increment the patch version (1)'
+    );
+    assert.equal(
+        incrVer({
+            highestVer: {major: 1, minor: 0, patch: 6, channel: 'beta', build: 9},
+            lastStableVer: {major: 1, minor: 0, patch: 5},
+            releaseType: 'minor',
+        }),
+        {major: 1, minor: 1, patch: 0},
+        'minor release should increment the minor version and reset patch'
+    );
+    assert.equal(
+        incrVer({
+            highestVer: {major: 1, minor: 0, patch: 6, channel: 'beta', build: 9},
+            lastStableVer: {major: 1, minor: 0, patch: 5},
+            releaseType: 'major',
+        }),
+        {major: 2, minor: 0, patch: 0},
+        'major release should increment the major version and reset minor/patch'
+    );
+
+});
+
+test('incrVer: prod to pre-release', (assert) => {
+
+    assert.equal(
+        incrVer({
+            highestVer: {major: 1, minor: 0, patch: 0},
+            lastStableVer: {major: 1, minor: 0, patch: 0},
+            releaseType: 'patch',
+            prereleaseChannel: 'alpha',
+        }),
+        {major: 1, minor: 0, patch: 1, channel: 'alpha', build: 1},
+        'patch release should increment the patch version and add prerelease channel'
+    );
+    assert.equal(
+        incrVer({
+            highestVer: {major: 2, minor: 0, patch: 0, channel: 'alpha', build: 2},
+            lastStableVer: {major: 1, minor: 0, patch: 1},
+            releaseType: 'patch',
+            prereleaseChannel: 'alpha',
+            lastChannelVer: {major: 2, minor: 0, patch: 0, channel: 'alpha', build: 2},
+        }),
+        {major: 2, minor: 0, patch: 0, channel: 'alpha', build: 3},
+        'should increment the build number if the last channel version conflicts with the next version'
+    );
+    assert.equal(
+        incrVer({
+            highestVer: {major: 1, minor: 0, patch: 1},
+            lastStableVer: {major: 1, minor: 0, patch: 1},
+            releaseType: 'patch',
+            prereleaseChannel: 'alpha',
+            lastChannelVer: {major: 1, minor: 0, patch: 0, channel: 'alpha'},
+        }),
+        {major: 1, minor: 0, patch: 2, channel: 'alpha', build: 1},
+        'should NOT use the root of the last channel version if it is less than the root of the highest version'
+    );
+    assert.equal(
+        incrVer({
+            highestVer: {major: 1, minor: 2, patch: 0, channel: 'beta', build: 2},
+            lastStableVer: {major: 1, minor: 0, patch: 1},
+            releaseType: 'minor',
+            prereleaseChannel: 'alpha',
+            lastChannelVer: {major: 1, minor: 2, patch: 0, channel: 'alpha', build: 1},
+        }),
+        {major: 1, minor: 2, patch: 0, channel: 'alpha', build: 2},
+        'allows a new release to be "less than" the highest version if it is the same root and on a different channel'
+    );
+
+});
+
+test('incrVer: pre-release to pre-release', (assert) => {
+
+    assert.equal(
+        incrVer({
+            highestVer: {major: 1, minor: 3, patch: 0, channel: 'next', build: 4},
+            lastStableVer: {major: 1, minor: 2, patch: 2},
+            releaseType: 'patch',
+            prereleaseChannel: 'alpha',
+            lastChannelVer: {major: 1, minor: 2, patch: 3, channel: 'alpha', build: 1},
+        }),
+        {major: 1, minor: 3, patch: 0, channel: 'alpha', build: 1},
+        'pre-release root must be at least equal to the highest version'
     );
 
 });

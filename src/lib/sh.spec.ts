@@ -14,7 +14,6 @@ test('bash: multi line', (assert) => {
         echo "Two roads diverged in a yellow wood," > /dev/null
         echo "And sorry I could not travel both" > /dev/null
     `);
-
     assert.equal(1, 1);
 
 });

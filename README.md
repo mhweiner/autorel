@@ -113,11 +113,11 @@ Example: `npx autorel@^2`
 
 Commit messages are parsed to determine the version bump. They must follow the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) standard specification.
 
-Here are some examples of commit messages and the resulting [SemVer](https://semver.org) version bump (with default configuration):
+Here are some examples of commit messages and the resulting [SemVer](https://semver.org) version bump (with the default configuration):
 
-- `fix: fix a bug` -> `0.0.1`
-- `feat: add new feature` -> `0.1.0`
-- `feat!: add breaking change` -> `1.0.0`
+- `fix: fix a bug` -> `0.0.1` (patch)
+- `feat: add new feature` -> `0.1.0` (minor)
+- `feat!: add breaking change` -> `1.0.0` (major)
 
 You can find more examples in the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) documentation.
 

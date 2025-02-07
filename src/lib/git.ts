@@ -18,25 +18,21 @@ export function createAndPushTag(tag: string): void {
 
 }
 
-/**
- * Get the last tag. It does this by:
- * 1. Getting all tags
- * 2. Filtering out tags that are not in the format v1.2.3
- * 3. Sorting the tags by version number by tricking the sort -V command by appending an
- *   underscore to tags that do not have a hyphen in them (i.e. they are not pre-release tags)
- *   Thanks to this StackOverflow answer: https://stackoverflow.com/questions/40390957/how-to-sort-semantic-versions-in-bash
- * 4. Removing the underscore from the sorted tags
- * 5. Getting the last tag
- */
-export function getLastTag(): string {
+export function getLastChannelTag(channel: string): string|undefined {
 
-    return $`git tag | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+' | sed '/-/!s/$/_/' | sort -V | sed 's/_$//' | tail -n 1` || '';
+    return $`git tag | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+-${channel}\.[0-9]+$' | sort -V | tail -n 1` || undefined;
 
 }
 
-export function getLastProdTag(): string {
+export function getHighestTag(): string|undefined {
 
-    return $`git tag --list | grep -E "^v[0-9]+\\.[0-9]+\\.[0-9]+$" | sort -V | tail -n 1` || '';
+    return $`git tag --sort=-v:refname | head -n1` || undefined;
+
+}
+
+export function getLastStableTag(): string|undefined {
+
+    return $`git tag --sort=-v:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | head -n1` || undefined;
 
 }
 
@@ -63,10 +59,10 @@ export function getRepo(): {owner: string, repository: string} {
 
 }
 
-export function getCommitsSinceLastTag(lastTag: string): Commit[] {
+export function getCommitsSinceLastTag(lastTag?: string): Commit[] {
 
     const format = '<commit><hash>%h</hash><message>%B</message></commit>';
-    const rawLog = lastTag !== ''
+    const rawLog = lastTag
         ? $`git log --pretty=format:"${format}" ${lastTag}..HEAD`
         : $`git log --pretty=format:"${format}"`;
     const commitsXml = rawLog.match(/<commit>.*?<\/commit>/gs);
