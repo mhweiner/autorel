@@ -83,9 +83,9 @@ export async function autorel(args: Config): Promise<string|undefined> {
     const highestTag = git.getHighestTag();
 
     // validate tags if they exist
-    if (lastChannelTag && !semver.isValidVersionStr(lastChannelTag)) throw new Error(`Invalid last channel tag: ${lastChannelTag}`);
-    if (lastStableTag && !semver.isValidVersionStr(lastStableTag)) throw new Error(`Invalid last stable tag: ${lastStableTag}`);
-    if (highestTag && !semver.isValidVersionStr(highestTag)) throw new Error(`Invalid highest tag: ${highestTag}`);
+    if (lastChannelTag && !semver.isValidTag(lastChannelTag)) throw new Error(`Invalid last channel tag: ${lastChannelTag}`);
+    if (lastStableTag && !semver.isValidTag(lastStableTag)) throw new Error(`Invalid last stable tag: ${lastStableTag}`);
+    if (highestTag && !semver.isValidTag(highestTag)) throw new Error(`Invalid highest tag: ${highestTag}`);
 
     !!lastChannelTag && output.log(`The last pre-release channel version (${prereleaseChannel}) is: ${color.bold(lastChannelTag)}`);
     output.log(`The last stable/production version is: ${lastStableTag ? color.bold(lastStableTag) : color.grey('none')}`);
@@ -127,7 +127,7 @@ export async function autorel(args: Config): Promise<string|undefined> {
     if (args.useVersion) {
 
         if (/^v(.+)$/.test(args.useVersion)) throw new Error('useVersion should not start with a "v".');
-        if (!semver.isValidVersionStr(args.useVersion)) throw new Error('useVersion must be a valid SemVer version');
+        if (!semver.isValidTag(args.useVersion)) throw new Error('useVersion must be a valid SemVer version');
 
         if (releaseType === 'none') {
 

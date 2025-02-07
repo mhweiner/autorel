@@ -10,7 +10,100 @@ import {
     stableVerNotValid,
     lastChannelVerNotSameChannel,
     lastChannelVerTooLarge,
+    fromTag,
+    toTag,
+    isValidTag,
 } from './semver';
+
+test('isValidTag', (assert) => {
+
+    assert.equal(
+        isValidTag('v1.0.0'),
+        true,
+        'valid: stable version'
+    );
+    assert.equal(
+        isValidTag('v3.3.2-beta.4'),
+        true,
+        'valid: pre-release with channel and build'
+    );
+    assert.equal(
+        isValidTag('v3.3.2-beta'),
+        true,
+        'valid: pre-release with channel but no build'
+    );
+    assert.equal(
+        isValidTag('1.0.0'),
+        false,
+        'invalid: version without v prefix'
+    );
+    assert.equal(
+        isValidTag('blah'),
+        false,
+        'invalid: random string'
+    );
+    assert.equal(
+        isValidTag('v3.3.2-b'),
+        true,
+        'invalid: pre-release with channel with invalid build'
+    );
+    assert.equal(
+        isValidTag('v3.3.2-0'),
+        true,
+        'invalid: pre-release with channel and build starting with 0'
+    );
+
+});
+
+test('toTag', (assert) => {
+
+    assert.equal(
+        toTag({major: 1, minor: 0, patch: 0}),
+        'v1.0.0',
+        'stable version'
+    );
+    assert.equal(
+        toTag({major: 1, minor: 0, patch: 0, channel: 'rc', build: 1}),
+        'v1.0.0-rc.1',
+        'pre-release with channel and build'
+    );
+    assert.equal(
+        toTag({major: 1, minor: 0, patch: 0, channel: 'rc'}),
+        'v1.0.0-rc',
+        'pre-release with channel but no build'
+    );
+
+});
+
+test('fromTag', (assert) => {
+
+    assert.equal(
+        fromTag('v1.0.0'),
+        {major: 1, minor: 0, patch: 0},
+        'stable version'
+    );
+    assert.equal(
+        fromTag('v1.0.0-rc.1'),
+        {major: 1, minor: 0, patch: 0, channel: 'rc', build: 1},
+        'pre-release with channel and build'
+    );
+    assert.equal(
+        fromTag('v1.0.0-rc'),
+        {major: 1, minor: 0, patch: 0, channel: 'rc'},
+        'pre-release with channel but no build'
+    );
+    assert.equal(
+        fromTag('1.0.0-rc'),
+        null,
+        'version without v prefix should return null'
+    );
+    assert.equal(
+        fromTag('blah'),
+        null,
+        'invalid version should return null'
+    );
+
+});
 
 test('incrPatch', (assert) => {
 

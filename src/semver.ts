@@ -194,9 +194,9 @@ export function incrMajor(version: SemVer): SemVer {
 
 }
 
-export function isValidVersionStr(ver: string): boolean {
+export function isValidTag(ver: string): boolean {
 
-    return !!fromTag(`v${ver}`);
+    return !!fromTag(ver);
 
 }
 
