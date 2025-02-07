@@ -86,20 +86,19 @@ export async function autorel(args: Config): Promise<string|undefined> {
     if (lastChannelTag && !semver.isValidTag(lastChannelTag)) throw new Error(`Invalid last channel tag: ${lastChannelTag}`);
     if (lastStableTag && !semver.isValidTag(lastStableTag)) throw new Error(`Invalid last stable tag: ${lastStableTag}`);
     if (highestTag && !semver.isValidTag(highestTag)) throw new Error(`Invalid highest tag: ${highestTag}`);
+    if (lastChannelTag && !highestTag) throw new Error('Last channel tag exists, but highest tag does not.');
+
+    const tagFromWhichToFindCommits = prereleaseChannel && lastChannelTag
+        ? semver.highestVersion(
+            semver.fromTag(lastChannelTag) as semver.SemVer,
+            semver.fromTag(lastStableTag ?? 'v0.0.0') as semver.SemVer,
+        )
+        : lastStableTag;
 
     !!lastChannelTag && output.log(`The last pre-release channel version (${prereleaseChannel}) is: ${color.bold(lastChannelTag)}`);
     output.log(`The last stable/production version is: ${lastStableTag ? color.bold(lastStableTag) : color.grey('none')}`);
     output.log(`The current/highest version is: ${highestTag ? color.bold(highestTag) : color.grey('none')}`);
-
-    if (prereleaseChannel) {
-
-        output.log(`Fetching commits since ${lastChannelTag || 'the beginning of the repository'}...`);
-
-    } else {
-
-        output.log(`Fetching commits since ${lastStableTag || 'the beginning of the repository'}...`);
-
-    }
+    output.log(`Fetching commits since ${tagFromWhichToFindCommits || 'the beginning of the repository'}...`);
 
     const commits = git.getCommitsSinceLastTag(prereleaseChannel ? lastChannelTag : lastStableTag);
 
