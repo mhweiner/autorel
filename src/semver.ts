@@ -1,13 +1,14 @@
 /* eslint-disable max-lines-per-function */
-type Semver = {
+export type SemVer = {
     major: number
     minor: number
     patch: number
     channel?: string
     build?: number
 };
+export type ReleaseType = 'major' | 'minor' | 'patch' | 'none';
 
-export function toTag(version: Semver): string {
+export function toTag(version: SemVer): string {
 
     let versionString = `${version.major}.${version.minor}.${version.patch}`;
 
@@ -27,7 +28,7 @@ export function toTag(version: Semver): string {
 
 }
 
-export function fromTag(tag: string): Semver | null {
+export function fromTag(tag: string): SemVer | null {
 
     const semverRegex = /^v(?<major>0|[1-9]\d*)\.(?<minor>0|[1-9]\d*)\.(?<patch>0|[1-9]\d*)(?:-(?<channel>[0-9a-zA-Z-]+)(?:\.(?<build>[0-9a-zA-Z-]+))?)?(?:\+(?<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/;
     const match = tag.match(semverRegex);
@@ -50,191 +51,93 @@ export function fromTag(tag: string): Semver | null {
 
 }
 
-export function incrementVersion(
-    lastProductionTag: string,
-    lastTag: string,
-    releaseType: 'major' | 'minor' | 'patch' | 'none',
-    prereleaseChannel?: string
-): string {
+export function isVerPrerelease(version: SemVer): boolean {
 
-    const lastVersion = fromTag(lastTag);
-
-    if (!lastVersion) throw new Error('lastTag is not a valid semver tag');
-
-    const {major, minor, patch, channel, build} = lastVersion;
-    const lastProductionVersion = fromTag(lastProductionTag);
-
-    if (!lastProductionVersion) throw new Error('lastProductionTag is not a valid semver tag');
-
-    const {major: prodMajor, minor: prodMinor, patch: prodPatch} = lastProductionVersion;
-
-    // some sanity checks
-    const lastVersionLessThanLastProdError = 'The current version cannot be less than the last production version (following SemVer).\n\nTo fix this, we recommend using the --use-version flag to specify the version you want to use.';
-
-    if (major < prodMajor) throw new Error(lastVersionLessThanLastProdError);
-    if (major === prodMajor && minor < prodMinor) throw new Error(lastVersionLessThanLastProdError);
-    if (major === prodMajor
-        && minor === prodMinor
-        && patch < prodPatch) throw new Error(lastVersionLessThanLastProdError);
-    if (!!channel
-        && major === prodMajor
-        && minor === prodMinor
-        && patch === prodPatch
-    ) throw new Error(lastVersionLessThanLastProdError);
-
-    if (!channel && !prereleaseChannel) {
-
-        // prod to prod
-        // ex: v1.0.1 -> v1.0.2
-
-        switch (releaseType) {
-
-            case 'major':
-
-                // ex: v1.0.1 -> v2.0.0
-                return toTag({major: major + 1, minor: 0, patch: 0});
-
-            case 'minor':
-
-                // ex: v1.0.1 -> v1.1.0
-                return toTag({major, minor: minor + 1, patch: 0});
-
-            case 'patch':
-
-                // ex: v1.0.1 -> v1.0.2
-                return toTag({major, minor, patch: patch + 1});
-
-            default:
-
-                // no changes on a prod release means we return the same version
-                return toTag(lastVersion);
-
-        }
-
-    } else if (!channel && !!prereleaseChannel) {
-
-        // prod to prerelease
-        // ex: v1.0.1 -> v1.0.2-alpha.1
-
-        switch (releaseType) {
-
-            case 'major':
-
-                // ex: v1.0.1 -> v2.0.0-alpha.1
-                return toTag({major: major + 1, minor: 0, patch: 0, channel: prereleaseChannel, build: 1});
-
-            case 'minor':
-
-                // ex: v1.0.1 -> v1.1.0-alpha.1
-                return toTag({major, minor: minor + 1, patch: 0, channel: prereleaseChannel, build: 1});
-
-            case 'patch':
-
-                // ex: v1.0.1 -> v1.0.2-alpha.1
-                return toTag({major, minor, patch: patch + 1, channel: prereleaseChannel, build: 1});
-
-            default:
-
-                // no changes on a prod release means we return the same version
-                return toTag(lastVersion);
-
-        }
-
-    } else if (!!channel && !!prereleaseChannel) {
-
-        // prerelease to prerelease
-        // ex: v1.0.1-alpha.1 -> v1.1.0-alpha.1
-
-        if (channel === prereleaseChannel) {
-
-            // same channel
-            // ex: v1.0.1-alpha.1 -> v1.0.1-alpha.2
-
-            if (releaseType === 'none') return lastTag; // no changes
-
-            // increment the last production version by the release type
-            const lastProdVersionRootIncr = incrByType(lastProductionVersion, releaseType);
-
-            // get the base version of the last version for comparison
-            const lastVersionRoot = {major, minor, patch};
-
-            // take the highest version of nextVersionNaked and lastVersion
-            const nextVersionRoot = returnHighestVersion(lastProdVersionRootIncr, lastVersionRoot);
-
-            // if the version is the same, increment the build number
-            if (toTag(nextVersionRoot) === toTag(lastVersionRoot)) {
-
-                // increment build number
-                return toTag({
-                    ...nextVersionRoot,
-                    channel,
-                    build: build ? build + 1 : 1,
-                });
-
-            } else {
-
-                // it's a new version
-                return toTag({...nextVersionRoot, channel, build: 1});
-
-            }
-
-        } else {
-
-            // different channel
-            // ex: v1.0.1-alpha.1 -> v1.0.1-beta.1
-
-            if (releaseType === 'none') {
-
-                // no changes but the channel is different
-                // ex: v1.0.1-alpha.1 -> v1.0.1-beta.1
-                return toTag({...lastVersion, channel: prereleaseChannel, build: 1});
-
-            }
-
-            // increment the last production version by the release type
-            const lastProdVersionRootIncr = incrByType(lastProductionVersion, releaseType);
-
-            // get the base version of the last version for comparison
-            const lastVersionRoot = {major, minor, patch};
-
-            // take the highest version of nextVersionNaked and lastVersion
-            const nextVersionRoot = returnHighestVersion(lastProdVersionRootIncr, lastVersionRoot);
-
-            // if the version is the same, change channel and reset build number
-            if (toTag(nextVersionRoot) === toTag(lastVersionRoot)) {
-
-                return toTag({
-                    ...nextVersionRoot,
-                    channel: prereleaseChannel,
-                    build: 1,
-                });
-
-            } else {
-
-                // it's a new version
-                return toTag({...nextVersionRoot, channel: prereleaseChannel, build: 1});
-
-            }
-
-        }
-
-    } else {
-
-        // prerelease to prod
-        // ex: v1.0.1-alpha.1 -> v1.0.1
-        return toTag({
-            major,
-            minor,
-            patch,
-        });
-
-    }
+    return !!version.channel;
 
 }
 
-export function incrByType(version: Semver, type: 'major' | 'minor' | 'patch'): Semver {
+export function normalize(version: SemVer): SemVer {
 
-    switch (type) {
+    return {
+        major: version.major,
+        minor: version.minor,
+        patch: version.patch,
+        ...(version.channel ? {
+            channel: version.channel,
+            build: version.build || 1,
+        } : {}),
+    };
+
+}
+
+/**
+ * Compares two versions and returns:
+ * - 1 if version1 is greater than version2
+ * - -1 if version1 is less than version2
+ * - 0 if they are equal
+ */
+export function compareVersions(version1: SemVer, version2: SemVer): number {
+
+    const version1n = normalize(version1);
+    const version2n = normalize(version2);
+
+    if (version1n.major > version2n.major) return 1;
+    if (version1n.major < version2n.major) return -1;
+
+    if (version1n.minor > version2n.minor) return 1;
+    if (version1n.minor < version2n.minor) return -1;
+
+    if (version1n.patch > version2n.patch) return 1;
+    if (version1n.patch < version2n.patch) return -1;
+
+    if (!version1n.channel && !!version2n.channel) return 1;
+    if (!!version1n.channel && !version2n.channel) return -1;
+
+    if (!version1n.build && !!version2n.build) return 1;
+    if (!!version1n.build && !version2n.build) return -1;
+
+    // compare channel
+    if (version1n.channel && version2n.channel) {
+
+        if (version1n.channel > version2n.channel) return 1;
+        if (version1n.channel < version2n.channel) return -1;
+
+        // compare build
+        if (version1n.build && version2n.build) {
+
+            if (version1n.build > version2n.build) return 1;
+            if (version1n.build < version2n.build) return -1;
+
+        }
+
+    }
+
+    return 0;
+
+}
+
+export function rootVersion(version: SemVer): SemVer {
+
+    return {
+        major: version.major,
+        minor: version.minor,
+        patch: version.patch,
+    };
+
+}
+
+export function highestVersion(version1: SemVer, version2: SemVer): SemVer {
+
+    const comparison = compareVersions(version1, version2);
+
+    return normalize(comparison > 0 ? version1 : version2);
+
+}
+
+export function incrByType(version: SemVer, releaseType: ReleaseType): SemVer {
+
+    switch (releaseType) {
 
         case 'major':
 
@@ -248,11 +151,14 @@ export function incrByType(version: Semver, type: 'major' | 'minor' | 'patch'): 
 
             return incrPatch(version);
 
+        default:
+            return version;
+
     }
 
 }
 
-export function incrPatch(version: Semver): Semver {
+export function incrPatch(version: SemVer): SemVer {
 
     return {
         ...version,
@@ -264,7 +170,7 @@ export function incrPatch(version: Semver): Semver {
 
 }
 
-export function incrMinor(version: Semver): Semver {
+export function incrMinor(version: SemVer): SemVer {
 
     return {
         ...version,
@@ -276,7 +182,7 @@ export function incrMinor(version: Semver): Semver {
 
 }
 
-export function incrMajor(version: Semver): Semver {
+export function incrMajor(version: SemVer): SemVer {
 
     return {
         ...version,
@@ -288,41 +194,85 @@ export function incrMajor(version: Semver): Semver {
 
 }
 
-export function returnHighestVersion(version1: Semver, version2: Semver): Semver {
+export function isValidTag(ver: string): boolean {
 
-    if (version1.major > version2.major) return version1;
-    if (version1.major < version2.major) return version2;
-
-    if (version1.minor > version2.minor) return version1;
-    if (version1.minor < version2.minor) return version2;
-
-    if (version1.patch > version2.patch) return version1;
-    if (version1.patch < version2.patch) return version2;
-
-    if (version1.channel && !version2.channel) return version2;
-    if (!version1.channel && version2.channel) return version1;
-    if (version1.channel && version2.channel) {
-
-        if (version1.channel > version2.channel) return version1;
-        if (version1.channel < version2.channel) return version2;
-
-    }
-
-    if (version1.build && !version2.build) return version1;
-    if (!version1.build && version2.build) return version2;
-    if (version1.build && version2.build) {
-
-        if (version1.build > version2.build) return version1;
-        if (version1.build < version2.build) return version2;
-
-    }
-
-    return version1;
+    return !!fromTag(ver);
 
 }
 
-export function isValidVersion(ver: string): boolean {
+export function isValidVersion(version: SemVer): boolean {
 
-    return !!fromTag(`v${ver}`);
+    return !!fromTag(toTag(version));
+
+}
+
+export const outOfOrderErr = 'The current/highest version cannot be less than the last stable/production version (following SemVer).'
+        + '\n\nTo fix this, we recommend using the --use-version flag to specify the version you want to use.';
+export const stableVerNotValid = 'The stable version cannot be a prerelease.';
+export const lastChannelVerNotSameChannel = 'The last channel version must be a prerelease of the same channel.';
+export const lastChannelVerTooLarge = 'The last channel version cannot be greater than the highest version.';
+
+/**
+ * Increments the version based on the release type. The next version must
+ * be greater than the highest/current version except for the following cases:
+ * 1. The release type is 'none'.
+ * 2. The highest version is a prerelease of a different channel. Even in this case,
+ *   the next version must be greater than the last stable/production version.
+ *
+ * Parameters:
+ * - `highestVer` is typically the current version of the package and the
+ *   same as `lastStableVer` if the last release was a stable/production release.
+ * - `lastStableVer` is the last stable/production release.
+ * - `releaseType` is the type of release to make.
+ * - `prereleaseChannel` is the name of the prerelease channel, if it's a prerelease.
+ * - `lastChannelVer` is the last version of the package on the same channel.
+ */
+export function incrVer(input: {
+    highestVer: SemVer
+    lastStableVer: SemVer
+    releaseType: ReleaseType
+    prereleaseChannel?: string
+    lastChannelVer?: SemVer
+}): SemVer {
+
+    const {lastStableVer, highestVer, releaseType, prereleaseChannel, lastChannelVer} = input;
+
+    if (releaseType === 'none') return highestVer;
+    if (compareVersions(highestVer, lastStableVer) < 0) throw new Error(outOfOrderErr);
+    if (isVerPrerelease(lastStableVer)) throw new Error(stableVerNotValid);
+    if (prereleaseChannel && lastChannelVer && compareVersions(lastChannelVer, highestVer) > 0)
+        throw new Error(lastChannelVerTooLarge);
+    if (prereleaseChannel && lastChannelVer && prereleaseChannel !== lastChannelVer.channel)
+        throw new Error(lastChannelVerNotSameChannel);
+
+    const isPrerelease = !!prereleaseChannel;
+    const nextRootVer = highestVersion(incrByType(lastStableVer, releaseType), rootVersion(highestVer));
+
+    if (isPrerelease) {
+
+        const nextVer = {
+            ...nextRootVer,
+            channel: prereleaseChannel,
+            build: 1,
+        };
+
+        if (!lastChannelVer || compareVersions(nextVer, lastChannelVer) > 0) {
+
+            return nextVer;
+
+        } else {
+
+            return {
+                ...lastChannelVer,
+                build: (lastChannelVer.build || 0) + 1,
+            };
+
+        }
+
+    } else {
+
+        return nextRootVer;
+
+    }
 
 }

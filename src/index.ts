@@ -39,9 +39,8 @@ export function getPrereleaseChannel(config: Config): string|undefined {
 
     const branch = git.getCurrentBranch();
 
-    if (!branch) throw new Error('Could not get the current branch.');
-
-    if (!config.branches || !config.branches.length) throw new Error('Branches are not defined in the configuration.');
+    if (!branch) throw new Error('Could not get the current branch. Please make sure you are in a git repository.');
+    if (!config.branches || !config.branches.length) throw new Error('Branches are not defined in the configuration. See https://github.com/mhweiner/autorel?tab=readme-ov-file#configuration');
 
     const matchingBranch = config.branches.find((b) => b.name === branch);
 
@@ -61,17 +60,6 @@ export async function autorel(args: Config): Promise<string|undefined> {
 
     }
 
-    const commitTypeMap = new Map(args.commitTypes.map((type) => [type.type, type]));
-
-    // fetch latest tags
-    git.gitFetchTags();
-
-    const lastTag = git.getLastTag();
-    const lastProdTag = git.getLastProdTag();
-
-    output.log(`The last tag is: ${lastTag ? color.bold(lastTag) : color.grey('none')}`);
-    output.log(`The last production tag is: ${lastProdTag ? color.bold(lastProdTag) : color.grey('none')}`);
-
     if (prereleaseChannel && !args.useVersion) {
 
         const stmt = `Using prerelease channel: ${color.bold(prereleaseChannel)}`;
@@ -86,17 +74,33 @@ export async function autorel(args: Config): Promise<string|undefined> {
 
     }
 
-    if (prereleaseChannel) {
+    const commitTypeMap = new Map(args.commitTypes.map((type) => [type.type, type]));
 
-        output.log(`Fetching commits since ${lastTag || 'the beginning of the repository'}...`);
+    git.gitFetchTags(); // fetch latest tags from remote
 
-    } else {
+    const lastChannelTag = prereleaseChannel ? git.getLastChannelTag(prereleaseChannel) : undefined;
+    const lastStableTag = git.getLastStableTag();
+    const highestTag = git.getHighestTag();
 
-        output.log(`Fetching commits since ${lastProdTag || 'the beginning of the repository'}...`);
+    // validate tags if they exist
+    if (lastChannelTag && !semver.isValidTag(lastChannelTag)) throw new Error(`Invalid last channel tag: ${lastChannelTag}`);
+    if (lastStableTag && !semver.isValidTag(lastStableTag)) throw new Error(`Invalid last stable tag: ${lastStableTag}`);
+    if (highestTag && !semver.isValidTag(highestTag)) throw new Error(`Invalid highest tag: ${highestTag}`);
+    if (lastChannelTag && !highestTag) throw new Error('Last channel tag exists, but highest tag does not.');
 
-    }
+    const tagFromWhichToFindCommits = prereleaseChannel && lastChannelTag
+        ? semver.toTag(semver.highestVersion(
+            semver.fromTag(lastChannelTag) as semver.SemVer,
+            semver.fromTag(lastStableTag ?? 'v0.0.0') as semver.SemVer,
+        ))
+        : lastStableTag;
 
-    const commits = git.getCommitsSinceLastTag(prereleaseChannel ? lastTag : lastProdTag);
+    !!lastChannelTag && output.log(`The last pre-release channel version (${prereleaseChannel}) is: ${color.bold(lastChannelTag)}`);
+    output.log(`The last stable/production version is: ${lastStableTag ? color.bold(lastStableTag) : color.grey('none')}`);
+    output.log(`The current/highest version is: ${highestTag ? color.bold(highestTag) : color.grey('none')}`);
+    output.log(`Fetching commits since ${tagFromWhichToFindCommits ?? 'the beginning of the repository'}...`);
+
+    const commits = git.getCommitsFromTag(tagFromWhichToFindCommits);
 
     output.log(`Found ${color.bold(commits.length.toString())} commit(s).`);
 
@@ -113,7 +117,6 @@ export async function autorel(args: Config): Promise<string|undefined> {
     if (releaseType === 'none' && !args.useVersion) {
 
         output.log('No release is needed. Have a nice day (^_^)/');
-
         return;
 
     }
@@ -123,7 +126,7 @@ export async function autorel(args: Config): Promise<string|undefined> {
     if (args.useVersion) {
 
         if (/^v(.+)$/.test(args.useVersion)) throw new Error('useVersion should not start with a "v".');
-        if (!semver.isValidVersion(args.useVersion)) throw new Error('useVersion must be a valid SemVer version');
+        if (!semver.isValidTag(args.useVersion)) throw new Error('useVersion must be a valid SemVer version');
 
         if (releaseType === 'none') {
 
@@ -137,12 +140,13 @@ export async function autorel(args: Config): Promise<string|undefined> {
 
     } else {
 
-        nextTagCalculated = semver.incrementVersion(
-            lastProdTag || 'v0.0.1',
-            lastTag || 'v0.0.1',
+        nextTagCalculated = semver.toTag(semver.incrVer({
+            highestVer: semver.fromTag(highestTag || 'v0.0.0') as semver.SemVer,
+            lastStableVer: semver.fromTag(lastStableTag || 'v0.0.0') as semver.SemVer,
             releaseType,
             prereleaseChannel,
-        );
+            lastChannelVer: lastChannelTag ? semver.fromTag(lastChannelTag) ?? undefined : undefined,
+        }));
 
         output.log(`The next version is: ${color.bold(nextTagCalculated)}`);
 
