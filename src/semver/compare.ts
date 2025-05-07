@@ -1,4 +1,4 @@
-import {normalizeVer} from './parse';
+import {fromTag, normalizeVer} from './parse';
 import {SemVer} from './types';
 
 /**
@@ -52,5 +52,18 @@ export function highestVersion(version1: SemVer, version2: SemVer): SemVer {
     const comparison = compareVersions(version1, version2);
 
     return normalizeVer(comparison > 0 ? version1 : version2);
+
+}
+
+/**
+ * Takes a list of tags and returns the latest version.
+ */
+export function getLatestVerFromTags(tags: string[]): SemVer | null {
+
+    const versions = tags.map(fromTag).filter((v): v is SemVer => !!v);
+
+    if (versions.length === 0) return null;
+
+    return versions.reduce(highestVersion);
 
 }
