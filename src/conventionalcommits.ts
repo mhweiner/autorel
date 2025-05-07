@@ -1,5 +1,5 @@
 import {inspect} from 'node:util';
-import output from './lib/output';
+import output from './lib/logger';
 import {CommitType} from '.';
 import {dim, greenBright, redBright, yellowBright} from 'colorette';
 

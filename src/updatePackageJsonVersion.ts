@@ -1,4 +1,4 @@
-import output from './lib/output';
+import output from './lib/logger';
 import {writeFileSync} from 'fs';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -40,6 +40,6 @@ export function updatePackageJsonVersion(newVersion: string): void {
         version: newVersion.replace(/^v/, ''),
     }, null, 2));
 
-    output.log('Successfully updated package.json locally');
+    output.info('Successfully updated package.json locally');
 
 }

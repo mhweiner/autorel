@@ -77,7 +77,7 @@ test('fromTag', (assert) => {
     );
     assert.equal(
         fromTag('v1.0.0-rc'),
-        {major: 1, minor: 0, patch: 0, channel: 'rc'},
+        {major: 1, minor: 0, patch: 0, channel: 'rc', build: 1},
         'pre-release with channel but no build'
     );
     assert.equal(

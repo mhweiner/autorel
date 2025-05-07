@@ -295,8 +295,19 @@ test('incrVer: pre-release to pre-release', (assert) => {
             prereleaseChannel: 'next',
             latestChannelVer: fromTag('v1.3.0-next')!,
         }),
-        fromTag('v1.3.0-next.1')!,
-        'should add a build number starting at 1 if the last channel root version is the same as the new version but there is no build number'
+        fromTag('v1.3.0-next.2')!,
+        'should add a build number starting at 2 if the last channel root version is the same as the new version but there is no build number'
+    );
+    assert.equal(
+        incrVer({
+            latestVer: {major: 1, minor: 3, patch: 0, channel: 'next'},
+            latestStableVer: fromTag('v1.2.2')!,
+            releaseType: 'patch',
+            prereleaseChannel: 'next',
+            latestChannelVer: {major: 1, minor: 3, patch: 0, channel: 'next'},
+        }),
+        fromTag('v1.3.0-next.2')!,
+        'should add a build number starting at 2 if the last channel root version is the same as the new version but there is no build number'
     );
 
 });

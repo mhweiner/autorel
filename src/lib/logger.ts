@@ -2,7 +2,7 @@ import {dim, red, yellow} from 'colorette';
 
 const prefix = '[autorel] ';
 
-function log(message: string): void {
+function info(message: string): void {
 
     console.log(`${prefix}${message}`);
 
@@ -10,24 +10,24 @@ function log(message: string): void {
 
 function debug(message: string): void {
 
-    process.env.AUTOREL_DEBUG && log(dim(message));
+    process.env.AUTOREL_DEBUG && info(dim(message));
 
 }
 
 function warn(message: string): void {
 
-    log(yellow(`Warning: ${message}`));
+    info(yellow(`Warning: ${message}`));
 
 }
 
 function error(message: string): void {
 
-    log(red(`Error: ${message}`));
+    info(red(`Error: ${message}`));
 
 }
 
 export default {
-    log,
+    info,
     debug,
     warn,
     error,

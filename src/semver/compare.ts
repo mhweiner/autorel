@@ -24,9 +24,6 @@ export function compareVersions(version1: SemVer, version2: SemVer): number {
     if (!version1n.channel && !!version2n.channel) return 1;
     if (!!version1n.channel && !version2n.channel) return -1;
 
-    if (!version1n.build && !!version2n.build) return 1;
-    if (!!version1n.build && !version2n.build) return -1;
-
     // compare channel
     if (version1n.channel && version2n.channel) {
 
@@ -48,9 +45,9 @@ export function compareVersions(version1: SemVer, version2: SemVer): number {
 }
 
 /**
- * Returns the latest version of two SemVer objects.
+ * Returns the highest version of two SemVer objects (nomalized).
  */
-export function latestVersion(version1: SemVer, version2: SemVer): SemVer {
+export function highestVersion(version1: SemVer, version2: SemVer): SemVer {
 
     const comparison = compareVersions(version1, version2);
 

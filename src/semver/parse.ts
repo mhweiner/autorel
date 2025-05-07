@@ -1,4 +1,4 @@
-import {latestVersion} from './compare';
+import {highestVersion} from './compare';
 import {SemVer} from './types';
 import {predicates as p, toResult} from 'typura';
 
@@ -51,13 +51,13 @@ export function fromTag(tag: string): SemVer | null {
 
     const {major, minor, patch, channel, build} = match.groups;
 
-    return {
+    return normalizeVer({
         major: parseInt(major, 10), // radix is necessary to avoid octal literals
         minor: parseInt(minor, 10),
         patch: parseInt(patch, 10),
         ...(channel ? {channel} : {}),
         ...(build ? {build: parseInt(build, 10)} : {}),
-    };
+    });
 
 }
 
@@ -128,7 +128,7 @@ export function getLatestVerFromTags(tags: string[]): SemVer | null {
 
     if (versions.length === 0) return null;
 
-    return versions.reduce(latestVersion);
+    return versions.reduce(highestVersion);
 
 }
 

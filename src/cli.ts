@@ -1,7 +1,7 @@
 import {Command} from 'commander';
 import {bold, dim, white} from 'colorette';
 import {autorel} from '.';
-import output from './lib/output';
+import output from './lib/logger';
 import {getConfig} from './config';
 
 export type CliFlags = {

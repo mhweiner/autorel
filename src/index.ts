@@ -5,7 +5,7 @@ import * as git from './services/git';
 import * as npm from './services/npm';
 import {generateChangelog} from './changelog';
 import * as github from './services/github';
-import output from './lib/output';
+import logger from './lib/logger';
 import {updatePackageJsonVersion} from './updatePackageJsonVersion';
 import {bash} from './services/sh';
 import {bold, dim, greenBright, redBright, strikethrough, yellowBright} from 'colorette';
@@ -72,7 +72,7 @@ export async function autorel(args: Config): Promise<string|undefined> {
 
     if (args.dryRun) {
 
-        output.warn('Running in dry-run mode. No changes will be made.');
+        logger.warn('Running in dry-run mode. No changes will be made.');
 
     }
 
@@ -80,13 +80,13 @@ export async function autorel(args: Config): Promise<string|undefined> {
 
         const stmt = `Using prerelease channel: ${bold(prereleaseChannel)}`;
 
-        output.log(!args.useVersion ? stmt : strikethrough(stmt));
+        logger.info(!args.useVersion ? stmt : strikethrough(stmt));
 
     } else {
 
         const stmt = 'This is a production release.';
 
-        output.log(!args.useVersion ? stmt : strikethrough(stmt));
+        logger.info(!args.useVersion ? stmt : strikethrough(stmt));
 
     }
 
@@ -105,20 +105,20 @@ export async function autorel(args: Config): Promise<string|undefined> {
     if (lastChannelTag && !highestTag) throw new Error('Last channel tag exists, but highest tag does not.');
 
     const tagFromWhichToFindCommits = prereleaseChannel && lastChannelTag
-        ? semver.toTag(semver.latestVersion(
+        ? semver.toTag(semver.highestVersion(
             semver.fromTag(lastChannelTag) as semver.SemVer,
             semver.fromTag(lastStableTag ?? 'v0.0.0') as semver.SemVer,
         ))
         : lastStableTag;
 
-    !!lastChannelTag && output.log(`The last pre-release channel version (${prereleaseChannel}) is: ${bold(lastChannelTag)}`);
-    output.log(`The last stable/production version is: ${lastStableTag ? bold(lastStableTag) : dim('none')}`);
-    output.log(`The current/highest version is: ${highestTag ? bold(highestTag) : dim('none')}`);
-    output.log(`Fetching commits since ${tagFromWhichToFindCommits ?? 'the beginning of the repository'}...`);
+    !!lastChannelTag && logger.info(`The last pre-release channel version (${prereleaseChannel}) is: ${bold(lastChannelTag)}`);
+    logger.info(`The last stable/production version is: ${lastStableTag ? bold(lastStableTag) : dim('none')}`);
+    logger.info(`The current/highest version is: ${highestTag ? bold(highestTag) : dim('none')}`);
+    logger.info(`Fetching commits since ${tagFromWhichToFindCommits ?? 'the beginning of the repository'}...`);
 
     const commits = git.getCommitsFromTag(tagFromWhichToFindCommits);
 
-    output.log(`Found ${bold(commits.length.toString())} commit(s).`);
+    logger.info(`Found ${bold(commits.length.toString())} commit(s).`);
 
     const parsedCommits = commits.map((commit) => convCom.parseConventionalCommit(commit.message, commit.hash))
         .filter((commit) => !!commit) as convCom.ConventionalCommit[];
@@ -128,11 +128,11 @@ export async function autorel(args: Config): Promise<string|undefined> {
             || (releaseType === 'minor' && yellowBright('minor'))
             || (releaseType === 'patch' && greenBright('patch'));
 
-    output.log(`The release type is: ${releaseTypeStr}`);
+    logger.info(`The release type is: ${releaseTypeStr}`);
 
     if (releaseType === 'none' && !args.useVersion) {
 
-        output.log('No release is needed. Have a nice day (^_^)/');
+        logger.info('No release is needed. Have a nice day (^_^)/');
         return;
 
     }
@@ -146,11 +146,11 @@ export async function autorel(args: Config): Promise<string|undefined> {
 
         if (releaseType === 'none') {
 
-            output.warn(`We didn't find any commmits that would create a release, but you have set 'useVersion', which will force a release as: ${bold(args.useVersion)}.`);
+            logger.warn(`We didn't find any commmits that would create a release, but you have set 'useVersion', which will force a release as: ${bold(args.useVersion)}.`);
 
         } else {
 
-            output.warn(`The next version was set by useVersion to be: ${bold(args.useVersion)}.`);
+            logger.warn(`The next version was set by useVersion to be: ${bold(args.useVersion)}.`);
 
         }
 
@@ -164,20 +164,20 @@ export async function autorel(args: Config): Promise<string|undefined> {
             latestChannelVer: lastChannelTag ? semver.fromTag(lastChannelTag) ?? undefined : undefined,
         }));
 
-        output.log(`The next version is: ${bold(nextTagCalculated)}`);
+        logger.info(`The next version is: ${bold(nextTagCalculated)}`);
 
     }
 
     const nextTag = args.useVersion ? `v${args.useVersion}` : nextTagCalculated;
     const changelog = generateChangelog(parsedCommits, commitTypeMap, args.breakingChangeTitle);
 
-    output.debug(`The changelog is:\n${changelog}`);
+    logger.debug(`The changelog is:\n${changelog}`);
 
     if (args.dryRun) return;
 
     if (args.preRun) {
 
-        output.log('Running pre-release bash script...');
+        logger.info('Running pre-release bash script...');
         bash(args.preRun);
 
     }
@@ -209,19 +209,19 @@ export async function autorel(args: Config): Promise<string|undefined> {
     // run post-release bash script
     if (args.run) {
 
-        output.log('Running post-release bash script...');
+        logger.info('Running post-release bash script...');
         bash(args.run);
 
     } else if (args.runScript) {
 
         // TODO: delete this block in the next major version
 
-        output.warn('----------------------------');
-        output.warn('🚨 The "runScript" option is deprecated. Please use "run" instead. 🚨');
-        output.warn('🚨 The "runScript" option will be removed in the next major version. 🚨');
-        output.warn('----------------------------');
+        logger.warn('----------------------------');
+        logger.warn('🚨 The "runScript" option is deprecated. Please use "run" instead. 🚨');
+        logger.warn('🚨 The "runScript" option will be removed in the next major version. 🚨');
+        logger.warn('----------------------------');
 
-        output.log('Running post-release bash script...');
+        logger.info('Running post-release bash script...');
         bash(args.runScript);
 
     }

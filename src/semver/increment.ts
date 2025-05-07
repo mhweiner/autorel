@@ -1,4 +1,4 @@
-import {compareVersions, latestVersion} from './compare';
+import {compareVersions, highestVersion} from './compare';
 import {isVerPrerelease, rootVersion} from './parse';
 import {ReleaseType, SemVer} from './types';
 import {errors} from './errors';
@@ -97,7 +97,7 @@ export function incrVer(input: {
         throw new Error(errors.lastChannelVerNotSameChannel);
 
     const isPrerelease = !!prereleaseChannel;
-    const nextRootVer = latestVersion(incrByType(latestStableVer, releaseType), rootVersion(latestVer));
+    const nextRootVer = highestVersion(incrByType(latestStableVer, releaseType), rootVersion(latestVer));
 
     if (isPrerelease) {
 
@@ -120,7 +120,7 @@ export function incrVer(input: {
             // Otherwise, increment the build number of the last channel version
             return {
                 ...latestChannelVer,
-                build: (latestChannelVer.build ?? 0) + 1,
+                build: (latestChannelVer.build ?? 1) + 1,
             };
 
         }

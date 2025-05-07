@@ -2,7 +2,7 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as yaml from 'js-yaml';
 import {ValidationError, predicates as p, toResult} from 'typura';
-import output from './lib/output';
+import output from './lib/logger';
 import {Config} from '.';
 import {defaultConfig} from './defaults';
 
@@ -39,12 +39,12 @@ function readAutorelYaml(filePath = '.autorel.yaml'): Config | {} {
     // Check if the file exists
     if (!fs.existsSync(absolutePath)) {
 
-        output.log('.autorel.yaml not found, using default configuration');
+        output.info('.autorel.yaml not found, using default configuration');
         return {};
 
     } else {
 
-        output.log('Using .autorel.yaml configuration');
+        output.info('Using .autorel.yaml configuration');
 
     }
 
