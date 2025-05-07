@@ -1,13 +1,13 @@
 /* eslint-disable max-lines-per-function */
 import * as semver from './semver';
 import * as convCom from './conventionalcommits';
-import * as git from './lib/git';
-import * as npm from './lib/npm';
+import * as git from './services/git';
+import * as npm from './services/npm';
 import {generateChangelog} from './changelog';
 import * as github from './services/github';
 import output from './lib/output';
 import {updatePackageJsonVersion} from './updatePackageJsonVersion';
-import {bash} from './lib/sh';
+import {bash} from './services/sh';
 import {bold, dim, greenBright, redBright, strikethrough, yellowBright} from 'colorette';
 
 export type CommitType = {

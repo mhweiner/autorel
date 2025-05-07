@@ -1,5 +1,5 @@
 import {execSync} from 'child_process';
-import out from './output';
+import out from '../lib/output';
 
 /**
  * Executes a bash program/command and returns the output. This is a tagged template
