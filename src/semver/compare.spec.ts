@@ -1,6 +1,6 @@
 /* eslint-disable max-lines-per-function */
 import {test} from 'hoare';
-import {compareVersions, getLatestVerFromTags, highestVersion} from './compare';
+import {compareVersions, getLatestChannelVerFromTags, getLatestStableVerFromTags, getLatestVerFromTags, highestVersion} from './compare';
 import {fromTag, toTag} from './parse';
 
 test('latestVersion', (assert) => {
@@ -200,10 +200,15 @@ test('getLatestVerFromTags: ignores invalid tags when computing latest', (assert
 
 test('getLatestVerFromTags: correctly handles prerelease ordering', (assert) => {
 
-    const tags = ['v2.0.0-alpha.1', 'v2.0.0-alpha.2', 'v1.9.9'];
-    const expected = fromTag('v2.0.0-alpha.2');
 
-    assert.equal(getLatestVerFromTags(tags), expected);
+    assert.equal(
+        getLatestVerFromTags(['v2.0.0-alpha.1', 'v2.0.0-alpha.2', 'v1.9.9']),
+        fromTag('v2.0.0-alpha.2')
+    );
+    assert.equal(
+        getLatestVerFromTags(['v1.0.0', 'v1.0.1', 'v1.0.2', 'v1.0.2-alpha.1']),
+        fromTag('v1.0.2')
+    );
 
 });
 
@@ -222,6 +227,41 @@ test('getLatestVerFromTags: toTag(getLatestVerFromTags(tags)) should return one 
     const latest = getLatestVerFromTags(tags);
     const latestTag = toTag(latest!);
 
-    assert.isTrue(tags.includes(latestTag), `Expected ${latestTag} to be in ${tags}`);
+    assert.isTrue(tags.includes(latestTag));
+
+});
+
+test('getLatestStableVerFromTags: ignores pre-releases', (assert) => {
+
+    const tags = ['v1.0.0', 'v1.2.0', 'v1.2.1', 'v1.2.1-alpha.1', 'v2.0.0-rc.1'];
+    const latest = getLatestStableVerFromTags(tags);
+    const latestTag = toTag(latest!);
+
+    assert.equal(latestTag, 'v1.2.1');
+
+});
+
+test('getLatestStableVerFromTags: no results should return null', (assert) => {
+
+    const tags = ['v1.0.0-rc.1'];
+
+    assert.equal(getLatestStableVerFromTags(tags), null);
+
+});
+
+test('getLatestChannelVerFromTags: only returns tags with specified channel', (assert) => {
+
+    const tags = ['v1.0.0', 'v1.2.0', 'v1.2.1', 'v1.2.1-alpha.1', 'v2.0.0-rc.1'];
+    const latest = getLatestChannelVerFromTags(tags, 'alpha');
+
+    assert.equal(toTag(latest!), 'v1.2.1-alpha.1');
+
+});
+
+test('getLatestChannelVerFromTags: no results should return null', (assert) => {
+
+    const tags = ['v1.0.0-rc.1'];
+
+    assert.equal(getLatestChannelVerFromTags(tags, 'alpha'), null);
 
 });

@@ -55,12 +55,38 @@ export function highestVersion(version1: SemVer, version2: SemVer): SemVer {
 
 }
 
-/**
- * Takes a list of tags and returns the latest version.
- */
 export function getLatestVerFromTags(tags: string[]): SemVer | null {
 
     const versions = tags.map(fromTag).filter((v): v is SemVer => !!v);
+
+    if (versions.length === 0) return null;
+
+    return versions.reduce(highestVersion);
+
+}
+
+export function getLatestChannelVerFromTags(
+    tags: string[],
+    channel: string,
+): SemVer | null {
+
+    const versions = tags
+        .map(fromTag)
+        .filter((v): v is SemVer => !!v)
+        .filter((v) => v.channel === channel);
+
+    if (versions.length === 0) return null;
+
+    return versions.reduce(highestVersion);
+
+}
+
+export function getLatestStableVerFromTags(tags: string[]): SemVer | null {
+
+    const versions = tags
+        .map(fromTag)
+        .filter((v): v is SemVer => !!v)
+        .filter((v) => !v.channel);
 
     if (versions.length === 0) return null;
 
