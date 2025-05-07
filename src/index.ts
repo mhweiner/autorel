@@ -33,6 +33,22 @@ export type Config = {
     branches: ReleaseBranch[]
 };
 
+/**
+ * Determines the prerelease channel to use for the current release.
+ *
+ * It follows this order of precedence:
+ * 1. Use `config.prereleaseChannel` if explicitly defined.
+ * 2. Otherwise, detect the current git branch and look for a matching entry
+ *    in `config.branches` to infer the prerelease channel.
+ *
+ * Returns:
+ * - A string representing the prerelease channel (e.g. "alpha", "beta"), or
+ * - `undefined` if no channel is configured or matched.
+ *
+ * Throws:
+ * - If the current branch cannot be determined.
+ * - If `config.branches` is undefined or empty.
+ */
 export function getPrereleaseChannel(config: Config): string|undefined {
 
     if (config.prereleaseChannel) return config.prereleaseChannel;
@@ -89,7 +105,7 @@ export async function autorel(args: Config): Promise<string|undefined> {
     if (lastChannelTag && !highestTag) throw new Error('Last channel tag exists, but highest tag does not.');
 
     const tagFromWhichToFindCommits = prereleaseChannel && lastChannelTag
-        ? semver.toTag(semver.highestVersion(
+        ? semver.toTag(semver.latestVersion(
             semver.fromTag(lastChannelTag) as semver.SemVer,
             semver.fromTag(lastStableTag ?? 'v0.0.0') as semver.SemVer,
         ))
@@ -141,11 +157,11 @@ export async function autorel(args: Config): Promise<string|undefined> {
     } else {
 
         nextTagCalculated = semver.toTag(semver.incrVer({
-            highestVer: semver.fromTag(highestTag || 'v0.0.0') as semver.SemVer,
-            lastStableVer: semver.fromTag(lastStableTag || 'v0.0.0') as semver.SemVer,
+            latestVer: semver.fromTag(highestTag || 'v0.0.0') as semver.SemVer,
+            latestStableVer: semver.fromTag(lastStableTag || 'v0.0.0') as semver.SemVer,
             releaseType,
             prereleaseChannel,
-            lastChannelVer: lastChannelTag ? semver.fromTag(lastChannelTag) ?? undefined : undefined,
+            latestChannelVer: lastChannelTag ? semver.fromTag(lastChannelTag) ?? undefined : undefined,
         }));
 
         output.log(`The next version is: ${bold(nextTagCalculated)}`);
