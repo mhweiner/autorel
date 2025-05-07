@@ -3,12 +3,12 @@ import * as semver from './semver';
 import * as convCom from './conventionalcommits';
 import * as git from './lib/git';
 import * as npm from './lib/npm';
-import * as color from './lib/colors';
 import {generateChangelog} from './changelog';
 import * as github from './services/github';
 import output from './lib/output';
 import {updatePackageJsonVersion} from './updatePackageJsonVersion';
 import {bash} from './lib/sh';
+import {bold, dim, greenBright, redBright, strikethrough, yellowBright} from 'colorette';
 
 export type CommitType = {
     type: string
@@ -62,15 +62,15 @@ export async function autorel(args: Config): Promise<string|undefined> {
 
     if (prereleaseChannel && !args.useVersion) {
 
-        const stmt = `Using prerelease channel: ${color.bold(prereleaseChannel)}`;
+        const stmt = `Using prerelease channel: ${bold(prereleaseChannel)}`;
 
-        output.log(!args.useVersion ? stmt : color.strikethrough(stmt));
+        output.log(!args.useVersion ? stmt : strikethrough(stmt));
 
     } else {
 
         const stmt = 'This is a production release.';
 
-        output.log(!args.useVersion ? stmt : color.strikethrough(stmt));
+        output.log(!args.useVersion ? stmt : strikethrough(stmt));
 
     }
 
@@ -95,22 +95,22 @@ export async function autorel(args: Config): Promise<string|undefined> {
         ))
         : lastStableTag;
 
-    !!lastChannelTag && output.log(`The last pre-release channel version (${prereleaseChannel}) is: ${color.bold(lastChannelTag)}`);
-    output.log(`The last stable/production version is: ${lastStableTag ? color.bold(lastStableTag) : color.grey('none')}`);
-    output.log(`The current/highest version is: ${highestTag ? color.bold(highestTag) : color.grey('none')}`);
+    !!lastChannelTag && output.log(`The last pre-release channel version (${prereleaseChannel}) is: ${bold(lastChannelTag)}`);
+    output.log(`The last stable/production version is: ${lastStableTag ? bold(lastStableTag) : dim('none')}`);
+    output.log(`The current/highest version is: ${highestTag ? bold(highestTag) : dim('none')}`);
     output.log(`Fetching commits since ${tagFromWhichToFindCommits ?? 'the beginning of the repository'}...`);
 
     const commits = git.getCommitsFromTag(tagFromWhichToFindCommits);
 
-    output.log(`Found ${color.bold(commits.length.toString())} commit(s).`);
+    output.log(`Found ${bold(commits.length.toString())} commit(s).`);
 
     const parsedCommits = commits.map((commit) => convCom.parseConventionalCommit(commit.message, commit.hash))
         .filter((commit) => !!commit) as convCom.ConventionalCommit[];
     const releaseType = convCom.determineReleaseType(parsedCommits, commitTypeMap);
-    const releaseTypeStr = (releaseType === 'none' && color.grey('none'))
-            || (releaseType === 'major' && color.red('major'))
-            || (releaseType === 'minor' && color.yellow('minor'))
-            || (releaseType === 'patch' && color.green('patch'));
+    const releaseTypeStr = (releaseType === 'none' && dim('none'))
+            || (releaseType === 'major' && redBright('major'))
+            || (releaseType === 'minor' && yellowBright('minor'))
+            || (releaseType === 'patch' && greenBright('patch'));
 
     output.log(`The release type is: ${releaseTypeStr}`);
 
@@ -130,11 +130,11 @@ export async function autorel(args: Config): Promise<string|undefined> {
 
         if (releaseType === 'none') {
 
-            output.warn(`We didn't find any commmits that would create a release, but you have set 'useVersion', which will force a release as: ${color.bold(args.useVersion)}.`);
+            output.warn(`We didn't find any commmits that would create a release, but you have set 'useVersion', which will force a release as: ${bold(args.useVersion)}.`);
 
         } else {
 
-            output.warn(`The next version was set by useVersion to be: ${color.bold(args.useVersion)}.`);
+            output.warn(`The next version was set by useVersion to be: ${bold(args.useVersion)}.`);
 
         }
 
@@ -148,7 +148,7 @@ export async function autorel(args: Config): Promise<string|undefined> {
             lastChannelVer: lastChannelTag ? semver.fromTag(lastChannelTag) ?? undefined : undefined,
         }));
 
-        output.log(`The next version is: ${color.bold(nextTagCalculated)}`);
+        output.log(`The next version is: ${bold(nextTagCalculated)}`);
 
     }
 
