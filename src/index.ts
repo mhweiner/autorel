@@ -92,7 +92,7 @@ export async function autorel(args: Config): Promise<string|undefined> {
             || (releaseType === 'minor' && yellowBright('minor'))
             || (releaseType === 'patch' && greenBright('patch'));
 
-    logger.info(`The release type is: ${releaseTypeStr}`);
+    logger.info(`The release type is: ${bold(String(releaseTypeStr))}`);
 
     if (releaseType === 'none' && !args.useVersion) {
 
