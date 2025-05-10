@@ -1,7 +1,6 @@
 import {inspect} from 'node:util';
 import output from './lib/logger';
 import {CommitType} from '.';
-import {dim, greenBright, redBright, yellowBright} from 'colorette';
 
 type ReleaseType = 'major' | 'minor' | 'patch' | 'none';
 
@@ -110,12 +109,6 @@ export function determineReleaseType(
         }));
 
         const releaseType = determineCommitReleaseType(commit, commitTypeMap);
-        const releaseTypeStr = (releaseType === 'none' && dim('none'))
-            || (releaseType === 'major' && redBright('major'))
-            || (releaseType === 'minor' && yellowBright('minor'))
-            || (releaseType === 'patch' && greenBright('patch'));
-
-        output.debug(`Release type: ${releaseTypeStr}`);
 
         return releaseType;
 

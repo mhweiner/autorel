@@ -8,7 +8,7 @@ import * as github from './services/github';
 import logger from './lib/logger';
 import {updatePackageJsonVersion} from './updatePackageJsonVersion';
 import {bash} from './services/sh';
-import {bold, dim, greenBright, redBright, strikethrough, yellowBright} from 'colorette';
+import {bold, gray, greenBright, redBright, strikethrough, yellowBright} from 'colorette';
 import {getPrereleaseChannel} from './getPrereleaseChannel';
 
 export type CommitType = {
@@ -76,8 +76,8 @@ export async function autorel(args: Config): Promise<string|undefined> {
     const tagFromWhichToFindCommits = lastChannelTag ?? lastStableTag;
 
     !!lastChannelTag && logger.info(`The last pre-release channel version (${prereleaseChannel}) is: ${bold(lastChannelTag)}`);
-    logger.info(`The last stable/production version is: ${lastStableTag ? bold(lastStableTag) : dim('none')}`);
-    logger.info(`The current/highest version is: ${latestTag ? bold(latestTag) : dim('none')}`);
+    logger.info(`The last stable/production version is: ${lastStableTag ? bold(lastStableTag) : gray('none')}`);
+    logger.info(`The current/highest version is: ${latestTag ? bold(latestTag) : gray('none')}`);
     logger.info(`Fetching commits since ${tagFromWhichToFindCommits ?? 'the beginning of the repository'}...`);
 
     const commits = git.getCommitsFromTag(tagFromWhichToFindCommits);
@@ -87,7 +87,7 @@ export async function autorel(args: Config): Promise<string|undefined> {
     const parsedCommits = commits.map((commit) => convCom.parseConventionalCommit(commit.message, commit.hash))
         .filter((commit) => !!commit) as convCom.ConventionalCommit[];
     const releaseType = convCom.determineReleaseType(parsedCommits, commitTypeMap);
-    const releaseTypeStr = (releaseType === 'none' && dim('none'))
+    const releaseTypeStr = (releaseType === 'none' && gray('none'))
             || (releaseType === 'major' && redBright('major'))
             || (releaseType === 'minor' && yellowBright('minor'))
             || (releaseType === 'patch' && greenBright('patch'));

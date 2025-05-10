@@ -1,5 +1,5 @@
 import {Command} from 'commander';
-import {bold, dim, white} from 'colorette';
+import {bold, gray, white} from 'colorette';
 import {autorel} from '.';
 import {getConfig} from './config';
 
@@ -18,7 +18,7 @@ const packageJson = require('../package.json');
 const program = new Command();
 
 console.log('------------------------------');
-console.log(`${bold(white('autorel'))} ${dim(`v${packageJson.version}`)}`);
+console.log(`${bold(white('autorel'))} ${gray(`v${packageJson.version}`)}`);
 console.log('------------------------------');
 
 program
