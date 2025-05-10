@@ -39,7 +39,7 @@ _Currently only has built-in support for `GitHub` and `NPM`, but you can write y
 
 [Read our FAQ on why you should use `autorel` and how it compares to other tools](docs/faq.md)
 
-# Table of Contents
+## Table of Contents
 
 - [Example Usage (CLI)](#example-usage-cli)
 - [Example Usage (Library)](#example-usage-library)
@@ -57,7 +57,7 @@ _Currently only has built-in support for `GitHub` and `NPM`, but you can write y
 - [Support, Feedback, and Contributions](#support-feedback-and-contributions)
 - [License](#license)
 
-# Example Usage (CLI)
+## Example Usage (CLI)
 
 ```bash
 npx autorel --publish --run 'echo "Next version is ${NEXT_VERSION}"'
@@ -77,13 +77,13 @@ npm i -g autorel
 autorel --publish
 ```
 
-## Avoiding Breaking Changes
+### Avoiding Breaking Changes
 
 If using the `npx` command, you may want to append the version number to prevent breaking changes in the future. You can do this by appending `@^` followed by the major version number.
 
 Example: `npx autorel@^2`
 
-# Example Usage (Library)
+## Example Usage (Library)
 
 1. Install `autorel` as a dependency
 
@@ -91,17 +91,22 @@ Example: `npx autorel@^2`
     npm i autorel
     ```
 
-2. Import and use in your project
+2. Import and use in your project to build custom release tooling
 
     ```typescript
-    import {autorel} from 'autorel';
+    import {autorel, defaultConfig} from 'autorel';
 
-    autorel({publish: true}).then((nextVersion) => {
+    const autorelConfig = {
+      ...defaultConfig,
+      publish: true,
+    };
+
+    autorel(autorelConfig).then((nextVersion) => {
         console.log(`Next version is ${nextVersion}`);
     });
     ```
 
-# System Requirements
+## System Requirements
 
 - Linux or MacOS (Windows is not officially supported)
 - Node.js 14+
@@ -109,7 +114,7 @@ Example: `npx autorel@^2`
 - Git 2.13+
 - Bash
 
-# Commit Messages
+## Commit Messages
 
 Commit messages are parsed to determine the version bump. They must follow the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) standard specification.
 
@@ -121,7 +126,7 @@ Here are some examples of commit messages and the resulting [SemVer](https://sem
 
 You can find more examples in the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) documentation.
 
-# Usage with GitHub Actions
+## Usage with GitHub Actions
 
 You can use `autorel` with GitHub Actions to automate your releases (recommended). 
 
@@ -158,7 +163,7 @@ jobs:
 
 It's also recommended you create a `.autorel.yaml` file in the root of your project to [configure](#configuration) `autorel`.
 
-# Usage with Other Repositories (not GitHub)
+## Usage with Other Repositories (not GitHub)
 
 `autorel` is designed to work with any CI/CD system, not just GitHub Actions. You can use it with GitLab, Bitbucket, Jenkins, or any other system that supports running shell commands.
 
@@ -166,7 +171,7 @@ Simply use the `--skip-release` flag (arg: `skipRelease: true`) to skip creating
 
 If you're interested in contributing built-in support for other systems, please open an issue or PR.
 
-# Usage with Other Languages (not Node.js)
+## Usage with Other Languages (not Node.js)
 
 `autorel` is designed to work with any language or platform. You can use it with Python, Ruby, Go, Java, or any other language.
 
@@ -174,7 +179,7 @@ Simply omit the `--publish` flag (arg: `publish: false`, which is default) to sk
 
 If you're interested in contributing built-in support for other systems, please open an issue or PR.
 
-# Configuration
+## Configuration
 
 When run in CLI mode, `autorel` can be configured via CLI arguments or a `yaml` file. CLI arguments take precedence over the `yaml` file. 
 
@@ -188,7 +193,7 @@ All arguments are optional.
 
 [See sample YAML configuration](#sample-yaml-configuration)
 
-## publish
+### publish
 
 Whether to publish the release to NPM. If `true`, you must be authenticated with NPM. To do so via GitHub Actions, see [this](https://docs.github.com/en/actions/guides/publishing-nodejs-packages#publishing-packages-to-the-npm-registry).
 
@@ -196,7 +201,7 @@ Whether to publish the release to NPM. If `true`, you must be authenticated with
 - Argument: `publish: boolean`
 - Default: `false`
 
-## dryRun
+### dryRun
 
 Whether to run in dry-run mode. This will not push the tag, create the release, publish to NPM, or run the command.
 
@@ -204,7 +209,7 @@ Whether to run in dry-run mode. This will not push the tag, create the release, 
 - Argument: `dryRun: boolean`
 - Default: `false`
 
-## skipRelease
+### skipRelease
 
 Whether to skip creating a release on GitHub. If `true`, the release will not be created, but the tag will still be pushed and the package on npm will still be updated, if applicable.
 
@@ -212,7 +217,7 @@ Whether to skip creating a release on GitHub. If `true`, the release will not be
 - Argument: `skipRelease: boolean`
 - Default: `false`
 
-## run
+### run
 
 A `bash` command/script to run after the release is complete. All scripts are run in "-e" mode, meaning they will exit on the first error.
 
@@ -247,7 +252,7 @@ run: |
 - Argument: `run: string`
 - Default: `undefined`
 
-## preRun
+### preRun
 
 A `bash` command/script to run before the release is started. All scripts are run in "-e" mode, meaning they will exit on the first error. Here's where you can do things like run tests or do build steps.
 
@@ -269,7 +274,7 @@ preRun: |
 - Argument: `preRun: string`
 - Default: `undefined`
 
-## preRelease
+### preRelease
 
 > ❗️ This is typically set via the `branches` configuration (recommended), but can be overridden here.
 
@@ -279,21 +284,21 @@ The pre-release channel to use. This will be appended to the version number. For
 - Argument: `preRelease: string`
 - Default: `undefined`
 
-## breakingChangeTitle (YAML/library only)
+### breakingChangeTitle (YAML/library only)
 
 The title to use for the breaking changes section in the release notes.
 
 - Argument: `breakingChangeTitle: string`
 - Default: `"🚨 Breaking Changes 🚨"`
 
-## commitTypes (YAML/library only)
+### commitTypes (YAML/library only)
 
 The commit types to use for both the release notes and version bumping.
 
 - Argument: `commitTypes: CommitType[]`
 - Defaults: [src/defaults.ts](src/defaults.ts)
 
-## branches (YAML/library only)
+### branches (YAML/library only)
 
 The branches to use for the release along with their pre-release channel. If not provided, the default is:
 
@@ -314,7 +319,7 @@ The above will release to the `latest` channel (production) on NPM for the `main
 
 - Argument: `branches: ReleaseBranch[]`
 
-## useVersion
+### useVersion
 
 The version to use for the release INSTEAD of the version being generated. Always results in a release being created unless `noRelease` is `true`. **Advanced usage only, not recommended for most users.**
 
@@ -324,7 +329,7 @@ The version to use for the release INSTEAD of the version being generated. Alway
 
 > ❗️ Must be a valid SemVer version, without the `v`.
 
-# Sample YAML Configuration
+## Sample YAML Configuration
 
 <sub>_.autorel.yaml_</sub>
 ```yaml
@@ -342,11 +347,11 @@ run: |
   aws s3 sync . s3://my-bucket
 ```
 
-# Types
+## Types
 
 You can find the types defined at [src/index.ts](src/index.ts).
 
-# Debug Mode
+## Debug Mode
 
 To enable debug mode, set `AUTOREL_DEBUG=1`:
 
@@ -356,40 +361,25 @@ AUTOREL_DEBUG=1 npx autorel
 
 This will output configuration and other debug information.
 
-# About package.json versions
+## About package.json versions
 
 If using our npm publishing feature, the package.json file's version will be updated in memory before being pushed to npm, as this is the only place where it's actually required. The change will not be pushed to the repository, as it is not necessary and could cause conflicts. See [this post](https://semantic-release.gitbook.io/semantic-release/support/faq)
 
 If you need access to the new version number in your CI/CD pipeline, you can use the `NEXT_VERSION` or `NEXT_TAG` environment variables.
 
-# Support, feedback, and contributions
+## Contributing
 
-- Star this repo if you like it!
-- Submit an [issue](https://github.com/mhweiner/autorel/issues) with your problem, feature request or bug report
-- Issue a PR against `main` and request review. Make sure all tests pass and coverage is good.
-- Write about this project in your blog, tweet about it, or share it with your friends!
+- ⭐ Star this repo if you like it!
+- 🐛 Open an [issue](https://github.com/mhweiner/autorel/issues) for bugs or suggestions.
+- 🤝 Submit a PR to `main` — all tests must pass.
 
-# Sponsorship
-<br>
-<picture>
-    <source srcset="docs/aeroview-white.svg" media="(prefers-color-scheme: dark)">
-    <source srcset="docs/aeroview-black.svg" media="(prefers-color-scheme: light)">
-    <img src="docs/aeroview-black.svg" alt="Logo" height="20">
-</picture>
-<br>
-
-Aeroview is a lightning-fast, developer-friendly, and AI-powered logging IDE. Get started for free at [https://aeroview.io](https://aeroview.io).
-
-Want to sponsor this project? [Reach out](mailto:mhweiner234@gmail.com?subject=I%20want%20to%20sponsor%20autorel).
-
-# Other useful libraries
+## Other useful libraries
 
 - [brek](https://github.com/mhweiner/brek): powerful yet simple configuration library for Node.js. It’s structured, typed, and designed for dynamic configuration loading, making it perfect for securely managing secrets (e.g., AWS Secrets Manager).
 - [hoare](https://github.com/mhweiner/hoare): An easy-to-use, fast, and defensive JS/TS test runner designed to help you to write simple, readable, and maintainable tests.
 - [jsout](https://github.com/mhweiner/jsout): A Syslog-compatible, small, and simple logger for Typescript/Javascript projects.
 - [cjs-mock](https://github.com/mhweiner/cjs-mock): NodeJS module mocking for CJS (CommonJS) modules for unit testing purposes.
-- [typura](https://github.com/aeroview/typura): Simple and extensible runtime input validation for TS/JS, written in TS.
 
-# License
+## License
 
 [MIT](LICENSE)

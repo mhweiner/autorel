@@ -189,3 +189,6 @@ export async function autorel(args: Config): Promise<string|undefined> {
 
 }
 
+export * from './defaults';
+export * from './config';
+
