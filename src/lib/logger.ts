@@ -1,4 +1,4 @@
-import {dim, red, yellow} from 'colorette';
+import {gray, red, yellow} from 'colorette';
 
 const prefix = '[autorel] ';
 
@@ -10,7 +10,7 @@ function info(message: string): void {
 
 function debug(message: string): void {
 
-    process.env.AUTOREL_DEBUG && info(dim(message));
+    process.env.AUTOREL_DEBUG && info(gray(message));
 
 }
 
