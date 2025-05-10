@@ -1,4 +1,4 @@
-import {fromTag, normalizeVer} from './parse';
+import {normalizeVer, parseTags, VersionWithRaw} from './parse';
 import {SemVer} from './types';
 
 /**
@@ -55,41 +55,43 @@ export function highestVersion(version1: SemVer, version2: SemVer): SemVer {
 
 }
 
-export function getLatestVerFromTags(tags: string[]): SemVer | null {
+export function latestTag(tags: string[]): string | undefined {
 
-    const versions = tags.map(fromTag).filter((v): v is SemVer => !!v);
+    const parsed = parseTags(tags);
 
-    if (versions.length === 0) return null;
+    if (parsed.length === 0) return undefined;
 
-    return versions.reduce(highestVersion);
-
-}
-
-export function getLatestChannelVerFromTags(
-    tags: string[],
-    channel: string,
-): SemVer | null {
-
-    const versions = tags
-        .map(fromTag)
-        .filter((v): v is SemVer => !!v)
-        .filter((v) => v.channel === channel);
-
-    if (versions.length === 0) return null;
-
-    return versions.reduce(highestVersion);
+    return highest(parsed).raw;
 
 }
 
-export function getLatestStableVerFromTags(tags: string[]): SemVer | null {
+export function latestChannelTag(tags: string[], channel: string): string | undefined {
 
-    const versions = tags
-        .map(fromTag)
-        .filter((v): v is SemVer => !!v)
-        .filter((v) => !v.channel);
+    const parsed = parseTags(tags)
+        .filter((entry) => entry.version.channel === channel);
 
-    if (versions.length === 0) return null;
+    if (parsed.length === 0) return undefined;
 
-    return versions.reduce(highestVersion);
+    return highest(parsed).raw;
+
+}
+
+export function latestStableTag(tags: string[]): string | undefined {
+
+    const parsed = parseTags(tags)
+        .filter((entry) => !entry.version.channel);
+
+    if (parsed.length === 0) return undefined;
+
+    return highest(parsed).raw;
+
+}
+
+/**
+ * Returns the raw tag string with the highest version.
+ */
+export function highest(parsed: VersionWithRaw[]): VersionWithRaw {
+
+    return parsed.reduce((a, b) => compareVersions(a.version, b.version) >= 0 ? a : b);
 
 }

@@ -1,7 +1,7 @@
 /* eslint-disable max-lines-per-function */
 import {test} from 'hoare';
-import {compareVersions, getLatestChannelVerFromTags, getLatestStableVerFromTags, getLatestVerFromTags, highestVersion} from './compare';
-import {fromTag, toTag} from './parse';
+import {compareVersions, latestChannelTag, latestStableTag, latestTag, highestVersion} from './compare';
+import {fromTag} from './parse';
 
 test('latestVersion', (assert) => {
 
@@ -157,111 +157,111 @@ test('compareVersions', (assert) => {
 
 });
 
-test('getLatestVerFromTags: returns null for empty input', (assert) => {
+test('latestTag: returns undefined for empty input', (assert) => {
 
-    assert.equal(getLatestVerFromTags([]), null);
+    assert.equal(latestTag([]), undefined);
 
 });
 
-test('getLatestVerFromTags: returns null if no valid tags', (assert) => {
+test('latestTag: returns undefined if no valid tags', (assert) => {
 
     const tags = ['invalid', 'not-a-version', 'v1.2', 'v1.2.3.4', 'v1.2.x'];
 
-    assert.equal(getLatestVerFromTags(tags), null);
+    assert.equal(latestTag(tags), undefined);
 
 });
 
-test('getLatestVerFromTags: returns the only valid version if there is just one', (assert) => {
+test('latestTag: returns the only valid version if there is just one', (assert) => {
 
-    const tag = 'v1.2.3';
-    const expected = fromTag(tag);
-
-    assert.equal(getLatestVerFromTags([tag]), expected);
+    assert.equal(latestTag(['v1.2.3']), 'v1.2.3');
 
 });
 
-test('getLatestVerFromTags: returns the latest version among valid ones', (assert) => {
-
-    const tags = ['v1.0.0', 'v1.2.3', 'v1.2.4', 'v0.9.9'];
-    const expected = fromTag('v1.2.4');
-
-    assert.equal(getLatestVerFromTags(tags), expected);
-
-});
-
-test('getLatestVerFromTags: ignores invalid tags when computing latest', (assert) => {
-
-    const tags = ['bad', 'v1.2.3', 'also-bad', 'v1.3.0'];
-    const expected = fromTag('v1.3.0');
-
-    assert.equal(getLatestVerFromTags(tags), expected);
-
-});
-
-test('getLatestVerFromTags: correctly handles prerelease ordering', (assert) => {
+test('latestTag: returns the latest version', (assert) => {
 
 
     assert.equal(
-        getLatestVerFromTags(['v2.0.0-alpha.1', 'v2.0.0-alpha.2', 'v1.9.9']),
-        fromTag('v2.0.0-alpha.2')
+        latestTag(['v1.0.0', 'v1.2.3', 'v1.2.4', 'v0.9.9']),
+        'v1.2.4'
     );
     assert.equal(
-        getLatestVerFromTags(['v1.0.0', 'v1.0.1', 'v1.0.2', 'v1.0.2-alpha.1']),
-        fromTag('v1.0.2')
+        latestTag(['v1.0.0', 'v1.2.3-beta.122', 'v1.2.4', 'v0.9.9']),
+        'v1.2.4'
     );
 
 });
 
-test('getLatestVerFromTags: prefers stable over prerelease if it’s higher', (assert) => {
+test('latestTag: ignores invalid tags when computing latest', (assert) => {
 
-    const tags = ['v1.2.3', 'v2.0.0-beta.1', 'v2.0.0'];
-    const expected = fromTag('v2.0.0');
 
-    assert.equal(getLatestVerFromTags(tags), expected);
+    assert.equal(latestTag(['bad', 'v1.2.3', 'also-bad', 'v1.3.0']), 'v1.3.0');
 
 });
 
-test('getLatestVerFromTags: toTag(getLatestVerFromTags(tags)) should return one of the original tags', (assert) => {
+test('latestTag: correctly handles prerelease ordering', (assert) => {
+
+
+    assert.equal(
+        latestTag(['v2.0.0-alpha.1', 'v2.0.0-alpha.2', 'v1.9.9']),
+        'v2.0.0-alpha.2'
+    );
+    assert.equal(
+        latestTag(['v1.0.0', 'v1.0.1', 'v1.0.2', 'v1.0.2-alpha.1']),
+        'v1.0.2'
+    );
+
+});
+
+test('latestTag: prefers stable over prerelease if it’s higher', (assert) => {
+
+
+    assert.equal(
+        latestTag(['v1.2.3', 'v2.0.0-beta.1', 'v2.0.0']),
+        'v2.0.0'
+    );
+
+});
+
+test('latestTag: toTag(latestTag(tags)) should return one of the original tags', (assert) => {
 
     const tags = ['v1.0.0', 'v1.2.0', 'v1.2.1'];
-    const latest = getLatestVerFromTags(tags);
-    const latestTag = toTag(latest!);
 
-    assert.isTrue(tags.includes(latestTag));
+    assert.isTrue(tags.includes(latestTag(tags)!));
 
 });
 
-test('getLatestStableVerFromTags: ignores pre-releases', (assert) => {
+test('latestStableTag: ignores pre-releases', (assert) => {
 
     const tags = ['v1.0.0', 'v1.2.0', 'v1.2.1', 'v1.2.1-alpha.1', 'v2.0.0-rc.1'];
-    const latest = getLatestStableVerFromTags(tags);
-    const latestTag = toTag(latest!);
 
-    assert.equal(latestTag, 'v1.2.1');
+    assert.equal(latestStableTag(tags), 'v1.2.1');
 
 });
 
-test('getLatestStableVerFromTags: no results should return null', (assert) => {
+test('latestStableTag: no results should return undefined', (assert) => {
 
     const tags = ['v1.0.0-rc.1'];
 
-    assert.equal(getLatestStableVerFromTags(tags), null);
+    assert.equal(latestStableTag(tags), undefined);
 
 });
 
-test('getLatestChannelVerFromTags: only returns tags with specified channel', (assert) => {
+test('latestChannelTAg: only returns tags with specified channel', (assert) => {
 
-    const tags = ['v1.0.0', 'v1.2.0', 'v1.2.1', 'v1.2.1-alpha.1', 'v2.0.0-rc.1'];
-    const latest = getLatestChannelVerFromTags(tags, 'alpha');
-
-    assert.equal(toTag(latest!), 'v1.2.1-alpha.1');
+    assert.equal(
+        latestChannelTag(
+            ['v1.0.0', 'v1.2.0', 'v1.2.1', 'v1.2.1-alpha.1', 'v2.0.0-rc.1'],
+            'alpha'
+        ),
+        'v1.2.1-alpha.1'
+    );
 
 });
 
-test('getLatestChannelVerFromTags: no results should return null', (assert) => {
+test('latestChannelTAg: no results should return undefined', (assert) => {
 
     const tags = ['v1.0.0-rc.1'];
 
-    assert.equal(getLatestChannelVerFromTags(tags, 'alpha'), null);
+    assert.equal(latestChannelTag(tags, 'alpha'), undefined);
 
 });

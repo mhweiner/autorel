@@ -66,7 +66,26 @@ function readAutorelYaml(filePath = '.autorel.yaml'): Config | {} {
 
     }
 
-    const [validationErr] = toResult(() => validateConfig(parsedData));
+    return parsedData as Config;
+
+}
+
+export function getConfig(overrides?: Partial<Config>): Config {
+
+    const yamlConfig = readAutorelYaml();
+    const mergedConfig = {
+        ...defaultConfig,
+        ...yamlConfig,
+        ...overrides ?? {},
+    };
+
+    output.debug('---\nConfig:');
+    output.debug(`Default: ${JSON.stringify(defaultConfig, null, 2)}`);
+    output.debug(`Yaml: ${JSON.stringify(yamlConfig, null, 2)}`);
+    output.debug(`Overrides: ${JSON.stringify(overrides, null, 2)}`);
+    output.debug('---');
+
+    const [validationErr] = toResult(() => validateConfig(mergedConfig));
 
     if (validationErr instanceof ValidationError) {
 
@@ -75,21 +94,7 @@ function readAutorelYaml(filePath = '.autorel.yaml'): Config | {} {
 
     }
 
-    return parsedData as Config;
-
-}
-
-export function getConfig(overrides?: Partial<Config>): Config {
-
-    const yamlConfig = readAutorelYaml();
-
-    output.debug(`Yaml: ${JSON.stringify(yamlConfig, null, 2)}`);
-
-    return {
-        ...defaultConfig,
-        ...yamlConfig,
-        ...overrides,
-    };
+    return mergedConfig;
 
 }
 

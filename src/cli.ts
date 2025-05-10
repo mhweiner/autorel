@@ -1,7 +1,6 @@
 import {Command} from 'commander';
 import {bold, dim, white} from 'colorette';
 import {autorel} from '.';
-import output from './lib/logger';
 import {getConfig} from './config';
 
 export type CliFlags = {
@@ -45,8 +44,6 @@ const cliOptions = {
     skipRelease: options.skipRelease,
 };
 
-output.debug(`CLI Options: ${JSON.stringify(cliOptions, null, 2)}`);
-
 // remove falsy values from the overrides
 if (cliOptions) {
 
@@ -58,7 +55,5 @@ if (cliOptions) {
 }
 
 const config = getConfig(cliOptions);
-
-output.debug(`Config: ${JSON.stringify(config, null, 2)}`);
 
 autorel(config);

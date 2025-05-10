@@ -9,6 +9,7 @@ import logger from './lib/logger';
 import {updatePackageJsonVersion} from './updatePackageJsonVersion';
 import {bash} from './services/sh';
 import {bold, dim, greenBright, redBright, strikethrough, yellowBright} from 'colorette';
+import {getPrereleaseChannel} from './getPrereleaseChannel';
 
 export type CommitType = {
     type: string
@@ -32,39 +33,6 @@ export type Config = {
     commitTypes: CommitType[]
     branches: ReleaseBranch[]
 };
-
-/**
- * Determines the prerelease channel to use for the current release.
- *
- * It follows this order of precedence:
- * 1. Use `config.prereleaseChannel` if explicitly defined.
- * 2. Otherwise, detect the current git branch and look for a matching entry
- *    in `config.branches` to infer the prerelease channel.
- *
- * Returns:
- * - A string representing the prerelease channel (e.g. "alpha", "beta"), or
- * - `undefined` if no channel is configured or matched.
- *
- * Throws:
- * - If the current branch cannot be determined.
- * - If `config.branches` is undefined or empty.
- */
-export function getPrereleaseChannel(config: Config): string|undefined {
-
-    if (config.prereleaseChannel) return config.prereleaseChannel;
-
-    const branch = git.getCurrentBranch();
-
-    if (!branch) throw new Error('Could not get the current branch. Please make sure you are in a git repository.');
-    if (!config.branches || !config.branches.length) throw new Error('Branches are not defined in the configuration. See https://github.com/mhweiner/autorel?tab=readme-ov-file#configuration');
-
-    const matchingBranch = config.branches.find((b) => b.name === branch);
-
-    if (!matchingBranch) return undefined;
-
-    return matchingBranch.prereleaseChannel || undefined;
-
-}
 
 export async function autorel(args: Config): Promise<string|undefined> {
 
@@ -92,28 +60,24 @@ export async function autorel(args: Config): Promise<string|undefined> {
 
     const commitTypeMap = new Map(args.commitTypes.map((type) => [type.type, type]));
 
-    git.gitFetchTags(); // fetch latest tags from remote
+    git.gitFetch();
 
-    const lastChannelTag = prereleaseChannel ? git.getLastChannelTag(prereleaseChannel) : undefined;
-    const lastStableTag = git.getLastStableTag();
-    const highestTag = git.getHighestTag();
+    const latestTags = git.getLatestTags();
+    const latestTag = semver.latestTag(latestTags);
+    const lastStableTag = semver.latestStableTag(latestTags);
+    const lastChannelTag = prereleaseChannel
+        ? semver.latestChannelTag(latestTags, prereleaseChannel)
+        : undefined;
 
-    // validate tags if they exist
-    if (lastChannelTag && !semver.isValidTag(lastChannelTag)) throw new Error(`Invalid last channel tag: ${lastChannelTag}`);
-    if (lastStableTag && !semver.isValidTag(lastStableTag)) throw new Error(`Invalid last stable tag: ${lastStableTag}`);
-    if (highestTag && !semver.isValidTag(highestTag)) throw new Error(`Invalid highest tag: ${highestTag}`);
-    if (lastChannelTag && !highestTag) throw new Error('Last channel tag exists, but highest tag does not.');
-
-    const tagFromWhichToFindCommits = prereleaseChannel && lastChannelTag
-        ? semver.toTag(semver.highestVersion(
-            semver.fromTag(lastChannelTag) as semver.SemVer,
-            semver.fromTag(lastStableTag ?? 'v0.0.0') as semver.SemVer,
-        ))
-        : lastStableTag;
+    // Determine the starting Git tag to compare against when generating
+    // release notes or changelogs (i.e. the point “since” which to find commits).
+    // If a pre-release channel is specified and a last channel tag exists,
+    // use the last channel tag. Otherwise, use the last stable tag.
+    const tagFromWhichToFindCommits = lastChannelTag ?? lastStableTag;
 
     !!lastChannelTag && logger.info(`The last pre-release channel version (${prereleaseChannel}) is: ${bold(lastChannelTag)}`);
     logger.info(`The last stable/production version is: ${lastStableTag ? bold(lastStableTag) : dim('none')}`);
-    logger.info(`The current/highest version is: ${highestTag ? bold(highestTag) : dim('none')}`);
+    logger.info(`The current/highest version is: ${latestTag ? bold(latestTag) : dim('none')}`);
     logger.info(`Fetching commits since ${tagFromWhichToFindCommits ?? 'the beginning of the repository'}...`);
 
     const commits = git.getCommitsFromTag(tagFromWhichToFindCommits);
@@ -137,8 +101,7 @@ export async function autorel(args: Config): Promise<string|undefined> {
 
     }
 
-    let nextTagCalculated = '';
-
+    // Validate useVersion & log warnings
     if (args.useVersion) {
 
         if (/^v(.+)$/.test(args.useVersion)) throw new Error('useVersion should not start with a "v".');
@@ -150,31 +113,27 @@ export async function autorel(args: Config): Promise<string|undefined> {
 
         } else {
 
-            logger.warn(`The next version was set by useVersion to be: ${bold(args.useVersion)}.`);
+            logger.warn(`The next version was explicitly set by useVersion to be: ${bold(args.useVersion)}.`);
 
         }
 
-    } else {
+    }
 
-        nextTagCalculated = semver.toTag(semver.incrVer({
-            latestVer: semver.fromTag(highestTag || 'v0.0.0') as semver.SemVer,
+    const nextTag = args.useVersion
+        ? `v${args.useVersion}`
+        : semver.toTag(semver.incrVer({
+            latestVer: semver.fromTag(latestTag || 'v0.0.0') as semver.SemVer,
             latestStableVer: semver.fromTag(lastStableTag || 'v0.0.0') as semver.SemVer,
             releaseType,
             prereleaseChannel,
             latestChannelVer: lastChannelTag ? semver.fromTag(lastChannelTag) ?? undefined : undefined,
         }));
-
-        logger.info(`The next version is: ${bold(nextTagCalculated)}`);
-
-    }
-
-    const nextTag = args.useVersion ? `v${args.useVersion}` : nextTagCalculated;
     const changelog = generateChangelog(parsedCommits, commitTypeMap, args.breakingChangeTitle);
 
+    logger.info(`The next version is: ${bold(nextTag)}`);
     logger.debug(`The changelog is:\n${changelog}`);
 
     if (args.dryRun) return;
-
     if (args.preRun) {
 
         logger.info('Running pre-release bash script...');

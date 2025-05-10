@@ -87,7 +87,7 @@ export function incrVer(input: {
 
     const {latestStableVer, latestVer, releaseType, prereleaseChannel, latestChannelVer} = input;
 
-    // Validate the input
+    // santiy checks and input validation
     if (releaseType === 'none') throw new Error(errors.noReleaseErr);
     if (compareVersions(latestVer, latestStableVer) < 0) throw new Error(errors.outOfOrderErr);
     if (isVerPrerelease(latestStableVer)) throw new Error(errors.stableVerNotValid);

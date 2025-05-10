@@ -1,5 +1,5 @@
 import {test} from 'hoare';
-import {fromTag, isValidTag, isValidVersion, toTag} from './parse';
+import {fromTag, isValidTag, isValidVersion, parseTags, toTag} from './parse';
 import {SemVer} from './types';
 
 /* eslint-disable max-lines-per-function */
@@ -82,13 +82,13 @@ test('fromTag', (assert) => {
     );
     assert.equal(
         fromTag('1.0.0-rc'),
-        null,
-        'version without v prefix should return null'
+        undefined,
+        'version without v prefix should return undefined'
     );
     assert.equal(
         fromTag('blah'),
-        null,
-        'invalid version should return null'
+        undefined,
+        'invalid version should return undefined'
     );
 
 });
@@ -129,29 +129,12 @@ test('isValidVersion: invalid SemVer objects should return false', (assert) => {
 
 });
 
-test('isValidVersion: isValidVersion(x) should be equivalent to fromTag(toTag(x)) !== null', (assert) => {
-
-    const versions: SemVer[] = [
-        {major: 1, minor: 0, patch: 0},
-        {major: 0, minor: 1, patch: 2, channel: 'beta', build: 5},
-    ];
-
-    for (const v of versions) {
-
-        const expected = fromTag(toTag(v)) !== null;
-
-        assert.equal(isValidVersion(v), expected);
-
-    }
-
-});
-
 test('isValidVersion: round-trip via toTag -> fromTag should preserve structure', (assert) => {
 
     const version: SemVer = {major: 3, minor: 2, patch: 1, channel: 'rc', build: 7};
     const parsed = fromTag(toTag(version));
 
-    assert.isTrue(!!parsed, 'Expected parsed version to be non-null');
+    assert.isTrue(!!parsed, 'Expected parsed version to be truthy');
     assert.equal(parsed, version);
 
 });
@@ -161,5 +144,33 @@ test('isValidVersion: version with missing build in prerelease should still be v
     const version: SemVer = {major: 2, minor: 5, patch: 9, channel: 'canary'};
 
     assert.isTrue(isValidVersion(version));
+
+});
+
+test('parseTags: filters out invalid semver tags and preserves the order of valid ones', (assert) => {
+
+    assert.equal(
+        parseTags([
+            '1.0.0',
+            'banana',
+            '2.3.4',
+            'v1.2.3',
+            'blah',
+            'v2.0.0-alpha.1',
+        ]),
+        [
+            {raw: 'v1.2.3', version: {major: 1, minor: 2, patch: 3}},
+            {raw: 'v2.0.0-alpha.1', version: {major: 2, minor: 0, patch: 0, channel: 'alpha', build: 1}},
+        ],
+    );
+
+});
+
+test('parseTags: returns empty array when all tags are invalid', (assert) => {
+
+    const tags = ['junk', '123abc', 'v', '', '🔥'];
+    const out = parseTags(tags);
+
+    assert.equal(out, []);
 
 });

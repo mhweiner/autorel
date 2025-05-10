@@ -37,14 +37,14 @@ export function toTag(version: SemVer): string {
 
 }
 
-export function fromTag(tag: string): SemVer | null {
+export function fromTag(tag: string): SemVer | undefined {
 
     const semverRegex = /^v(?<major>0|[1-9]\d*)\.(?<minor>0|[1-9]\d*)\.(?<patch>0|[1-9]\d*)(?:-(?<channel>[0-9a-zA-Z-]+)(?:\.(?<build>[0-9a-zA-Z-]+))?)?(?:\+(?<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/;
     const match = tag.match(semverRegex);
 
     if (!match || !match.groups) {
 
-        return null;
+        return undefined;
 
     }
 
@@ -118,4 +118,21 @@ export function rootVersion(version: SemVer): SemVer {
 
 }
 
+export type VersionWithRaw = {
+    version: SemVer
+    raw: string // original version string
+};
 
+export function parseTags(tags: string[]): VersionWithRaw[] {
+
+    return tags
+        .map((raw) => {
+
+            const version = fromTag(raw);
+
+            return version ? {raw, version} : undefined;
+
+        })
+        .filter((entry): entry is VersionWithRaw => !!entry);
+
+}

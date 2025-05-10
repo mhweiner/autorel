@@ -5,7 +5,7 @@ export type Commit = {
     message: string
 };
 
-export function gitFetchTags(): void {
+export function gitFetch(): void {
 
     $`git fetch`;
 
@@ -18,21 +18,11 @@ export function createAndPushTag(tag: string): void {
 
 }
 
-export function getLastChannelTag(channel: string): string|undefined {
+export function getLatestTags(): string[] {
 
-    return $`git tag | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+-${channel}\.[0-9]+$' | sort -V | tail -n 1` || undefined;
+    const tags = $`git tag --sort=-v:refname | head -n 100`;
 
-}
-
-export function getHighestTag(): string|undefined {
-
-    return $`git tag --sort=-v:refname | head -n1` || undefined;
-
-}
-
-export function getLastStableTag(): string|undefined {
-
-    return $`git tag --sort=-v:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | head -n1` || undefined;
+    return tags.split('\n').filter((tag) => tag.trim() !== '');
 
 }
 
