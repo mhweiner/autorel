@@ -2,7 +2,7 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as yaml from 'js-yaml';
 import {ValidationError, predicates as p, toResult} from 'typura';
-import output from './lib/output';
+import output from './lib/logger';
 import {Config} from '.';
 import {defaultConfig} from './defaults';
 
@@ -39,12 +39,12 @@ function readAutorelYaml(filePath = '.autorel.yaml'): Config | {} {
     // Check if the file exists
     if (!fs.existsSync(absolutePath)) {
 
-        output.log('.autorel.yaml not found, using default configuration');
+        output.info('.autorel.yaml not found, using default configuration');
         return {};
 
     } else {
 
-        output.log('Using .autorel.yaml configuration');
+        output.info('Using .autorel.yaml configuration');
 
     }
 
@@ -66,7 +66,26 @@ function readAutorelYaml(filePath = '.autorel.yaml'): Config | {} {
 
     }
 
-    const [validationErr] = toResult(() => validateConfig(parsedData));
+    return parsedData as Config;
+
+}
+
+export function getConfig(overrides?: Partial<Config>): Config {
+
+    const yamlConfig = readAutorelYaml();
+    const mergedConfig = {
+        ...defaultConfig,
+        ...yamlConfig,
+        ...overrides ?? {},
+    };
+
+    output.debug('---\nConfig:');
+    output.debug(`Default: ${JSON.stringify(defaultConfig, null, 2)}`);
+    output.debug(`Yaml: ${JSON.stringify(yamlConfig, null, 2)}`);
+    output.debug(`Overrides: ${JSON.stringify(overrides, null, 2)}`);
+    output.debug('---');
+
+    const [validationErr] = toResult(() => validateConfig(mergedConfig));
 
     if (validationErr instanceof ValidationError) {
 
@@ -75,21 +94,7 @@ function readAutorelYaml(filePath = '.autorel.yaml'): Config | {} {
 
     }
 
-    return parsedData as Config;
-
-}
-
-export function getConfig(overrides?: Partial<Config>): Config {
-
-    const yamlConfig = readAutorelYaml();
-
-    output.debug(`Yaml: ${JSON.stringify(yamlConfig, null, 2)}`);
-
-    return {
-        ...defaultConfig,
-        ...yamlConfig,
-        ...overrides,
-    };
+    return mergedConfig;
 
 }
 

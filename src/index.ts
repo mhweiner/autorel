@@ -1,14 +1,15 @@
 /* eslint-disable max-lines-per-function */
 import * as semver from './semver';
 import * as convCom from './conventionalcommits';
-import * as git from './lib/git';
-import * as npm from './lib/npm';
-import * as color from './lib/colors';
+import * as git from './services/git';
+import * as npm from './services/npm';
 import {generateChangelog} from './changelog';
 import * as github from './services/github';
-import output from './lib/output';
+import logger from './lib/logger';
 import {updatePackageJsonVersion} from './updatePackageJsonVersion';
-import {bash} from './lib/sh';
+import {bash} from './services/sh';
+import {bold, gray, greenBright, redBright, strikethrough, yellowBright} from 'colorette';
+import {getPrereleaseChannel} from './getPrereleaseChannel';
 
 export type CommitType = {
     type: string
@@ -33,96 +34,74 @@ export type Config = {
     branches: ReleaseBranch[]
 };
 
-export function getPrereleaseChannel(config: Config): string|undefined {
-
-    if (config.prereleaseChannel) return config.prereleaseChannel;
-
-    const branch = git.getCurrentBranch();
-
-    if (!branch) throw new Error('Could not get the current branch. Please make sure you are in a git repository.');
-    if (!config.branches || !config.branches.length) throw new Error('Branches are not defined in the configuration. See https://github.com/mhweiner/autorel?tab=readme-ov-file#configuration');
-
-    const matchingBranch = config.branches.find((b) => b.name === branch);
-
-    if (!matchingBranch) return undefined;
-
-    return matchingBranch.prereleaseChannel || undefined;
-
-}
-
 export async function autorel(args: Config): Promise<string|undefined> {
 
     const prereleaseChannel = getPrereleaseChannel(args);
 
     if (args.dryRun) {
 
-        output.warn('Running in dry-run mode. No changes will be made.');
+        logger.warn('Running in dry-run mode. No changes will be made.');
 
     }
 
     if (prereleaseChannel && !args.useVersion) {
 
-        const stmt = `Using prerelease channel: ${color.bold(prereleaseChannel)}`;
+        const stmt = `Using prerelease channel: ${bold(prereleaseChannel)}`;
 
-        output.log(!args.useVersion ? stmt : color.strikethrough(stmt));
+        logger.info(!args.useVersion ? stmt : strikethrough(stmt));
 
     } else {
 
         const stmt = 'This is a production release.';
 
-        output.log(!args.useVersion ? stmt : color.strikethrough(stmt));
+        logger.info(!args.useVersion ? stmt : strikethrough(stmt));
 
     }
 
     const commitTypeMap = new Map(args.commitTypes.map((type) => [type.type, type]));
 
-    git.gitFetchTags(); // fetch latest tags from remote
+    git.gitFetch();
 
-    const lastChannelTag = prereleaseChannel ? git.getLastChannelTag(prereleaseChannel) : undefined;
-    const lastStableTag = git.getLastStableTag();
-    const highestTag = git.getHighestTag();
+    const latestTags = git.getLatestTags();
+    const latestTag = semver.latestTag(latestTags);
+    const lastStableTag = semver.latestStableTag(latestTags);
+    const lastChannelTag = prereleaseChannel
+        ? semver.latestChannelTag(latestTags, prereleaseChannel)
+        : undefined;
 
-    // validate tags if they exist
-    if (lastChannelTag && !semver.isValidTag(lastChannelTag)) throw new Error(`Invalid last channel tag: ${lastChannelTag}`);
-    if (lastStableTag && !semver.isValidTag(lastStableTag)) throw new Error(`Invalid last stable tag: ${lastStableTag}`);
-    if (highestTag && !semver.isValidTag(highestTag)) throw new Error(`Invalid highest tag: ${highestTag}`);
-    if (lastChannelTag && !highestTag) throw new Error('Last channel tag exists, but highest tag does not.');
+    // Determine the starting Git tag to compare against when generating
+    // release notes or changelogs (i.e. the point “since” which to find commits).
+    // If a pre-release channel is specified and a last channel tag exists,
+    // use the last channel tag. Otherwise, use the last stable tag.
+    const tagFromWhichToFindCommits = lastChannelTag ?? lastStableTag;
 
-    const tagFromWhichToFindCommits = prereleaseChannel && lastChannelTag
-        ? semver.toTag(semver.highestVersion(
-            semver.fromTag(lastChannelTag) as semver.SemVer,
-            semver.fromTag(lastStableTag ?? 'v0.0.0') as semver.SemVer,
-        ))
-        : lastStableTag;
-
-    !!lastChannelTag && output.log(`The last pre-release channel version (${prereleaseChannel}) is: ${color.bold(lastChannelTag)}`);
-    output.log(`The last stable/production version is: ${lastStableTag ? color.bold(lastStableTag) : color.grey('none')}`);
-    output.log(`The current/highest version is: ${highestTag ? color.bold(highestTag) : color.grey('none')}`);
-    output.log(`Fetching commits since ${tagFromWhichToFindCommits ?? 'the beginning of the repository'}...`);
+    !!lastChannelTag && logger.info(`The last pre-release channel version (${prereleaseChannel}) is: ${bold(lastChannelTag)}`);
+    logger.info(`The last stable/production version is: ${lastStableTag ? bold(lastStableTag) : gray('none')}`);
+    logger.info(`The current/highest version is: ${latestTag ? bold(latestTag) : gray('none')}`);
+    logger.info(`Fetching commits since ${tagFromWhichToFindCommits ?? 'the beginning of the repository'}...`);
 
     const commits = git.getCommitsFromTag(tagFromWhichToFindCommits);
 
-    output.log(`Found ${color.bold(commits.length.toString())} commit(s).`);
+    logger.info(`Found ${bold(commits.length.toString())} commit(s).`);
 
     const parsedCommits = commits.map((commit) => convCom.parseConventionalCommit(commit.message, commit.hash))
         .filter((commit) => !!commit) as convCom.ConventionalCommit[];
     const releaseType = convCom.determineReleaseType(parsedCommits, commitTypeMap);
-    const releaseTypeStr = (releaseType === 'none' && color.grey('none'))
-            || (releaseType === 'major' && color.red('major'))
-            || (releaseType === 'minor' && color.yellow('minor'))
-            || (releaseType === 'patch' && color.green('patch'));
+    const releaseTypeStr = (releaseType === 'none' && gray('none'))
+            || (releaseType === 'major' && redBright('major'))
+            || (releaseType === 'minor' && yellowBright('minor'))
+            || (releaseType === 'patch' && greenBright('patch'));
 
-    output.log(`The release type is: ${releaseTypeStr}`);
+    logger.info(`The release type is: ${bold(String(releaseTypeStr))}`);
 
     if (releaseType === 'none' && !args.useVersion) {
 
-        output.log('No release is needed. Have a nice day (^_^)/');
+        logger.info('No release is needed. Have a nice day (^_^)/');
         return;
 
     }
 
-    let nextTagCalculated = '';
-
+    // Validate useVersion & log warnings
     if (args.useVersion) {
 
         if (/^v(.+)$/.test(args.useVersion)) throw new Error('useVersion should not start with a "v".');
@@ -130,38 +109,34 @@ export async function autorel(args: Config): Promise<string|undefined> {
 
         if (releaseType === 'none') {
 
-            output.warn(`We didn't find any commmits that would create a release, but you have set 'useVersion', which will force a release as: ${color.bold(args.useVersion)}.`);
+            logger.warn(`We didn't find any commmits that would create a release, but you have set 'useVersion', which will force a release as: ${bold(args.useVersion)}.`);
 
         } else {
 
-            output.warn(`The next version was set by useVersion to be: ${color.bold(args.useVersion)}.`);
+            logger.warn(`The next version was explicitly set by useVersion to be: ${bold(args.useVersion)}.`);
 
         }
 
-    } else {
-
-        nextTagCalculated = semver.toTag(semver.incrVer({
-            highestVer: semver.fromTag(highestTag || 'v0.0.0') as semver.SemVer,
-            lastStableVer: semver.fromTag(lastStableTag || 'v0.0.0') as semver.SemVer,
-            releaseType,
-            prereleaseChannel,
-            lastChannelVer: lastChannelTag ? semver.fromTag(lastChannelTag) ?? undefined : undefined,
-        }));
-
-        output.log(`The next version is: ${color.bold(nextTagCalculated)}`);
-
     }
 
-    const nextTag = args.useVersion ? `v${args.useVersion}` : nextTagCalculated;
+    const nextTag = args.useVersion
+        ? `v${args.useVersion}`
+        : semver.toTag(semver.incrVer({
+            latestVer: semver.fromTag(latestTag || 'v0.0.0') as semver.SemVer,
+            latestStableVer: semver.fromTag(lastStableTag || 'v0.0.0') as semver.SemVer,
+            releaseType,
+            prereleaseChannel,
+            latestChannelVer: lastChannelTag ? semver.fromTag(lastChannelTag) ?? undefined : undefined,
+        }));
     const changelog = generateChangelog(parsedCommits, commitTypeMap, args.breakingChangeTitle);
 
-    output.debug(`The changelog is:\n${changelog}`);
+    logger.info(`The next version is: ${bold(nextTag)}`);
+    logger.debug(`The changelog is:\n${changelog}`);
 
     if (args.dryRun) return;
-
     if (args.preRun) {
 
-        output.log('Running pre-release bash script...');
+        logger.info('Running pre-release bash script...');
         bash(args.preRun);
 
     }
@@ -193,19 +168,19 @@ export async function autorel(args: Config): Promise<string|undefined> {
     // run post-release bash script
     if (args.run) {
 
-        output.log('Running post-release bash script...');
+        logger.info('Running post-release bash script...');
         bash(args.run);
 
     } else if (args.runScript) {
 
         // TODO: delete this block in the next major version
 
-        output.warn('----------------------------');
-        output.warn('🚨 The "runScript" option is deprecated. Please use "run" instead. 🚨');
-        output.warn('🚨 The "runScript" option will be removed in the next major version. 🚨');
-        output.warn('----------------------------');
+        logger.warn('----------------------------');
+        logger.warn('🚨 The "runScript" option is deprecated. Please use "run" instead. 🚨');
+        logger.warn('🚨 The "runScript" option will be removed in the next major version. 🚨');
+        logger.warn('----------------------------');
 
-        output.log('Running post-release bash script...');
+        logger.info('Running post-release bash script...');
         bash(args.runScript);
 
     }

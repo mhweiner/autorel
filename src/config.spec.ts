@@ -2,7 +2,7 @@
 import {test} from 'hoare';
 import {mock} from 'cjs-mock';
 import * as mod from './config';
-import {fakeLogger} from './test_fixtures/fakeLog';
+import {mockLogger} from './lib/mockLogger';
 import {ValidationError, toResult} from 'typura';
 import {defaultConfig} from './defaults';
 import {Config} from '.';
@@ -20,7 +20,7 @@ test('getConfig: no .autorel.yaml', async (assert) => {
     const configMod: typeof mod = mock('./config', {
         'node:fs': mockFs,
         'node:path': {resolve: (p: string) => p},
-        './lib/output': fakeLogger,
+        './lib/logger': mockLogger,
     });
 
     assert.equal(configMod.getConfig(), defaultConfig, 'should return the default configuration');
@@ -43,7 +43,7 @@ test('getConfig: valid .autorel.yaml', async (assert) => {
     const configMod: typeof mod = mock('./config', {
         'node:fs': mockFs,
         'node:path': {resolve: (p: string) => p},
-        './lib/output': fakeLogger,
+        './lib/logger': mockLogger,
     });
     const expectedConfig = {
         ...defaultConfig,
@@ -74,7 +74,7 @@ test('getConfig: invalid configuration', async (assert) => {
     const configMod: typeof mod = mock('./config', {
         'node:fs': mockFs,
         'node:path': {resolve: (p: string) => p},
-        './lib/output': fakeLogger,
+        './lib/logger': mockLogger,
     });
 
     assert.throws(() => configMod.getConfig(), new ValidationError({
@@ -98,7 +98,7 @@ test('getConfig: readFile error', async (assert) => {
     const configMod: typeof mod = mock('./config', {
         'node:fs': mockFs,
         'node:path': {resolve: (p: string) => p},
-        './lib/output': fakeLogger,
+        './lib/logger': mockLogger,
     });
 
     assert.throws(() => configMod.getConfig(), new Error('something happened'), 'should re-throw error');
@@ -119,7 +119,7 @@ a:
     const configMod: typeof mod = mock('./config', {
         'node:fs': mockFs,
         'node:path': {resolve: (p: string) => p},
-        './lib/output': fakeLogger,
+        './lib/logger': mockLogger,
     });
 
     const [err] = toResult(() => configMod.getConfig());
@@ -141,7 +141,7 @@ test('getConfig: valid .autorel.yaml with cli overrides', async (assert) => {
     const configMod: typeof mod = mock('./config', {
         'node:fs': mockFs,
         'node:path': {resolve: (p: string) => p},
-        './lib/output': fakeLogger,
+        './lib/logger': mockLogger,
     });
     const cliOptions = { // all falsy values are removed
         run: 'test',
@@ -195,7 +195,7 @@ test('getConfig: valid .autorel.yaml with empty cli overrides (2)', async (asser
     const configMod: typeof mod = mock('./config', {
         'node:fs': mockFs,
         'node:path': {resolve: (p: string) => p},
-        './lib/output': fakeLogger,
+        './lib/logger': mockLogger,
     });
     const cliOptions = {};
     const expectedConfig: Config = {

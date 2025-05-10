@@ -1,7 +1,6 @@
 import {Command} from 'commander';
-import {bold, grey} from './lib/colors';
+import {bold, gray, white} from 'colorette';
 import {autorel} from '.';
-import output from './lib/output';
 import {getConfig} from './config';
 
 export type CliFlags = {
@@ -19,7 +18,7 @@ const packageJson = require('../package.json');
 const program = new Command();
 
 console.log('------------------------------');
-console.log(`${bold('autorel')} ${grey(`v${packageJson.version}`)}`);
+console.log(`${bold(white('autorel'))} ${gray(`v${packageJson.version}`)}`);
 console.log('------------------------------');
 
 program
@@ -45,8 +44,6 @@ const cliOptions = {
     skipRelease: options.skipRelease,
 };
 
-output.debug(`CLI Options: ${JSON.stringify(cliOptions, null, 2)}`);
-
 // remove falsy values from the overrides
 if (cliOptions) {
 
@@ -58,7 +55,5 @@ if (cliOptions) {
 }
 
 const config = getConfig(cliOptions);
-
-output.debug(`Config: ${JSON.stringify(config, null, 2)}`);
 
 autorel(config);

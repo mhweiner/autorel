@@ -1,5 +1,5 @@
 import {execSync} from 'child_process';
-import out from './output';
+import out from '../lib/logger';
 
 /**
  * Executes a bash program/command and returns the output. This is a tagged template
@@ -13,7 +13,7 @@ export function $(strings: TemplateStringsArray, ...values: any[]): string {
 
     const command = strings.reduce((acc, str, i) => acc + str + (values[i] || ''), '');
 
-    out.debug(command);
+    out.debug(`> ${command}`);
 
     const escapedCommand = command.replace(/(["$`\\])/g, '\\$1');
     const output = execSync(`bash -c "${escapedCommand}"`, {encoding: 'utf8'});
