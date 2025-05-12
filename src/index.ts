@@ -62,22 +62,24 @@ export async function autorel(args: Config): Promise<string|undefined> {
 
     git.gitFetch();
 
-    const latestTags = git.getLatestTags();
-    const latestTag = semver.latestTag(latestTags);
-    const lastStableTag = semver.latestStableTag(latestTags);
-    const lastChannelTag = prereleaseChannel
-        ? semver.latestChannelTag(latestTags, prereleaseChannel)
+    const recentTags = git.getRecentTags();
+    const highestTag = semver.highestTag(recentTags);
+    const highestStableTag = semver.highestStableTag(recentTags);
+    const highestChannelTag = prereleaseChannel
+        ? semver.highestChannelTag(recentTags, prereleaseChannel)
         : undefined;
 
     // Determine the starting Git tag to compare against when generating
     // release notes or changelogs (i.e. the point “since” which to find commits).
-    // If a pre-release channel is specified and a last channel tag exists,
-    // use the last channel tag. Otherwise, use the last stable tag.
-    const tagFromWhichToFindCommits = lastChannelTag ?? lastStableTag;
+    // If a pre-release channel is specified, and that channel has a tag, and
+    // it is higher than the stable tag, use that tag. Otherwise, use the stable tag.
+    const tagFromWhichToFindCommits = highestChannelTag
+        ? semver.highestTag([highestChannelTag, highestStableTag ?? 'v0.0.0'])
+        : highestStableTag;
 
-    !!lastChannelTag && logger.info(`The last pre-release channel version (${prereleaseChannel}) is: ${bold(lastChannelTag)}`);
-    logger.info(`The last stable/production version is: ${lastStableTag ? bold(lastStableTag) : gray('none')}`);
-    logger.info(`The current/highest version is: ${latestTag ? bold(latestTag) : gray('none')}`);
+    !!highestChannelTag && logger.info(`The last pre-release channel version (${prereleaseChannel}) is: ${bold(highestChannelTag)}`);
+    logger.info(`The last stable/production version is: ${highestStableTag ? bold(highestStableTag) : gray('none')}`);
+    logger.info(`The current/highest version is: ${highestTag ? bold(highestTag) : gray('none')}`);
     logger.info(`Fetching commits since ${tagFromWhichToFindCommits ?? 'the beginning of the repository'}...`);
 
     const commits = git.getCommitsFromTag(tagFromWhichToFindCommits);
@@ -122,11 +124,11 @@ export async function autorel(args: Config): Promise<string|undefined> {
     const nextTag = args.useVersion
         ? `v${args.useVersion}`
         : semver.toTag(semver.incrVer({
-            latestVer: semver.fromTag(latestTag || 'v0.0.0') as semver.SemVer,
-            latestStableVer: semver.fromTag(lastStableTag || 'v0.0.0') as semver.SemVer,
+            latestVer: semver.fromTag(highestTag || 'v0.0.0') as semver.SemVer,
+            latestStableVer: semver.fromTag(highestStableTag || 'v0.0.0') as semver.SemVer,
             releaseType,
             prereleaseChannel,
-            latestChannelVer: lastChannelTag ? semver.fromTag(lastChannelTag) ?? undefined : undefined,
+            latestChannelVer: highestChannelTag ? semver.fromTag(highestChannelTag) ?? undefined : undefined,
         }));
     const changelog = generateChangelog(parsedCommits, commitTypeMap, args.breakingChangeTitle);
 

@@ -18,7 +18,11 @@ export function createAndPushTag(tag: string): void {
 
 }
 
-export function getLatestTags(): string[] {
+/**
+ * Returns the most recent 100 tags in the repository loosely sorted by version
+ * (does not take into account pre-release tags).
+ */
+export function getRecentTags(): string[] {
 
     const tags = $`git tag --sort=-v:refname | head -n 100`;
 

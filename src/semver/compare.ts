@@ -55,7 +55,10 @@ export function highestVersion(version1: SemVer, version2: SemVer): SemVer {
 
 }
 
-export function latestTag(tags: string[]): string | undefined {
+/**
+ * Returns the tag with the highest version.
+ */
+export function highestTag(tags: string[]): string | undefined {
 
     const parsed = parseTags(tags);
 
@@ -65,7 +68,10 @@ export function latestTag(tags: string[]): string | undefined {
 
 }
 
-export function latestChannelTag(tags: string[], channel: string): string | undefined {
+/**
+ * Returns the tag with the highest version for a specific channel.
+ */
+export function highestChannelTag(tags: string[], channel: string): string | undefined {
 
     const parsed = parseTags(tags)
         .filter((entry) => entry.version.channel === channel);
@@ -76,7 +82,10 @@ export function latestChannelTag(tags: string[], channel: string): string | unde
 
 }
 
-export function latestStableTag(tags: string[]): string | undefined {
+/**
+ * Returns the tag with the highest version that does not have a channel.
+ */
+export function highestStableTag(tags: string[]): string | undefined {
 
     const parsed = parseTags(tags)
         .filter((entry) => !entry.version.channel);
