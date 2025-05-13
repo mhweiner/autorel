@@ -18,6 +18,13 @@ export function createAndPushTag(tag: string): void {
 
 }
 
+export function deleteTagFromLocalAndRemote(tag: string): void {
+
+    $`git tag -d ${tag}`;
+    $`git push origin :refs/tags/${tag}`;
+
+}
+
 /**
  * Returns the most recent 100 tags in the repository loosely sorted by version
  * (does not take into account pre-release tags).
