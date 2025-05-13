@@ -4,8 +4,6 @@ import {bash} from './services/sh';
 
 export function runUserReleaseScripts(args: Config): void {
 
-    if (args.dryRun) return;
-
     if (args.run) {
 
         logger.info('Running post-release bash script...');

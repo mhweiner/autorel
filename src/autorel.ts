@@ -89,10 +89,10 @@ export async function autorel(args: Config): Promise<string|undefined> {
     runUserPreleaseScripts(args);
     git.createAndPushTag(nextTag);
 
-    const {owner, repository} = git.getRepo();
-
     // publish to GitHub
     if (!args.skipRelease) {
+
+        const {owner, repository} = git.getRepo();
 
         github.createRelease({
             token: process.env.GITHUB_TOKEN!,
