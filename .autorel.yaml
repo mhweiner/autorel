@@ -4,9 +4,9 @@ commitTypes:
   - {type: perf, title: 🚀 Performance Improvements, release: patch}
   - {type: revert, title: ⏪ Reverts, release: patch}
   - {type: docs, title: 📚 Documentation, release: patch}
-  - {type: style, title: 💅 Styles, release: patch}
-  - {type: refactor, title: 🛠 Code Refactoring, release: patch}
-  - {type: test, title: 🧪 Tests, release: patch}
+  - {type: style, title: 💅 Styles, release: none}
+  - {type: refactor, title: 🛠 Code Refactoring, release: none}
+  - {type: test, title: 🧪 Tests, release: none}
   - {type: build, title: 🏗 Build System, release: patch}
   - {type: ci, title: 🔧 Continuous Integration, release: patch}
 branches:
