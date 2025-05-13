@@ -3,41 +3,31 @@ import * as convCom from './conventionalcommits';
 import * as git from './services/git';
 import * as npm from './services/npm';
 import {generateChangelog} from './changelog';
-import * as github from './services/github';
 import logger from './lib/logger';
 import {updatePackageJsonVersion} from './updatePackageJsonVersion';
-import {bold, gray, greenBright, redBright, strikethrough, yellowBright} from 'colorette';
+import {bold, gray, greenBright, redBright, yellowBright} from 'colorette';
 import {getPrereleaseChannel} from './getPrereleaseChannel';
 import {Config} from '.';
 import {getTags} from './getTags';
-import {validateUseVersion} from './validateUseVersion';
 import {getNextTag} from './getNextTag';
 import {runUserReleaseScripts} from './runUserReleaseScripts';
 import {runUserPreleaseScripts} from './runUserPrereleaseScripts';
+import {publishGithubRelease} from './publishGithubRelease';
+import {isValidTag} from './semver';
 
 export async function autorel(args: Config): Promise<string|undefined> {
 
+    if (args.useVersion && /^v(.+)$/.test(args.useVersion)) throw new Error('useVersion should not start with a "v".');
+    if (args.useVersion && !isValidTag(args.useVersion)) throw new Error('useVersion must be a valid SemVer version');
+
     const prereleaseChannel = getPrereleaseChannel(args);
+    const isDryRun = !!args.dryRun;
+    const isPrerelease = !!prereleaseChannel;
 
-    if (args.dryRun) {
-
-        logger.warn('Running in dry-run mode. No changes will be made.');
-
-    }
-
-    if (prereleaseChannel && !args.useVersion) {
-
-        const stmt = `Using prerelease channel: ${bold(prereleaseChannel)}`;
-
-        logger.info(!args.useVersion ? stmt : strikethrough(stmt));
-
-    } else {
-
-        const stmt = 'This is a production release.';
-
-        logger.info(!args.useVersion ? stmt : strikethrough(stmt));
-
-    }
+    isDryRun && logger.info('Running in dry-run mode. No changes will be made.');
+    isPrerelease && logger.info(`Using prerelease channel: ${bold(prereleaseChannel)}`);
+    !isPrerelease && logger.info('This is a production release.');
+    !!args.useVersion && logger.info(`Using pinned version: ${bold(args.useVersion)}`);
 
     git.gitFetch();
 
@@ -67,9 +57,11 @@ export async function autorel(args: Config): Promise<string|undefined> {
         logger.info('No release is needed. Have a nice day (^_^)/');
         return;
 
-    }
+    } else if (releaseType === 'none' && args.useVersion) {
 
-    validateUseVersion(args.useVersion, releaseType);
+        logger.info('No release is needed. But you are using --use-version, so we will do a release anyway.');
+
+    }
 
     const nextTag = getNextTag({
         releaseType,
@@ -92,16 +84,7 @@ export async function autorel(args: Config): Promise<string|undefined> {
     // publish to GitHub
     if (!args.skipRelease) {
 
-        const {owner, repository} = git.getRepo();
-
-        github.createRelease({
-            token: process.env.GITHUB_TOKEN!,
-            owner,
-            repository,
-            tag: nextTag,
-            name: nextTag,
-            body: changelog,
-        });
+        publishGithubRelease(nextTag, changelog);
 
     }
 
