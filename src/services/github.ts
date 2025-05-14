@@ -11,6 +11,7 @@ interface CreateReleaseParams {
     prerelease?: boolean
 }
 
+// eslint-disable-next-line max-lines-per-function
 export async function createRelease(params: CreateReleaseParams): Promise<number> {
 
     const {
@@ -38,6 +39,7 @@ export async function createRelease(params: CreateReleaseParams): Promise<number
             Accept: 'application/vnd.github+json',
             Authorization: `Bearer ${token}`,
             'X-GitHub-Api-Version': '2022-11-28',
+            'User-Agent': 'autorel (https://npmjs.com/autorel)',
         },
     };
 
