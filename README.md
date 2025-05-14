@@ -74,7 +74,7 @@ autorel --publish
 
 ### ⚠️ Avoiding Breaking Changes
 
-If using the `npx` command, you may want to append the version number to prevent breaking changes in the future. You can do this by appending `@^` followed by the major version number, ie. `npx autorel@^2`. Breaking changes are planned for v3 (following SemVer), so this will ensure you always get the latest v2.x.x version.
+If using the `npx` command, you may want to append the version number to prevent breaking changes in the future. You can do this by appending `@^` followed by the major version number, ie. `npx autorel@^2`.
 
 ## Example Usage (Library)
 
