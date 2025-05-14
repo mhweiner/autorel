@@ -1,18 +1,11 @@
-<picture>
-    <source srcset="docs/autorel-white.svg" media="(prefers-color-scheme: dark)">
-    <source srcset="docs/autorel-black.svg" media="(prefers-color-scheme: light)">
-    <img src="docs/autorel-black.svg" alt="Autorel" size="250">
-</picture>
-
----
+# autorel
 
 [![build status](https://github.com/mhweiner/autorel/actions/workflows/release.yml/badge.svg)](https://github.com/mhweiner/autorel/actions)
-[![SemVer](https://img.shields.io/badge/SemVer-2.0.0-blue)](https://semver.org)
+[![SemVer](https://img.shields.io/badge/SemVer-2.0.0-blue)]()
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org)
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-[![Static Badge](https://img.shields.io/badge/v2-autorel?label=autorel&labelColor=0ab5fc&color=grey&link=https%3A%2F%2Fgithub.com%2Fmhweiner%2Fautorel)](https://github.com/mhweiner/autorel)
+[![autorel](https://img.shields.io/badge/autorel-blue)](https://github.com/mhweiner/autorel)
 
-Automate releases based on [SemVer](https://semver.org/) and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/). Like `semantic-release` and `release-please` but simpler and faster.
+Automate releases based on [SemVer](https://semver.org/) and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/). Like `semantic-release` and `release-please` but much faster, simpler, and fully standards compliant.
 
 Autorel automatically does the following, if appropriate:
 
@@ -21,13 +14,12 @@ Autorel automatically does the following, if appropriate:
 - Publishes the package to NPM
 - Runs any arbitrary command or bash script
 
-_Currently only has built-in support for `GitHub` and `NPM`, but you can write your own scripts to support other systems and languages._
-
-**✅ Conventional Commit and SemVer Compliant** 
+**✅ Conventional Commit & SemVer Compliant** 
 - 100% compliant with Conventional Commits and SemVer out of the box, including "!" for breaking changes
 
 **😃 Simple & Easy to Use**
 - No confusing configuration files or complex setup
+- Configuration validation and error handling
 - Works with any CI/CD system, including GitHub Actions
 - Works with any language or platform
 - Built-in bash script support
@@ -38,6 +30,9 @@ _Currently only has built-in support for `GitHub` and `NPM`, but you can write y
 - Less broken builds and more time to focus on your code!
 
 [Read our FAQ on why you should use `autorel` and how it compares to other tools](docs/faq.md)
+
+> - Currently only has built-in support for `GitHub` and `NPM`, but you can write your own scripts to support other systems and languages.
+> - Currently Linux and MacOS only. If you need Windows support, please open an issue or PR.
 
 ## Table of Contents
 

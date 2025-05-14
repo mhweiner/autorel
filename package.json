@@ -60,6 +60,6 @@
     "colorette": "2.0.20",
     "commander": "^12.1.0",
     "js-yaml": "^4.1.0",
-    "typura": "^1.4.11"
+    "typura": "1.6.4"
   }
 }

@@ -1,6 +1,7 @@
+/* eslint-disable max-lines-per-function */
 import * as git from './services/git';
 import * as semver from './semver';
-import logger from './lib/logger';
+import logger from './services/logger';
 import {bold, gray} from 'colorette';
 
 export function getTags(prereleaseChannel?: string): {

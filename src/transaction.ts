@@ -1,3 +1,6 @@
+import {inspect} from 'util';
+import logger from './services/logger';
+
 export type AddToRollback = (action: () => Promise<void>) => void;
 export type Action = (addToRollback: AddToRollback) => Promise<void>;
 
@@ -25,7 +28,8 @@ export async function transaction(action: Action): Promise<void> {
 
             } catch (rollbackError) {
 
-                console.error('Rollback failed:', rollbackError);
+                // Log the error but continue with the rollback
+                logger.error(inspect(rollbackError, {depth: null, colors: false}));
 
             }
 

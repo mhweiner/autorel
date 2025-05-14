@@ -19,7 +19,7 @@ export type Config = {
     breakingChangeTitle: string
     commitTypes: CommitType[]
     branches: ReleaseBranch[]
-    gitHubToken?: string
+    githubToken?: string
 };
 
 export * from './defaults';

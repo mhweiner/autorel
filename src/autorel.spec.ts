@@ -5,7 +5,7 @@ import * as m from './autorel';
 import {autorel} from './autorel';
 import {defaultConfig} from './defaults';
 import {toResultAsync} from './lib/toResult';
-import {mockLogger} from './lib/mockLogger';
+import {mockLogger} from './services/mockLogger';
 
 test('throws if useVersion starts with v or not valid semver', async (assert) => {
 
@@ -60,7 +60,7 @@ test('does not run release when releaseType is none and useVersion is undefined'
                 tagFromWhichToFindCommits: 'v1.0.0',
             }),
         },
-        './lib/logger': mockLogger,
+        './services/logger': mockLogger,
     });
 
     const result = await mockMod.autorel({
@@ -136,13 +136,13 @@ test('if release, creates tags, publishes to npm, creates github release w/ chan
                 tagFromWhichToFindCommits: 'v1.0.1',
             }),
         },
-        './lib/logger': mockLogger,
+        './services/logger': mockLogger,
     });
 
     const result = await mockMod.autorel({
         ...defaultConfig,
         run: 'echo "hello world"',
-        gitHubToken: 'GITHUB_TOKEN_TEST',
+        githubToken: 'GITHUB_TOKEN_TEST',
         publish: true,
     });
 
@@ -219,13 +219,13 @@ test('skips github release if skipRelease=true', async (assert) => {
                 tagFromWhichToFindCommits: 'v1.0.1',
             }),
         },
-        './lib/logger': mockLogger,
+        './services/logger': mockLogger,
     });
 
     const result = await mockMod.autorel({
         ...defaultConfig,
         run: 'echo "hello world"',
-        gitHubToken: 'GITHUB_TOKEN_TEST',
+        githubToken: 'GITHUB_TOKEN_TEST',
         publish: true,
         skipRelease: true,
     });
@@ -303,13 +303,13 @@ test('skips npm publish if publish=false (default behavior)', async (assert) => 
                 tagFromWhichToFindCommits: 'v1.0.1',
             }),
         },
-        './lib/logger': mockLogger,
+        './services/logger': mockLogger,
     });
 
     const result = await mockMod.autorel({
         ...defaultConfig,
         run: 'echo "hello world"',
-        gitHubToken: 'GITHUB_TOKEN_TEST',
+        githubToken: 'GITHUB_TOKEN_TEST',
     });
 
     assert.equal(result, '1.0.2', 'returns next version');
@@ -385,13 +385,13 @@ test('publishes using useVersion even if no commits are needed', async (assert) 
                 tagFromWhichToFindCommits: 'v1.0.1',
             }),
         },
-        './lib/logger': mockLogger,
+        './services/logger': mockLogger,
     });
 
     const result = await mockMod.autorel({
         ...defaultConfig,
         run: 'echo "hello world"',
-        gitHubToken: 'GITHUB_TOKEN_TEST',
+        githubToken: 'GITHUB_TOKEN_TEST',
         publish: true,
         useVersion: '2.2.2',
     });
@@ -469,13 +469,13 @@ test('publishes using useVersion even if no commits are needed (prerelease)', as
                 tagFromWhichToFindCommits: 'v1.0.1',
             }),
         },
-        './lib/logger': mockLogger,
+        './services/logger': mockLogger,
     });
 
     const result = await mockMod.autorel({
         ...defaultConfig,
         run: 'echo "hello world"',
-        gitHubToken: 'GITHUB_TOKEN_TEST',
+        githubToken: 'GITHUB_TOKEN_TEST',
         publish: true,
         useVersion: '2.2.2-alpha.1',
         prereleaseChannel: 'dev',
@@ -544,7 +544,7 @@ test('release (no npm/github release) with prereleaseChannel, on the correct bra
                 tagFromWhichToFindCommits: 'v2.0.0-beta.1',
             }),
         },
-        './lib/logger': mockLogger,
+        './services/logger': mockLogger,
     });
 
     const result = await mockMod.autorel({
@@ -572,6 +572,83 @@ test('release (no npm/github release) with prereleaseChannel, on the correct bra
     assert.equal(stubs.github.deleteReleaseById.getCalls().length, 0, 'does not call deleteReleaseById');
     assert.equal(stubs.packageJson.setVersion.getCalls().length, 0, 'does not call setVersion');
     assert.equal(stubs.packageJson.read.getCalls().length, 0, 'does not call read');
+
+});
+
+test('throws if githubToken is not present, and rolls back tag', async (assert) => {
+
+    const stubs = {
+        git: {
+            gitFetch: stub('gitFetch'),
+            getCommitsFromTag: stub('getCommitsFromTag')
+                .setExpectedArgs('v1.0.1')
+                .setReturnValue([
+                    {message: 'fix: thing', hash: '123'},
+                ]),
+            getRepo: stub('getRepo').setReturnValue({owner: 'owner', repository: 'repo'}),
+            createAndPushTag: stub('createAndPushTag').setExpectedArgs('v1.0.2'),
+            deleteTagFromLocalAndRemote: stub('deleteTagFromLocalAndRemote').setExpectedArgs('v1.0.2'),
+        },
+        github: {
+            createRelease: stub('createRelease'),
+            deleteReleaseById: stub('deleteReleaseById'),
+        },
+        npm: {
+            publishPackage: stub('publishPackage'),
+            unpublishPackage: stub('unpublishPackage'),
+        },
+        sh: {
+            bash: stub('bash'),
+            $: stub(),
+        },
+        packageJson: {
+            read: stub('read').setReturnValue({
+                name: 'test',
+                version: '0.0.0',
+            }),
+            setVersion: stub('setVersion'),
+        },
+    };
+    const mockMod: typeof m = mock('./autorel', {
+        './services/git': stubs.git,
+        './services/github': stubs.github,
+        './services/npm': stubs.npm,
+        './services/packageJson': stubs.packageJson,
+        './services/sh': stubs.sh,
+        './getTags': {
+            getTags: () => ({
+                highestTag: 'v1.0.1',
+                highestChannelTag: undefined,
+                highestStableTag: 'v1.0.1',
+                tagFromWhichToFindCommits: 'v1.0.1',
+            }),
+        },
+        './services/logger': mockLogger,
+    });
+
+    const [err] = await toResultAsync(mockMod.autorel({
+        ...defaultConfig,
+        run: 'echo "hello world"',
+        githubToken: undefined,
+    }));
+
+    assert.isTrue(err instanceof Error, 'throws error');
+
+    // calls the following only once
+    assert.equal(stubs.git.gitFetch.getCalls().length, 1, 'calls gitFetch once');
+    assert.equal(stubs.git.getCommitsFromTag.getCalls().length, 1, 'calls getCommitsFromTag once');
+    assert.equal(stubs.git.createAndPushTag.getCalls().length, 1, 'calls createAndPushTag once');
+
+    // rollback
+    assert.equal(stubs.git.deleteTagFromLocalAndRemote.getCalls().length, 1, 'calls deleteTagFromLocalAndRemote once');
+
+    // does not call any of the following
+    assert.equal(stubs.github.deleteReleaseById.getCalls().length, 0, 'does not call deleteReleaseById');
+    assert.equal(stubs.npm.unpublishPackage.getCalls().length, 0, 'does not call unpublishPackage');
+    assert.equal(stubs.sh.$.getCalls().length, 0, 'does not call $'); // because it's mocked out
+    assert.equal(stubs.sh.bash.getCalls().length, 0, 'does not call bash'); // because it failed before it was called
+    assert.equal(stubs.github.createRelease.getCalls().length, 0, 'does not call createRelease'); // because it failed before it was called
+    assert.equal(stubs.npm.publishPackage.getCalls().length, 0, 'does not call publishPackage'); // because publish is false
 
 });
 
@@ -632,13 +709,13 @@ test('rolls back tag and github release if npm publish fails', async (assert) =>
                 tagFromWhichToFindCommits: 'v1.0.1',
             }),
         },
-        './lib/logger': mockLogger,
+        './services/logger': mockLogger,
     });
 
     const [err, result] = await toResultAsync(mockMod.autorel({
         ...defaultConfig,
         run: 'echo "hello world"',
-        gitHubToken: 'GITHUB_TOKEN_TEST',
+        githubToken: 'GITHUB_TOKEN_TEST',
         publish: true,
     }));
 
@@ -720,13 +797,13 @@ test('rolls back tag, github release, and npm publish if user script fails', asy
                 tagFromWhichToFindCommits: 'v1.0.1',
             }),
         },
-        './lib/logger': mockLogger,
+        './services/logger': mockLogger,
     });
 
     const [err, result] = await toResultAsync(mockMod.autorel({
         ...defaultConfig,
         run: 'echo "hello world"',
-        gitHubToken: 'GITHUB_TOKEN_TEST',
+        githubToken: 'GITHUB_TOKEN_TEST',
         publish: true,
     }));
 
@@ -748,5 +825,422 @@ test('rolls back tag, github release, and npm publish if user script fails', asy
 
     // does not call any of the following
     assert.equal(stubs.sh.$.getCalls().length, 0, 'does not call $'); // because it's mocked out
+
+});
+
+test('aborts release if user-defined pre-release script fails', async (assert) => {
+
+    const stubs = {
+        git: {
+            gitFetch: stub(),
+            getCommitsFromTag: stub().setReturnValue([
+                {message: 'fix: bug', hash: '123'},
+            ]),
+            getRepo: stub(),
+            createAndPushTag: stub(),
+            deleteTagFromLocalAndRemote: stub(),
+        },
+        github: {
+            createRelease: stub(),
+            deleteReleaseById: stub(),
+        },
+        npm: {
+            publishPackage: stub(),
+            unpublishPackage: stub(),
+        },
+    };
+    const mockMod: typeof m = mock('./autorel', {
+        './services/git': stubs.git,
+        './services/github': stubs.github,
+        './services/npm': stubs.npm,
+        './getTags': {
+            getTags: () => ({
+                highestTag: 'v1.0.0',
+                highestChannelTag: '',
+                highestStableTag: 'v1.0.0',
+                tagFromWhichToFindCommits: 'v1.0.0',
+            }),
+        },
+        './services/logger': mockLogger,
+    });
+
+    const [err, result] = await toResultAsync(mockMod.autorel({
+        ...defaultConfig,
+        preRun: 'nonexistent_command',
+    }));
+
+    assert.isTrue(err instanceof Error, 'throws error');
+    assert.equal(result, undefined, 'returns undefined');
+
+    // calls the following only once
+    assert.equal(stubs.git.gitFetch.getCalls().length, 1, 'calls gitFetch once');
+    assert.equal(stubs.git.getCommitsFromTag.getCalls().length, 1, 'calls getCommitsFromTag once');
+
+    // does not call any of the following
+    assert.equal(stubs.git.createAndPushTag.getCalls().length, 0, 'does not call createAndPushTag');
+    assert.equal(stubs.github.createRelease.getCalls().length, 0, 'does not call createRelease');
+    assert.equal(stubs.npm.publishPackage.getCalls().length, 0, 'does not call publishPackage');
+
+});
+
+test('does not run pre-pelease script or do release if dryRun is set', async (assert) => {
+
+    const stubs = {
+        git: {
+            gitFetch: stub(),
+            getCommitsFromTag: stub().setReturnValue([
+                {message: 'fix: stuff', hash: '123'},
+            ]),
+            getRepo: stub(),
+            createAndPushTag: stub(),
+            deleteTagFromLocalAndRemote: stub(),
+        },
+        github: {
+            createRelease: stub(),
+            deleteReleaseById: stub(),
+        },
+        npm: {
+            publishPackage: stub(),
+            unpublishPackage: stub(),
+        },
+        bash: stub(),
+    };
+    const mockMod: typeof m = mock('./autorel', {
+        './services/git': stubs.git,
+        './services/github': stubs.github,
+        './services/npm': stubs.npm,
+        './services/sh': {bash: stubs.bash},
+        './getTags': {
+            getTags: () => ({
+                highestTag: 'v1.0.0',
+                highestChannelTag: '',
+                highestStableTag: 'v1.0.0',
+                tagFromWhichToFindCommits: 'v1.0.0',
+            }),
+        },
+        './services/logger': mockLogger,
+    });
+
+    const result = await mockMod.autorel({
+        ...defaultConfig,
+        dryRun: true,
+        preRun: 'echo "hello world"',
+        run: 'echo "hello world"',
+    });
+
+    assert.equal(result, undefined, 'returns undefined');
+
+    // calls the following only once
+    assert.equal(stubs.git.gitFetch.getCalls().length, 1, 'calls gitFetch once');
+    assert.equal(stubs.git.getCommitsFromTag.getCalls().length, 1, 'calls getCommitsFromTag once');
+
+    // does not call any of the following
+    assert.equal(stubs.git.createAndPushTag.getCalls().length, 0, 'does not call createAndPushTag');
+    assert.equal(stubs.github.createRelease.getCalls().length, 0, 'does not call createRelease');
+    assert.equal(stubs.npm.publishPackage.getCalls().length, 0, 'does not call publishPackage');
+    assert.equal(stubs.bash.getCalls().length, 0, 'does not call bash');
+
+});
+
+test('runs user-defined bash script at the end of release process', async (assert) => {
+
+    const stubs = {
+        git: {
+            gitFetch: stub('gitFetch'),
+            getCommitsFromTag: stub('getCommitsFromTag')
+                .setExpectedArgs('v1.0.1')
+                .setReturnValue([
+                    {message: 'fix: thing', hash: '123'},
+                ]),
+            getRepo: stub('getRepo').setReturnValue({owner: 'owner', repository: 'repo'}),
+            createAndPushTag: stub('createAndPushTag').setExpectedArgs('v1.0.2'),
+            deleteTagFromLocalAndRemote: stub('deleteTagFromLocalAndRemote'),
+        },
+        github: {
+            createRelease: stub('createRelease'),
+            deleteReleaseById: stub('deleteReleaseById'),
+        },
+        npm: {
+            publishPackage: stub('publishPackage'),
+            unpublishPackage: stub('unpublishPackage'),
+        },
+        sh: {
+            bash: stub('bash').setExpectedArgs('echo "hello world"'),
+            $: stub(),
+        },
+        packageJson: {
+            read: stub('read').setReturnValue({
+                name: 'test',
+                version: '1.0.0',
+            }),
+            setVersion: stub('setVersion'),
+        },
+    };
+    const mockMod: typeof m = mock('./autorel', {
+        './services/git': stubs.git,
+        './services/github': stubs.github,
+        './services/npm': stubs.npm,
+        './services/packageJson': stubs.packageJson,
+        './services/sh': stubs.sh,
+        './getTags': {
+            getTags: () => ({
+                highestTag: 'v1.0.1',
+                highestChannelTag: undefined,
+                highestStableTag: 'v1.0.1',
+                tagFromWhichToFindCommits: 'v1.0.1',
+            }),
+        },
+        './services/logger': mockLogger,
+    });
+
+    const result = await mockMod.autorel({
+        ...defaultConfig,
+        publish: false,
+        skipRelease: true,
+        runScript: 'echo "hello world"',
+    });
+
+    assert.equal(result, '1.0.2', 'returns next version');
+
+    // calls the following only once
+    assert.equal(stubs.git.gitFetch.getCalls().length, 1, 'calls gitFetch once');
+    assert.equal(stubs.git.getCommitsFromTag.getCalls().length, 1, 'calls getCommitsFromTag once');
+    assert.equal(stubs.git.createAndPushTag.getCalls().length, 1, 'calls createAndPushTag once');
+    assert.equal(stubs.sh.bash.getCalls().length, 1, 'calls bash once');
+
+    // does not call any of the following
+    assert.equal(stubs.git.deleteTagFromLocalAndRemote.getCalls().length, 0, 'does not call deleteTagFromLocalAndRemote');
+    assert.equal(stubs.github.deleteReleaseById.getCalls().length, 0, 'does not call deleteReleaseById');
+    assert.equal(stubs.npm.unpublishPackage.getCalls().length, 0, 'does not call unpublishPackage');
+    assert.equal(stubs.sh.$.getCalls().length, 0, 'does not call $'); // because it's mocked out
+    assert.equal(stubs.github.createRelease.getCalls().length, 0, 'does not call createRelease');
+    assert.equal(stubs.npm.publishPackage.getCalls().length, 0, 'does not call publishPackage');
+
+});
+
+test('breaking commit results in returning major version', async (assert) => {
+
+    const stubs = {
+        git: {
+            gitFetch: stub('gitFetch'),
+            getCommitsFromTag: stub('getCommitsFromTag')
+                .setExpectedArgs('v1.0.1')
+                .setReturnValue([
+                    {message: 'fix!: thing with breaking change', hash: '123'},
+                ]),
+            getRepo: stub('getRepo').setReturnValue({owner: 'owner', repository: 'repo'}),
+            createAndPushTag: stub('createAndPushTag').setExpectedArgs('v2.0.0'),
+            deleteTagFromLocalAndRemote: stub('deleteTagFromLocalAndRemote'),
+        },
+        github: {
+            createRelease: stub('createRelease'),
+            deleteReleaseById: stub('deleteReleaseById'),
+        },
+        npm: {
+            publishPackage: stub('publishPackage'),
+            unpublishPackage: stub('unpublishPackage'),
+        },
+        sh: {
+            bash: stub('bash').setExpectedArgs('echo "hello world"'),
+            $: stub(),
+        },
+        packageJson: {
+            read: stub('read').setReturnValue({
+                name: 'test',
+                version: '1.0.0',
+            }),
+            setVersion: stub('setVersion'),
+        },
+    };
+    const mockMod: typeof m = mock('./autorel', {
+        './services/git': stubs.git,
+        './services/github': stubs.github,
+        './services/npm': stubs.npm,
+        './services/packageJson': stubs.packageJson,
+        './services/sh': stubs.sh,
+        './getTags': {
+            getTags: () => ({
+                highestTag: 'v1.0.1',
+                highestChannelTag: undefined,
+                highestStableTag: 'v1.0.1',
+                tagFromWhichToFindCommits: 'v1.0.1',
+            }),
+        },
+        './services/logger': mockLogger,
+    });
+
+    const result = await mockMod.autorel({
+        ...defaultConfig,
+        publish: false,
+        skipRelease: true,
+        runScript: 'echo "hello world"',
+    });
+
+    assert.equal(result, '2.0.0', 'returns next version');
+
+    // calls the following only once
+    assert.equal(stubs.git.gitFetch.getCalls().length, 1, 'calls gitFetch once');
+    assert.equal(stubs.git.getCommitsFromTag.getCalls().length, 1, 'calls getCommitsFromTag once');
+    assert.equal(stubs.git.createAndPushTag.getCalls().length, 1, 'calls createAndPushTag once');
+    assert.equal(stubs.sh.bash.getCalls().length, 1, 'calls bash once');
+
+    // does not call any of the following
+    assert.equal(stubs.git.deleteTagFromLocalAndRemote.getCalls().length, 0, 'does not call deleteTagFromLocalAndRemote');
+    assert.equal(stubs.github.deleteReleaseById.getCalls().length, 0, 'does not call deleteReleaseById');
+    assert.equal(stubs.npm.unpublishPackage.getCalls().length, 0, 'does not call unpublishPackage');
+    assert.equal(stubs.sh.$.getCalls().length, 0, 'does not call $'); // because it's mocked out
+    assert.equal(stubs.github.createRelease.getCalls().length, 0, 'does not call createRelease');
+    assert.equal(stubs.npm.publishPackage.getCalls().length, 0, 'does not call publishPackage');
+
+});
+
+test('starts with v0.0.0 as base if no git tags', async (assert) => {
+
+    const stubs = {
+        git: {
+            gitFetch: stub('gitFetch'),
+            getCommitsFromTag: stub('getCommitsFromTag')
+                .setExpectedArgs(undefined)
+                .setReturnValue([
+                    {message: 'feat: new repo', hash: '123'},
+                ]),
+            getRepo: stub('getRepo').setReturnValue({owner: 'owner', repository: 'repo'}),
+            createAndPushTag: stub('createAndPushTag').setExpectedArgs('v0.1.0'),
+            deleteTagFromLocalAndRemote: stub('deleteTagFromLocalAndRemote'),
+        },
+        github: {
+            createRelease: stub('createRelease'),
+            deleteReleaseById: stub('deleteReleaseById'),
+        },
+        npm: {
+            publishPackage: stub('publishPackage'),
+            unpublishPackage: stub('unpublishPackage'),
+        },
+        sh: {
+            bash: stub('bash').setExpectedArgs('echo "hello world"'),
+            $: stub(),
+        },
+        packageJson: {
+            read: stub('read').setReturnValue({
+                name: 'test',
+                version: 'v0.0.0',
+            }),
+            setVersion: stub('setVersion'),
+        },
+    };
+    const mockMod: typeof m = mock('./autorel', {
+        './services/git': stubs.git,
+        './services/github': stubs.github,
+        './services/npm': stubs.npm,
+        './services/packageJson': stubs.packageJson,
+        './services/sh': stubs.sh,
+        './getTags': {
+            getTags: () => ({
+                highestTag: undefined,
+                highestChannelTag: undefined,
+                highestStableTag: undefined,
+                tagFromWhichToFindCommits: undefined,
+            }),
+        },
+        './services/logger': mockLogger,
+    });
+
+    const result = await mockMod.autorel({
+        ...defaultConfig,
+        publish: false,
+        skipRelease: true,
+    });
+
+    assert.equal(result, '0.1.0', 'returns next version');
+
+    // calls the following only once
+    assert.equal(stubs.git.gitFetch.getCalls().length, 1, 'calls gitFetch once');
+    assert.equal(stubs.git.getCommitsFromTag.getCalls().length, 1, 'calls getCommitsFromTag once');
+    assert.equal(stubs.git.createAndPushTag.getCalls().length, 1, 'calls createAndPushTag once');
+
+    // does not call any of the following
+    assert.equal(stubs.git.deleteTagFromLocalAndRemote.getCalls().length, 0, 'does not call deleteTagFromLocalAndRemote');
+    assert.equal(stubs.github.deleteReleaseById.getCalls().length, 0, 'does not call deleteReleaseById');
+    assert.equal(stubs.npm.unpublishPackage.getCalls().length, 0, 'does not call unpublishPackage');
+    assert.equal(stubs.sh.$.getCalls().length, 0, 'does not call $'); // because it's mocked out
+    assert.equal(stubs.github.createRelease.getCalls().length, 0, 'does not call createRelease');
+    assert.equal(stubs.npm.publishPackage.getCalls().length, 0, 'does not call publishPackage');
+    assert.equal(stubs.sh.bash.getCalls().length, 0, 'does not call bash');
+
+});
+
+test('starts with v0.0.0 as base if no git tags and prerelease channel is provided', async (assert) => {
+
+    const stubs = {
+        git: {
+            gitFetch: stub('gitFetch'),
+            getCommitsFromTag: stub('getCommitsFromTag')
+                .setExpectedArgs(undefined)
+                .setReturnValue([
+                    {message: 'feat: new repo', hash: '123'},
+                ]),
+            getRepo: stub('getRepo').setReturnValue({owner: 'owner', repository: 'repo'}),
+            createAndPushTag: stub('createAndPushTag').setExpectedArgs('v0.1.0-alpha.1'),
+            deleteTagFromLocalAndRemote: stub('deleteTagFromLocalAndRemote'),
+        },
+        github: {
+            createRelease: stub('createRelease'),
+            deleteReleaseById: stub('deleteReleaseById'),
+        },
+        npm: {
+            publishPackage: stub('publishPackage'),
+            unpublishPackage: stub('unpublishPackage'),
+        },
+        sh: {
+            bash: stub('bash').setExpectedArgs('echo "hello world"'),
+            $: stub(),
+        },
+        packageJson: {
+            read: stub('read').setReturnValue({
+                name: 'test',
+                version: 'v0.0.0',
+            }),
+            setVersion: stub('setVersion'),
+        },
+    };
+    const mockMod: typeof m = mock('./autorel', {
+        './services/git': stubs.git,
+        './services/github': stubs.github,
+        './services/npm': stubs.npm,
+        './services/packageJson': stubs.packageJson,
+        './services/sh': stubs.sh,
+        './getTags': {
+            getTags: () => ({
+                highestTag: undefined,
+                highestChannelTag: undefined,
+                highestStableTag: undefined,
+                tagFromWhichToFindCommits: undefined,
+            }),
+        },
+        './services/logger': mockLogger,
+    });
+
+    const result = await mockMod.autorel({
+        ...defaultConfig,
+        publish: false,
+        skipRelease: true,
+        prereleaseChannel: 'alpha',
+    });
+
+    assert.equal(result, '0.1.0-alpha.1', 'returns next version');
+
+    // calls the following only once
+    assert.equal(stubs.git.gitFetch.getCalls().length, 1, 'calls gitFetch once');
+    assert.equal(stubs.git.getCommitsFromTag.getCalls().length, 1, 'calls getCommitsFromTag once');
+    assert.equal(stubs.git.createAndPushTag.getCalls().length, 1, 'calls createAndPushTag once');
+
+    // does not call any of the following
+    assert.equal(stubs.git.deleteTagFromLocalAndRemote.getCalls().length, 0, 'does not call deleteTagFromLocalAndRemote');
+    assert.equal(stubs.github.deleteReleaseById.getCalls().length, 0, 'does not call deleteReleaseById');
+    assert.equal(stubs.npm.unpublishPackage.getCalls().length, 0, 'does not call unpublishPackage');
+    assert.equal(stubs.sh.$.getCalls().length, 0, 'does not call $'); // because it's mocked out
+    assert.equal(stubs.github.createRelease.getCalls().length, 0, 'does not call createRelease');
+    assert.equal(stubs.npm.publishPackage.getCalls().length, 0, 'does not call publishPackage');
+    assert.equal(stubs.sh.bash.getCalls().length, 0, 'does not call bash');
 
 });

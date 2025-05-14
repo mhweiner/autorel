@@ -1,4 +1,4 @@
-import logger from '../lib/logger';
+import logger from './logger';
 import {writeFileSync} from 'fs';
 import * as fs from 'fs';
 import * as path from 'path';

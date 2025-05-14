@@ -3,16 +3,6 @@ import {bold, gray, white} from 'colorette';
 import {autorel} from '.';
 import {getConfig} from './config';
 
-export type CliFlags = {
-    dry?: boolean
-    preRelease?: string
-    useVersion?: string
-    run?: string
-    preRun?: string
-    noRelease?: boolean
-    publish?: boolean
-};
-
 // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
 const packageJson = require('../package.json');
 const program = new Command();
@@ -29,31 +19,28 @@ program
     .option('--use-version <value>', 'Specify a version to be used instead of calculating it from commit analysis. Must be a valid SemVer version, with no \'v\'. Overrides --pre-release, commitType, and branches configuration. (arg: useVersion)')
     .option('--run <value>', 'Command to run after the release is successful. (arg: run)')
     .option('--pre-run <value>', 'Command to run after the release is successful. (arg: preRun)')
+    .option('--publish', 'Publish the package to npm, requires npm already set up and authenticated. (arg: publish)')
+    .option('--github-token <value>', 'GitHub token to use for creating the release. By default, we use GITHUB_TOKEN environment variable (arg: githubToken)')
     .option('--skip-release', 'Skips creating a release on GitHub. (arg: skipRelease)')
-    .option('--publish', 'Publish the package to npm, requires passing --npm-token or NPM_TOKEN environment variable. (arg: publish)')
     .parse(process.argv);
 
 const options = program.opts();
-const cliOptions = {
-    dryRun: options.dryRun,
-    run: options.run,
-    preRun: options.preRun,
-    prereleaseChannel: options.preRelease,
-    useVersion: options.useVersion,
-    publish: options.publish,
-    skipRelease: options.skipRelease,
-};
 
 // remove falsy values from the overrides
-if (cliOptions) {
+if (options) {
 
-    Object.keys(cliOptions).forEach((key) => (
+    Object.keys(options).forEach((key) => (
         // @ts-ignore
         !cliOptions[key] && delete cliOptions[key]
     ));
 
 }
 
-const config = getConfig(cliOptions);
+const config = getConfig(options);
 
-autorel(config);
+autorel(config).catch((error) => {
+
+    console.error('[autorel] Error:', error);
+    process.exit(1);
+
+});

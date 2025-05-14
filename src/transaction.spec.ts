@@ -1,6 +1,13 @@
 import {test} from 'hoare';
-import {transaction, Action} from './transaction';
-import {toResultAsync} from './toResult';
+import {Action} from './transaction';
+import {mock} from 'cjs-mock';
+import * as m from './transaction';
+import {toResultAsync} from './lib/toResult';
+import {mockLogger} from './services/mockLogger';
+
+const mocked: typeof m = mock('./transaction', {
+    './services/logger': mockLogger,
+});
 
 test('executes the action without rollback if no error is thrown', async (assert) => {
 
@@ -18,7 +25,7 @@ test('executes the action without rollback if no error is thrown', async (assert
 
     };
 
-    const [err] = await toResultAsync(transaction(action));
+    const [err] = await toResultAsync(mocked.transaction(action));
 
     assert.isTrue(!err, 'should not throw');
     assert.isTrue(actionCalled, 'action should be called');
@@ -41,7 +48,7 @@ test('calls rollback if action throws', async (assert) => {
 
     };
 
-    const [err] = await toResultAsync(transaction(action));
+    const [err] = await toResultAsync(mocked.transaction(action));
 
     assert.isTrue(!!err, 'should throw');
     assert.equal(calls, ['rollback'], 'rollback should be called');
@@ -74,7 +81,7 @@ test('calls rollbacks in reverse order', async (assert) => {
 
     };
 
-    await toResultAsync(transaction(action));
+    await toResultAsync(mocked.transaction(action));
     assert.equal(calls, ['r3', 'r2', 'r1'], 'rollback should run in reverse');
 
 });
@@ -104,7 +111,7 @@ test('rollback errors do not stop other rollbacks', async (assert) => {
 
     };
 
-    await toResultAsync(transaction(action));
+    await toResultAsync(mocked.transaction(action));
     assert.equal(calls, ['r3', 'r1'], 'rollback should continue after error');
 
 });
@@ -122,7 +129,7 @@ test('rethrows original error even if rollback fails', async (assert) => {
 
     };
 
-    const [err] = await toResultAsync(transaction(action));
+    const [err] = await toResultAsync(mocked.transaction(action));
 
     assert.isTrue(!!err, 'should throw');
     assert.equal(err!.message, 'original error');

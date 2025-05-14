@@ -6,19 +6,25 @@ import * as semver from './semver';
 import * as github from './services/github';
 import * as packageJson from './services/packageJson';
 import {generateChangelog} from './changelog';
-import logger from './lib/logger';
+import logger from './services/logger';
 import {bold, gray, greenBright, redBright, yellowBright} from 'colorette';
 import {getPrereleaseChannel} from './getPrereleaseChannel';
-import {Config} from '.';
+import {Config, validateConfig} from '.';
 import {getTags} from './getTags';
-import {isValidTag} from './semver';
-import {transaction} from './lib/transaction';
+import {transaction} from './transaction';
 import {bash} from './services/sh';
+import {inspect} from 'node:util';
+import {toResult, ValidationError} from 'typura';
 
 export async function autorel(args: Config): Promise<string|undefined> {
 
-    if (args.useVersion && /^v(.+)$/.test(args.useVersion)) throw new Error('useVersion should not start with a "v".');
-    if (args.useVersion && !isValidTag(`v${args.useVersion}`)) throw new Error('useVersion must be a valid SemVer version');
+    const [validationErr] = toResult(() => validateConfig(args));
+
+    if (validationErr instanceof ValidationError) {
+
+        throw new Error(`Invalid configuration:\n${inspect(validationErr.messages, {depth: null, colors: false})}`);
+
+    }
 
     const prereleaseChannel = getPrereleaseChannel(args);
     const isDryRun = !!args.dryRun;
@@ -66,11 +72,11 @@ export async function autorel(args: Config): Promise<string|undefined> {
     const nextTag = args.useVersion
         ? `v${args.useVersion}`
         : semver.toTag(semver.incrVer({
-            latestVer: semver.fromTag(highestTag || 'v0.0.0') as semver.SemVer,
-            latestStableVer: semver.fromTag(highestStableTag || 'v0.0.0') as semver.SemVer,
+            latestVer: semver.fromTag(highestTag ?? 'v0.0.0') as semver.SemVer,
+            latestStableVer: semver.fromTag(highestStableTag ?? 'v0.0.0') as semver.SemVer,
             releaseType,
             prereleaseChannel,
-            latestChannelVer: highestChannelTag ? semver.fromTag(highestChannelTag) ?? undefined : undefined,
+            latestChannelVer: highestChannelTag ? semver.fromTag(highestChannelTag) : undefined,
         }));
     const changelog = generateChangelog(parsedCommits, commitTypeMap, args.breakingChangeTitle);
 
@@ -101,12 +107,12 @@ export async function autorel(args: Config): Promise<string|undefined> {
         // create GitHub release
         if (!args.skipRelease) {
 
-            if (!args.gitHubToken) throw new Error('GitHub token is required to publish a release. Please set the GITHUB_TOKEN environment variable or pass it as an argument.');
+            if (!args.githubToken) throw new Error('GitHub token is required to publish a release. Please set the GITHUB_TOKEN environment variable or pass it as an argument.');
 
             const {owner, repository} = git.getRepo();
 
             const releaseId = await github.createRelease({
-                token: args.gitHubToken,
+                token: args.githubToken,
                 owner,
                 repository,
                 tag: nextTag,
@@ -164,12 +170,7 @@ export async function autorel(args: Config): Promise<string|undefined> {
         } else if (args.runScript) {
 
             // TODO: delete this block in the next major version
-
-            logger.warn('----------------------------');
-            logger.warn('🚨 The "runScript" option is deprecated. Please use "run" instead. 🚨');
-            logger.warn('🚨 The "runScript" option will be removed in the next major version. 🚨');
-            logger.warn('----------------------------');
-
+            logger.warn('🚨 Warning: The "runScript" option is deprecated. Please use "run" instead. It will be removed in the next major version.');
             logger.info('Running post-release bash script...');
             bash(args.runScript);
 

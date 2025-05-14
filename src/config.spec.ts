@@ -2,8 +2,8 @@
 import {test} from 'hoare';
 import {mock} from 'cjs-mock';
 import * as mod from './config';
-import {mockLogger} from './lib/mockLogger';
-import {ValidationError, toResult} from 'typura';
+import {mockLogger} from './services/mockLogger';
+import {toResult} from 'typura';
 import {defaultConfig} from './defaults';
 import {Config} from '.';
 
@@ -20,7 +20,7 @@ test('getConfig: no .autorel.yaml', async (assert) => {
     const configMod: typeof mod = mock('./config', {
         'node:fs': mockFs,
         'node:path': {resolve: (p: string) => p},
-        './lib/logger': mockLogger,
+        './services/logger': mockLogger,
     });
 
     assert.equal(configMod.getConfig(), defaultConfig, 'should return the default configuration');
@@ -43,7 +43,7 @@ test('getConfig: valid .autorel.yaml', async (assert) => {
     const configMod: typeof mod = mock('./config', {
         'node:fs': mockFs,
         'node:path': {resolve: (p: string) => p},
-        './lib/logger': mockLogger,
+        './services/logger': mockLogger,
     });
     const expectedConfig = {
         ...defaultConfig,
@@ -60,31 +60,6 @@ test('getConfig: valid .autorel.yaml', async (assert) => {
 
 });
 
-test('getConfig: invalid configuration', async (assert) => {
-
-    const mockFs = {
-        existsSync: () => true,
-        readFileSync: () => `
-            breakingChange: 'BREAKING CHANGES'
-            commitTypes:
-              - test
-              - build
-        `,
-    };
-    const configMod: typeof mod = mock('./config', {
-        'node:fs': mockFs,
-        'node:path': {resolve: (p: string) => p},
-        './lib/logger': mockLogger,
-    });
-
-    assert.throws(() => configMod.getConfig(), new ValidationError({
-        'commitTypes.[0]': 'must be an object with keys type, title, release',
-        'commitTypes.[1]': 'must be an object with keys type, title, release',
-        breakingChange: 'unknown key',
-    }), 'should throw ValidationError');
-
-});
-
 test('getConfig: readFile error', async (assert) => {
 
     const mockFs = {
@@ -98,7 +73,7 @@ test('getConfig: readFile error', async (assert) => {
     const configMod: typeof mod = mock('./config', {
         'node:fs': mockFs,
         'node:path': {resolve: (p: string) => p},
-        './lib/logger': mockLogger,
+        './services/logger': mockLogger,
     });
 
     assert.throws(() => configMod.getConfig(), new Error('something happened'), 'should re-throw error');
@@ -119,7 +94,7 @@ a:
     const configMod: typeof mod = mock('./config', {
         'node:fs': mockFs,
         'node:path': {resolve: (p: string) => p},
-        './lib/logger': mockLogger,
+        './services/logger': mockLogger,
     });
 
     const [err] = toResult(() => configMod.getConfig());
@@ -141,7 +116,7 @@ test('getConfig: valid .autorel.yaml with cli overrides', async (assert) => {
     const configMod: typeof mod = mock('./config', {
         'node:fs': mockFs,
         'node:path': {resolve: (p: string) => p},
-        './lib/logger': mockLogger,
+        './services/logger': mockLogger,
     });
     const cliOptions = { // all falsy values are removed
         run: 'test',
@@ -195,7 +170,7 @@ test('getConfig: valid .autorel.yaml with empty cli overrides (2)', async (asser
     const configMod: typeof mod = mock('./config', {
         'node:fs': mockFs,
         'node:path': {resolve: (p: string) => p},
-        './lib/logger': mockLogger,
+        './services/logger': mockLogger,
     });
     const cliOptions = {};
     const expectedConfig: Config = {

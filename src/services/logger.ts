@@ -22,7 +22,7 @@ function warn(message: string): void {
 
 function error(message: string): void {
 
-    info(red(`Error: ${message}`));
+    console.error(red(`${prefix}Error: ${message}`));
 
 }
 

@@ -1,5 +1,5 @@
 import {inspect} from 'node:util';
-import output from './lib/logger';
+import output from './services/logger';
 import {CommitType} from '.';
 
 type ReleaseType = 'major' | 'minor' | 'patch' | 'none';
