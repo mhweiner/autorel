@@ -1,13 +1,7 @@
 import {test} from 'hoare';
-import {Action} from './transaction';
-import {mock} from 'cjs-mock';
-import * as m from './transaction';
+import {Action, transaction} from './transaction';
+import {stub} from 'cjs-mock';
 import {toResultAsync} from './lib/toResult';
-import {mockLogger} from './services/mockLogger';
-
-const mocked: typeof m = mock('./transaction', {
-    './services/logger': mockLogger,
-});
 
 test('executes the action without rollback if no error is thrown', async (assert) => {
 
@@ -24,12 +18,16 @@ test('executes the action without rollback if no error is thrown', async (assert
         actionCalled = true;
 
     };
+    const onRollbackStub = stub();
+    const onRollbackErrorStub = stub();
 
-    const [err] = await toResultAsync(mocked.transaction(action));
+    const [err] = await toResultAsync(transaction(action, onRollbackStub, onRollbackErrorStub));
 
     assert.isTrue(!err, 'should not throw');
     assert.isTrue(actionCalled, 'action should be called');
     assert.isTrue(!rollbackCalled, 'rollback should not be called');
+    assert.equal(onRollbackStub.getCalls().length, 0, 'onRollback should not be called');
+    assert.equal(onRollbackErrorStub.getCalls().length, 0, 'onRollbackError should not be called');
 
 });
 
@@ -47,12 +45,16 @@ test('calls rollback if action throws', async (assert) => {
         throw new Error('fail');
 
     };
+    const onRollbackStub = stub();
+    const onRollbackErrorStub = stub();
 
-    const [err] = await toResultAsync(mocked.transaction(action));
+    const [err] = await toResultAsync(transaction(action, onRollbackStub, onRollbackErrorStub));
 
     assert.isTrue(!!err, 'should throw');
     assert.equal(calls, ['rollback'], 'rollback should be called');
     assert.equal(err!.message, 'fail');
+    assert.equal(onRollbackStub.getCalls().length, 1, 'onRollback should be called once');
+    assert.equal(onRollbackErrorStub.getCalls().length, 0, 'onRollbackError should not be called');
 
 });
 
@@ -80,8 +82,10 @@ test('calls rollbacks in reverse order', async (assert) => {
         throw new Error('fail');
 
     };
+    const onRollbackStub = stub();
+    const onRollbackErrorStub = stub();
 
-    await toResultAsync(mocked.transaction(action));
+    await toResultAsync(transaction(action, onRollbackStub, onRollbackErrorStub));
     assert.equal(calls, ['r3', 'r2', 'r1'], 'rollback should run in reverse');
 
 });
@@ -110,9 +114,13 @@ test('rollback errors do not stop other rollbacks', async (assert) => {
         throw new Error('main fail');
 
     };
+    const onRollbackStub = stub();
+    const onRollbackErrorStub = stub();
 
-    await toResultAsync(mocked.transaction(action));
+    await toResultAsync(transaction(action, onRollbackStub, onRollbackErrorStub));
     assert.equal(calls, ['r3', 'r1'], 'rollback should continue after error');
+    assert.equal(onRollbackStub.getCalls().length, 1, 'onRollback should be called once');
+    assert.equal(onRollbackErrorStub.getCalls().length, 1, 'onRollbackError should be called once');
 
 });
 
@@ -128,10 +136,14 @@ test('rethrows original error even if rollback fails', async (assert) => {
         throw new Error('original error');
 
     };
+    const onRollbackStub = stub();
+    const onRollbackErrorStub = stub();
 
-    const [err] = await toResultAsync(mocked.transaction(action));
+    const [err] = await toResultAsync(transaction(action, onRollbackStub, onRollbackErrorStub));
 
     assert.isTrue(!!err, 'should throw');
     assert.equal(err!.message, 'original error');
+    assert.equal(onRollbackStub.getCalls().length, 1, 'onRollback should be called once');
+    assert.equal(onRollbackErrorStub.getCalls().length, 1, 'onRollbackError should be called once');
 
 });

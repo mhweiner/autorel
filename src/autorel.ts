@@ -16,6 +16,19 @@ import {bash} from './services/sh';
 import {inspect} from 'node:util';
 import {toResult, ValidationError} from 'typura';
 
+const onRollback = (err: Error) => {
+
+    logger.error('An error occurred during release, rolling back...');
+    logger.error(inspect(err, {depth: null, colors: false}));
+
+};
+const onRollbackError = (err: Error) => {
+
+    logger.error('An error occurred during rollback:');
+    logger.error(inspect(err, {depth: null, colors: false}));
+
+};
+
 export async function autorel(args: Config): Promise<string|undefined> {
 
     const [validationErr] = toResult(() => validateConfig(args));
@@ -176,7 +189,7 @@ export async function autorel(args: Config): Promise<string|undefined> {
 
         }
 
-    });
+    }, onRollback, onRollbackError);
 
     return nextTag.replace('v', '');
 

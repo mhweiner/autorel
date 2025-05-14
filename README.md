@@ -3,36 +3,40 @@
 [![build status](https://github.com/mhweiner/autorel/actions/workflows/release.yml/badge.svg)](https://github.com/mhweiner/autorel/actions)
 [![SemVer](https://img.shields.io/badge/SemVer-2.0.0-blue)]()
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org)
-[![autorel](https://img.shields.io/badge/autorel-blue)](https://github.com/mhweiner/autorel)
+[![AutoRel](https://img.shields.io/badge/AutoRel-blue)](https://github.com/mhweiner/AutoRel)
 
-Automate releases based on [SemVer](https://semver.org/) and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/). Like `semantic-release` and `release-please` but much faster, simpler, and fully standards compliant.
+**Autorel** is a fast, simple, and reliable tool for automating releases based on commit messages.
 
-Autorel automatically does the following, if appropriate:
+It follows [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) and [Semantic Versioning](https://semver.org/) to do things like:
 
-- Bumps the version based on the commit messages
-- Creates a new release on GitHub with Release Notes
-- Publishes the package to NPM
-- Runs any arbitrary command or bash script
+- Run pre-release tasks (tests, builds, etc.)
+- Bump the version and tag based on commit messages
+- Create tagged GitHub releases with notes
+- Publish to npm
+- Run custom scripts
+
+🚀 Like `semantic-release` or `release-please`, but faster, more reliable, and easier to use.
+
+Supports GitHub Actions and npm (Node.js) natively. You can add custom scripts for other languages and systems (or contribute built-in support).
+
+Use Autorel to save time, prevent broken releases, and ship with confidence.
 
 **✅ Conventional Commit & SemVer Compliant** 
 - 100% compliant with Conventional Commits and SemVer out of the box, including "!" for breaking changes
 
-**😃 Simple & Easy to Use**
+**🔒 Safe & Reliable**
+- Automatic rollback on failure
 - No confusing configuration files or complex setup
 - Configuration validation and error handling
-- Works with any CI/CD system, including GitHub Actions
-- Works with any language or platform
-- Built-in bash script support
+- Excellent test coverage
 
 **🚀 Fast & Lightweight**
-- Minimal dependencies and fast execution written in TypeScript
-- Comprehensive test coverage
+- Minimal dependencies and fast, concurrent execution
+- Written in TypeScript with comprehensive test coverage
+- No need to install or configure a separate CI/CD system
 - Less broken builds and more time to focus on your code!
 
 [Read our FAQ on why you should use `autorel` and how it compares to other tools](docs/faq.md)
-
-> - Currently only has built-in support for `GitHub` and `NPM`, but you can write your own scripts to support other systems and languages.
-> - Currently Linux and MacOS only. If you need Windows support, please open an issue or PR.
 
 ## Table of Contents
 
