@@ -848,6 +848,10 @@ test('aborts release if user-defined pre-release script fails', async (assert) =
             publishPackage: stub(),
             unpublishPackage: stub(),
         },
+        sh: {
+            bash: stub().throws(new Error('bash: line 1: nonexistent_command: command not found')),
+            $: stub(),
+        },
     };
     const mockMod: typeof m = mock('./autorel', {
         './services/git': stubs.git,
@@ -862,6 +866,7 @@ test('aborts release if user-defined pre-release script fails', async (assert) =
             }),
         },
         './services/logger': mockLogger,
+        './services/sh': stubs.sh,
     });
 
     const [err, result] = await toResultAsync(mockMod.autorel({
