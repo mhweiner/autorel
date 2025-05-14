@@ -40,7 +40,7 @@ const config = getConfig(options);
 
 autorel(config).catch((error) => {
 
-    console.error('[autorel] Error:', error);
+    console.error('[autorel] Release failed:', error);
     process.exit(1);
 
 });
