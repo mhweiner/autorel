@@ -19,7 +19,7 @@ export async function transaction(action: Action): Promise<void> {
 
     } catch (error) {
 
-        logger.error('An error occurred during deployment, rolling back...');
+        logger.error('An error occurred during release, rolling back...');
         logger.error(inspect(error, {depth: null, colors: false}));
 
         // Rollback all actions
