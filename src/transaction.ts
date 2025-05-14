@@ -19,6 +19,9 @@ export async function transaction(action: Action): Promise<void> {
 
     } catch (error) {
 
+        logger.error('An error occurred during deployment, rolling back...');
+        logger.error(inspect(error, {depth: null, colors: false}));
+
         // Rollback all actions
         for (const rollbackAction of rollbackActions.reverse()) {
 
@@ -29,6 +32,7 @@ export async function transaction(action: Action): Promise<void> {
             } catch (rollbackError) {
 
                 // Log the error but continue with the rollback
+                logger.error('An error occurred during rollback:');
                 logger.error(inspect(rollbackError, {depth: null, colors: false}));
 
             }
