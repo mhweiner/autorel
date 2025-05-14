@@ -60,7 +60,7 @@ _Currently only has built-in support for `GitHub` and `NPM`, but you can write y
 ## Example Usage (CLI)
 
 ```bash
-npx autorel --publish --run 'echo "Next version is ${NEXT_VERSION}"'
+npx autorel@^2 --publish --run 'echo "Next version is ${NEXT_VERSION}"'
 ```
 
 This will:
@@ -77,11 +77,9 @@ npm i -g autorel
 autorel --publish
 ```
 
-### Avoiding Breaking Changes
+### ⚠️ Avoiding Breaking Changes
 
-If using the `npx` command, you may want to append the version number to prevent breaking changes in the future. You can do this by appending `@^` followed by the major version number.
-
-Example: `npx autorel@^2`
+If using the `npx` command, you may want to append the version number to prevent breaking changes in the future. You can do this by appending `@^` followed by the major version number, ie. `npx autorel@^2`. Breaking changes are planned for v3 (following SemVer), so this will ensure you always get the latest v2.x.x version.
 
 ## Example Usage (Library)
 
@@ -102,7 +100,7 @@ Example: `npx autorel@^2`
     };
 
     autorel(autorelConfig).then((nextVersion) => {
-        console.log(`Next version is ${nextVersion}`);
+        console.log(`Next version is ${nextVersion}`); // ie, "Next version is 1.0.1"
     });
     ```
 
@@ -328,6 +326,10 @@ The version to use for the release INSTEAD of the version being generated. Alway
 - Default: `undefined`
 
 > ❗️ Must be a valid SemVer version, without the `v`.
+
+### githubToken
+
+The GitHub token to use for creating the release. If not provided, it will use the `GITHUB_TOKEN` environment variable. This is only used if `skipRelease` is `false`.
 
 ## Sample YAML Configuration
 

@@ -17,4 +17,5 @@ export const defaultConfig: Config = {
     branches: [
         {name: 'main'},
     ],
+    gitHubToken: process.env.GITHUB_TOKEN,
 };

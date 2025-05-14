@@ -30,6 +30,6 @@ export function getPrereleaseChannel(config: Config): string|undefined {
 
     if (!matchingBranch) return undefined;
 
-    return matchingBranch.prereleaseChannel || undefined;
+    return matchingBranch.prereleaseChannel ?? undefined;
 
 }
