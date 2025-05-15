@@ -1,26 +1,8 @@
-export type CommitType = {
-    type: string
-    title: string
-    release: 'minor' | 'patch' | 'none'
-};
-export type ReleaseBranch = {
-    name: string
-    prereleaseChannel?: string
-};
-export type Config = {
-    dryRun?: boolean
-    run?: string
-    preRun?: string
-    runScript?: string
-    prereleaseChannel?: string
-    useVersion?: string
-    skipRelease?: boolean
-    publish?: boolean
-    breakingChangeTitle: string
-    commitTypes: CommitType[]
-    branches: ReleaseBranch[]
-    githubToken?: string
-};
+import {Infer} from 'typura';
+import {commitType, validateConfig} from './config';
+
+export type CommitType = Infer<typeof commitType>;
+export type Config = Infer<typeof validateConfig>;
 
 export * from './defaults';
 export * from './config';

@@ -6,27 +6,39 @@ import output from './services/logger';
 import {Config} from '.';
 import {defaultConfig} from './defaults';
 
-const useVersionRegex = /^(?<major>0|[1-9]\d*)\.(?<minor>0|[1-9]\d*)\.(?<patch>0|[1-9]\d*)(?:-(?<channel>[0-9a-zA-Z-]+)(?:\.(?<build>[0-9a-zA-Z-]+))?)?(?:\+(?<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/;
+const useVersionRegex = /^v?(?<major>0|[1-9]\d*)\.(?<minor>0|[1-9]\d*)\.(?<patch>0|[1-9]\d*)(?:-(?<channel>[0-9a-zA-Z-]+)(?:\.(?<build>[0-9a-zA-Z-]+))?)?(?:\+(?<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/;
+
+export const releaseType = p.union([
+    p.literal('major' as const),
+    p.literal('minor' as const),
+    p.literal('patch' as const),
+    p.literal('none' as const),
+], 'must be one of: major, minor, patch, or none');
+export const commitType = p.object({
+    type: p.string(),
+    title: p.string(),
+    release: releaseType,
+});
 
 export const validateConfig = p.object({
     dryRun: p.optional(p.boolean()),
     run: p.optional(p.string()),
     preRun: p.optional(p.string()),
     runScript: p.optional(p.string()),
-    prereleaseChannel: p.optional(p.string()),
+    prereleaseChannel: p.optional(p.union([
+        p.string(),
+        p.literal(null),
+        p.literal(false),
+    ], 'must be a string, null, or false')),
     useVersion: p.optional(p.regex(useVersionRegex, 'Invalid version format. Should be x.y.z or x.y.z-channel.build')),
     skipRelease: p.optional(p.boolean()),
     publish: p.optional(p.boolean()),
     breakingChangeTitle: p.optional(p.string()),
-    commitTypes: p.optional(p.array(p.object({
-        type: p.string(),
-        title: p.string(),
-        release: p.string(),
-    }))),
-    branches: p.optional(p.array(p.object({
+    commitTypes: p.array(commitType),
+    branches: p.array(p.object({
         name: p.string(),
         prereleaseChannel: p.optional(p.string()),
-    }))),
+    })),
     githubToken: p.optional(p.string()),
 });
 

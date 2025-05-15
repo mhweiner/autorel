@@ -1,5 +1,5 @@
 import {inspect} from 'node:util';
-import output from './services/logger';
+import logger from './services/logger';
 import {CommitType} from '.';
 
 type ReleaseType = 'major' | 'minor' | 'patch' | 'none';
@@ -102,8 +102,8 @@ export function determineReleaseType(
 
     const releaseTypes = commits.map((commit) => {
 
-        output.debug('Analyzing commit:');
-        output.debug(inspect(commit, {
+        logger.debug('Analyzing commit:');
+        logger.debug(inspect(commit, {
             depth: null,
             colors: false,
         }));

@@ -46,7 +46,7 @@ export async function autorel(args: Config): Promise<string|undefined> {
     isDryRun && logger.info('Running in dry-run mode. No changes will be made.');
     isPrerelease && logger.info(`Using prerelease channel: ${bold(prereleaseChannel)}`);
     !isPrerelease && logger.info('This is a production release.');
-    !!args.useVersion && logger.info(`Using pinned version: ${bold(args.useVersion)}`);
+    !!args.useVersion && logger.info(`Using pinned version: ${bold(args.useVersion.replace('v', ''))}`);
 
     git.gitFetch();
 
@@ -83,7 +83,7 @@ export async function autorel(args: Config): Promise<string|undefined> {
     }
 
     const nextTag = args.useVersion
-        ? `v${args.useVersion}`
+        ? `v${args.useVersion.replace('v', '')}`
         : semver.toTag(semver.incrVer({
             latestVer: semver.fromTag(highestTag ?? 'v0.0.0') as semver.SemVer,
             latestStableVer: semver.fromTag(highestStableTag ?? 'v0.0.0') as semver.SemVer,
@@ -131,6 +131,7 @@ export async function autorel(args: Config): Promise<string|undefined> {
                 tag: nextTag,
                 name: nextTag,
                 body: changelog,
+                prerelease: isPrerelease,
             });
 
             addToRollback(async () => {
@@ -152,7 +153,7 @@ export async function autorel(args: Config): Promise<string|undefined> {
 
             const oldVersion = packageJson.read().version;
 
-            packageJson.setVersion(nextTag);
+            packageJson.setVersion(nextTag.replace('v', ''));
             addToRollback(async () => {
 
                 logger.info('Rolling back package.json...');

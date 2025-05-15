@@ -4,16 +4,42 @@ import {defaultConfig} from './defaults';
 import {mock} from 'cjs-mock';
 import * as mockMod from './getPrereleaseChannel';
 
-test('returns explicit config.prereleaseChannel if defined', (assert) => {
+test('returns config.prereleaseChannel if defined (ie, "beta", null, false, etc.)', (assert) => {
 
-    const config = {
+    assert.equal(getPrereleaseChannel({
+        ...defaultConfig,
+        prereleaseChannel: 'beta',
+    }), 'beta', 'returns prereleaseChannel from config.prereleaseChannel');
+    assert.equal(getPrereleaseChannel({
+        ...defaultConfig,
+        prereleaseChannel: null,
+    }), undefined, 'returns prereleaseChannel from config.prereleaseChannel');
+    assert.equal(getPrereleaseChannel({
+        ...defaultConfig,
+        prereleaseChannel: false,
+    }), undefined, 'returns prereleaseChannel from config.prereleaseChannel');
+
+});
+
+test('returns channel from config.useVersion if defined, overriding config.prereleaseChannel', (assert) => {
+
+    assert.equal(getPrereleaseChannel({
         ...defaultConfig,
         prereleaseChannel: 'beta',
         branches: [],
-    };
-    const result = getPrereleaseChannel(config);
-
-    assert.equal(result, 'beta');
+        useVersion: '1.2.3-alpha.1',
+    }), 'alpha');
+    assert.equal(getPrereleaseChannel({
+        ...defaultConfig,
+        prereleaseChannel: 'beta',
+        branches: [],
+        useVersion: 'v1.2.3-dev.1',
+    }), 'dev');
+    assert.equal(getPrereleaseChannel({
+        ...defaultConfig,
+        branches: [],
+        useVersion: 'v1.2.3-delta.1',
+    }), 'delta');
 
 });
 
