@@ -3,7 +3,7 @@
 [![build status](https://github.com/mhweiner/autorel/actions/workflows/release.yml/badge.svg)](https://github.com/mhweiner/autorel/actions)
 [![SemVer](https://img.shields.io/badge/SemVer-2.0.0-blue)]()
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org)
-[![AutoRel](https://img.shields.io/badge/AutoRel-blue)](https://github.com/mhweiner/AutoRel)
+[![AutoRel](https://img.shields.io/badge/AutoRel-1bd499)](https://github.com/mhweiner/autorel)
 
 **Autorel** is a fast, simple, and reliable tool for automating releases based on commit messages.
 
