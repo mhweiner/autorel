@@ -1,4 +1,5 @@
 import {Config} from '.';
+import {fromTag} from './semver';
 import * as git from './services/git';
 
 /**
@@ -19,7 +20,9 @@ import * as git from './services/git';
  */
 export function getPrereleaseChannel(config: Config): string|undefined {
 
-    if (config.prereleaseChannel) return config.prereleaseChannel;
+    if (config.useVersion) return fromTag(`v${config.useVersion.replace('v', '')}`)?.channel;
+    if (config.prereleaseChannel) return String(config.prereleaseChannel);
+    if (config.prereleaseChannel === null || config.prereleaseChannel === false) return undefined;
 
     const branch = git.getCurrentBranch();
 
@@ -30,6 +33,6 @@ export function getPrereleaseChannel(config: Config): string|undefined {
 
     if (!matchingBranch) return undefined;
 
-    return matchingBranch.prereleaseChannel || undefined;
+    return matchingBranch.prereleaseChannel ?? undefined;
 
 }

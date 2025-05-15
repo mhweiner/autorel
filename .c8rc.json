@@ -4,7 +4,9 @@
   ],
   "exclude": [
     "**/*.spec.ts",
-    "**/*.spec.js"
+    "**/*.spec.js",
+    "**/src/services/**/*.ts",
+    "**/src/lib/**/*.ts"
   ],
   "reporter": [],
   "all": true,

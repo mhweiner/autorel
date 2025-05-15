@@ -1,40 +1,39 @@
-<picture>
-    <source srcset="docs/autorel-white.svg" media="(prefers-color-scheme: dark)">
-    <source srcset="docs/autorel-black.svg" media="(prefers-color-scheme: light)">
-    <img src="docs/autorel-black.svg" alt="Autorel" size="250">
-</picture>
-
----
+# autorel
 
 [![build status](https://github.com/mhweiner/autorel/actions/workflows/release.yml/badge.svg)](https://github.com/mhweiner/autorel/actions)
-[![SemVer](https://img.shields.io/badge/SemVer-2.0.0-blue)](https://semver.org)
+[![SemVer](https://img.shields.io/badge/SemVer-2.0.0-blue)]()
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org)
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-[![Static Badge](https://img.shields.io/badge/v2-autorel?label=autorel&labelColor=0ab5fc&color=grey&link=https%3A%2F%2Fgithub.com%2Fmhweiner%2Fautorel)](https://github.com/mhweiner/autorel)
+[![AutoRel](https://img.shields.io/badge/AutoRel-blue)](https://github.com/mhweiner/AutoRel)
 
-Automate releases based on [SemVer](https://semver.org/) and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/). Like `semantic-release` and `release-please` but simpler and faster.
+**Autorel** is a fast, simple, and reliable tool for automating releases based on commit messages.
 
-Autorel automatically does the following, if appropriate:
+It follows [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) and [Semantic Versioning](https://semver.org/) to do things like:
 
-- Bumps the version based on the commit messages
-- Creates a new release on GitHub with Release Notes
-- Publishes the package to NPM
-- Runs any arbitrary command or bash script
+- Run pre-release tasks (tests, builds, etc.)
+- Bump the version and tag based on commit messages
+- Create tagged GitHub releases with notes
+- Publish to npm
+- Run custom scripts
 
-_Currently only has built-in support for `GitHub` and `NPM`, but you can write your own scripts to support other systems and languages._
+🚀 Like `semantic-release` or `release-please`, but faster, more reliable, and easier to use.
 
-**✅ Conventional Commit and SemVer Compliant** 
+Supports GitHub Actions and npm (Node.js) natively. You can add custom scripts for other languages and systems (or contribute built-in support).
+
+Use Autorel to save time, prevent broken releases, and ship with confidence.
+
+**✅ Conventional Commit & SemVer Compliant** 
 - 100% compliant with Conventional Commits and SemVer out of the box, including "!" for breaking changes
 
-**😃 Simple & Easy to Use**
+**🔒 Safe & Reliable**
+- Automatic rollback on failure
 - No confusing configuration files or complex setup
-- Works with any CI/CD system, including GitHub Actions
-- Works with any language or platform
-- Built-in bash script support
+- Configuration validation and error handling
+- Excellent test coverage
 
 **🚀 Fast & Lightweight**
-- Minimal dependencies and fast execution written in TypeScript
-- Comprehensive test coverage
+- Minimal dependencies and fast, concurrent execution
+- Written in TypeScript with comprehensive test coverage
+- No need to install or configure a separate CI/CD system
 - Less broken builds and more time to focus on your code!
 
 [Read our FAQ on why you should use `autorel` and how it compares to other tools](docs/faq.md)
@@ -60,7 +59,7 @@ _Currently only has built-in support for `GitHub` and `NPM`, but you can write y
 ## Example Usage (CLI)
 
 ```bash
-npx autorel --publish --run 'echo "Next version is ${NEXT_VERSION}"'
+npx autorel@^2 --publish --run 'echo "Next version is ${NEXT_VERSION}"'
 ```
 
 This will:
@@ -77,11 +76,9 @@ npm i -g autorel
 autorel --publish
 ```
 
-### Avoiding Breaking Changes
+### ⚠️ Avoiding Breaking Changes
 
-If using the `npx` command, you may want to append the version number to prevent breaking changes in the future. You can do this by appending `@^` followed by the major version number.
-
-Example: `npx autorel@^2`
+If using the `npx` command, you may want to append the version number to prevent breaking changes in the future. You can do this by appending `@^` followed by the major version number, ie. `npx autorel@^2`.
 
 ## Example Usage (Library)
 
@@ -102,7 +99,7 @@ Example: `npx autorel@^2`
     };
 
     autorel(autorelConfig).then((nextVersion) => {
-        console.log(`Next version is ${nextVersion}`);
+        console.log(`Next version is ${nextVersion}`); // ie, "Next version is 1.0.1"
     });
     ```
 
@@ -328,6 +325,10 @@ The version to use for the release INSTEAD of the version being generated. Alway
 - Default: `undefined`
 
 > ❗️ Must be a valid SemVer version, without the `v`.
+
+### githubToken
+
+The GitHub token to use for creating the release. If not provided, it will use the `GITHUB_TOKEN` environment variable. This is only used if `skipRelease` is `false`.
 
 ## Sample YAML Configuration
 
