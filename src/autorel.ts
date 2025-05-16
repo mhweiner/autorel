@@ -46,8 +46,9 @@ export async function autorel(args: Config): Promise<string|undefined> {
     isDryRun && logger.info('Running in dry-run mode. No changes will be made.');
     isPrerelease && logger.info(`Using prerelease channel: ${bold(prereleaseChannel)}`);
     !isPrerelease && logger.info('This is a production release.');
-    !!args.useVersion && logger.info(`Using pinned version: ${bold(args.useVersion.replace('v', ''))}`);
+    !!args.useVersion && logger.info(`Will release specified version: ${bold(args.useVersion.replace('v', ''))}`);
 
+    logger.info('-> Fetching git tags...');
     git.gitFetch();
 
     const {
@@ -56,6 +57,8 @@ export async function autorel(args: Config): Promise<string|undefined> {
         highestStableTag,
         tagFromWhichToFindCommits,
     } = getTags(prereleaseChannel);
+
+    logger.info(`-> Fetching git commits since ${tagFromWhichToFindCommits}...`);
     const commits = git.getCommitsFromTag(tagFromWhichToFindCommits);
 
     logger.info(`Found ${bold(commits.length.toString())} commit(s).`);
@@ -195,6 +198,8 @@ export async function autorel(args: Config): Promise<string|undefined> {
             bash(args.runScript);
 
         }
+
+        logger.info('🤘🎸 All done!');
 
     }, onRollback, onRollbackError);
 
