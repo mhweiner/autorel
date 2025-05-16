@@ -91,9 +91,12 @@ export async function autorel(args: Config): Promise<string|undefined> {
             prereleaseChannel,
             latestChannelVer: highestChannelTag ? semver.fromTag(highestChannelTag) : undefined,
         }));
-    const changelog = generateChangelog(parsedCommits, commitTypeMap, args.breakingChangeTitle);
 
     logger.info(`The next version is: ${bold(nextTag)}`);
+
+    logger.info('-> Generating changelog...');
+    const changelog = generateChangelog(parsedCommits, commitTypeMap, args.breakingChangeTitle);
+
     logger.debug(`The changelog is:\n${changelog}`);
 
     if (args.dryRun) return;
@@ -101,7 +104,7 @@ export async function autorel(args: Config): Promise<string|undefined> {
     // User-defined scripts for things like running tests, building the project, etc.
     if (args.preRun) {
 
-        logger.info('Running pre-release bash script...');
+        logger.info('-> Running pre-release bash script...');
         bash(args.preRun);
 
     }
@@ -120,6 +123,7 @@ export async function autorel(args: Config): Promise<string|undefined> {
         // create GitHub release
         if (!args.skipRelease) {
 
+            logger.info('-> Creating GitHub release...');
             if (!args.githubToken) throw new Error('GitHub token is required to publish a release. Please set the GITHUB_TOKEN environment variable or pass it as an argument.');
 
             const {owner, repository} = git.getRepo();
@@ -136,7 +140,7 @@ export async function autorel(args: Config): Promise<string|undefined> {
 
             addToRollback(async () => {
 
-                logger.info('Rolling back GitHub release...');
+                logger.info('<- Rolling back GitHub release...');
                 await github.deleteReleaseById({
                     token: process.env.GITHUB_TOKEN!,
                     owner,
@@ -151,12 +155,14 @@ export async function autorel(args: Config): Promise<string|undefined> {
         // update package.json and publish to npm registry
         if (args.publish) {
 
+            logger.info('-> Publishing to npm registry...');
+
             const oldVersion = packageJson.read().version;
 
             packageJson.setVersion(nextTag.replace('v', ''));
             addToRollback(async () => {
 
-                logger.info('Rolling back package.json...');
+                logger.info('<- Rolling back package.json...');
                 packageJson.setVersion(oldVersion);
 
             });
@@ -164,7 +170,7 @@ export async function autorel(args: Config): Promise<string|undefined> {
             npm.publishPackage(prereleaseChannel);
             addToRollback(async () => {
 
-                logger.info('Rolling back npm publish...');
+                logger.info('<- Rolling back npm publish...');
                 await npm.unpublishPackage(`${packageJson.read().name}@${nextTag}`);
 
             });
@@ -178,14 +184,14 @@ export async function autorel(args: Config): Promise<string|undefined> {
         // run user-defined release scripts
         if (args.run) {
 
-            logger.info('Running release bash script...');
+            logger.info('-> Running release bash script...');
             bash(args.run);
 
         } else if (args.runScript) {
 
             // TODO: delete this block in the next major version
             logger.warn('🚨 Warning: The "runScript" option is deprecated. Please use "run" instead. It will be removed in the next major version.');
-            logger.info('Running post-release bash script...');
+            logger.info('-> Running post-release bash script...');
             bash(args.runScript);
 
         }
