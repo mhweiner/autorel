@@ -1,7 +1,13 @@
 /* eslint-disable max-lines-per-function */
 import {test} from 'hoare';
-import {filterBreakingCommits, determineReleaseType, parseConventionalCommit} from './conventionalcommits';
 import {CommitType} from '.';
+import * as m from './conventionalcommits';
+import {mock} from 'cjs-mock';
+import {mockLogger} from './services/mockLogger';
+
+const mod: typeof m = mock('./conventionalcommits', {
+    './services/logger': mockLogger,
+});
 
 const commitTypes: CommitType[] = [
     {type: 'feat', title: 'Features', release: 'minor'},
@@ -20,34 +26,34 @@ test('filterBreakingCommits', (assert) => {
     const expected = [
         {type: 'feat', description: 'Add new feature', hash: 'abc123', breaking: true, footers: []},
     ];
-    const actual = filterBreakingCommits(commits);
+    const actual = mod.filterBreakingCommits(commits);
 
     assert.equal(actual, expected, 'should return only breaking changes');
-    assert.equal(filterBreakingCommits([]), [], 'should return an empty array when there are no breaking changes');
+    assert.equal(mod.filterBreakingCommits([]), [], 'should return an empty array when there are no breaking changes');
 
 });
 
 test('determineReleaseType: should return the highest release type', (assert) => {
 
-    assert.equal(determineReleaseType([
+    assert.equal(mod.determineReleaseType([
         {type: 'feat', description: 'Add new feature', hash: 'abc123', breaking: true, footers: []},
         {type: 'fix', description: 'Fix a bug', hash: 'def456', breaking: false, footers: []},
         {type: 'docs', description: 'Update documentation', hash: 'ghi789', breaking: false, footers: []},
     ], commitTypeMap), 'major', 'highest is major');
-    assert.equal(determineReleaseType([
+    assert.equal(mod.determineReleaseType([
         {type: 'feat', description: 'Add new feature', hash: 'abc123', breaking: false, footers: []},
         {type: 'fix', description: 'Fix a bug', hash: 'def456', breaking: false, footers: []},
         {type: 'docs', description: 'Update documentation', hash: 'ghi789', breaking: false, footers: []},
     ], commitTypeMap), 'minor', 'highest is minor');
-    assert.equal(determineReleaseType([
+    assert.equal(mod.determineReleaseType([
         {type: 'fix', description: 'Fix a bug', hash: 'def456', breaking: false, footers: []},
         {type: 'docs', description: 'Update documentation', hash: 'ghi789', breaking: false, footers: []},
     ], commitTypeMap), 'patch', 'highest is patch');
-    assert.equal(determineReleaseType([
+    assert.equal(mod.determineReleaseType([
         {type: 'docs', description: 'Update documentation', hash: 'ghi789', breaking: false, footers: []},
     ], commitTypeMap), 'none', 'highest is none');
-    assert.equal(determineReleaseType([], commitTypeMap), 'none', 'should return none for no commits');
-    assert.equal(determineReleaseType([
+    assert.equal(mod.determineReleaseType([], commitTypeMap), 'none', 'should return none for no commits');
+    assert.equal(mod.determineReleaseType([
         {type: 'foo', description: 'blah', hash: 'ghi789', breaking: false, footers: []},
     ], commitTypeMap), 'none', 'should return none for unknown types');
 
@@ -56,7 +62,7 @@ test('determineReleaseType: should return the highest release type', (assert) =>
 test('parseConventionalCommit: breaking changes', (assert) => {
 
     assert.equal(
-        parseConventionalCommit(
+        mod.parseConventionalCommit(
             'feat: Add new feature\n\nBREAKING CHANGE: This is a breaking change',
             'abc123'
         ),
@@ -72,7 +78,7 @@ test('parseConventionalCommit: breaking changes', (assert) => {
         'BREAKING CHANGE in footer'
     );
     assert.equal(
-        parseConventionalCommit(
+        mod.parseConventionalCommit(
             'feat: Add new feature\n\nBREAKING CHANGES: This is a breaking change',
             'abc123'
         ),
@@ -88,7 +94,7 @@ test('parseConventionalCommit: breaking changes', (assert) => {
         'BREAKING CHANGES in footer'
     );
     assert.equal(
-        parseConventionalCommit(
+        mod.parseConventionalCommit(
             'feat!: Add new feature',
             'abc123'
         ),
@@ -104,7 +110,7 @@ test('parseConventionalCommit: breaking changes', (assert) => {
         'breaking change via ! without scope'
     );
     assert.equal(
-        parseConventionalCommit(
+        mod.parseConventionalCommit(
             'feat(signin)!: Add new feature',
             'abc123'
         ),
@@ -120,7 +126,7 @@ test('parseConventionalCommit: breaking changes', (assert) => {
         'breaking change via ! after scope'
     );
     assert.equal(
-        parseConventionalCommit(
+        mod.parseConventionalCommit(
             'feat!(signin): Add new feature',
             'abc123'
         ),
@@ -141,7 +147,7 @@ test('parseConventionalCommit: breaking changes', (assert) => {
 test('parseConventionalCommit: non-breaking changes', (assert) => {
 
     assert.equal(
-        parseConventionalCommit(
+        mod.parseConventionalCommit(
             'feat: Add new feature',
             'abc123'
         ),
@@ -157,7 +163,7 @@ test('parseConventionalCommit: non-breaking changes', (assert) => {
         'without scope, body, or footers'
     );
     assert.equal(
-        parseConventionalCommit(
+        mod.parseConventionalCommit(
             'fix(signin): Fix a bug\n\nThis is a body\n\nFixes: #123',
             'abc123'
         ),
@@ -173,7 +179,7 @@ test('parseConventionalCommit: non-breaking changes', (assert) => {
         'with scope, body, and footers'
     );
     assert.equal(
-        parseConventionalCommit(
+        mod.parseConventionalCommit(
             'fix(signin): Fix a bug\n\nThis is a body\n\nStuff: multi-line\nfooter',
             'abc123'
         ),
@@ -189,7 +195,7 @@ test('parseConventionalCommit: non-breaking changes', (assert) => {
         'multi-line footer'
     );
     assert.equal(
-        parseConventionalCommit(
+        mod.parseConventionalCommit(
             'foo: Fix a bug',
             'abc123'
         ),
@@ -210,7 +216,7 @@ test('parseConventionalCommit: non-breaking changes', (assert) => {
 test('parseConventionalCommit: invalid commit should return undefined', (assert) => {
 
     assert.equal(
-        parseConventionalCommit(
+        mod.parseConventionalCommit(
             'this is not a conventional commit',
             'abc123'
         ),
