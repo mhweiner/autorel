@@ -40,6 +40,4 @@ export function setVersion(newVersion: string): void {
         version: newVersion.replace(/^v/, ''),
     }, null, 2));
 
-    logger.info('Successfully updated package.json locally');
-
 }
