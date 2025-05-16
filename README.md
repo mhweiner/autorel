@@ -11,7 +11,7 @@ It follows [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/
 
 - Run pre-release tasks (tests, builds, etc.)
 - Bump the version and tag based on commit messages
-- Create tagged GitHub releases with notes
+- Create tagged GitHub releases with changelog notes
 - Publish to npm registry (or other package managers)
 - Run custom scripts or commands with the new version number available as an environment variable
 
