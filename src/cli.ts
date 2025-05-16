@@ -31,7 +31,7 @@ if (options) {
 
     Object.keys(options).forEach((key) => (
         // @ts-ignore
-        !cliOptions[key] && delete cliOptions[key]
+        !options[key] && delete options[key]
     ));
 
 }
