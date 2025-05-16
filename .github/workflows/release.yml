@@ -19,9 +19,6 @@ jobs:
           node-version: latest
           registry-url: "https://registry.npmjs.org"
           cache: "npm"
-      - run: npm ci
-      - run: npm test
-      - run: npm run lint
       - run: ./bin/cli.js --verbose
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}

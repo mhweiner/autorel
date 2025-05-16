@@ -13,3 +13,8 @@ branches:
   - {name: main}
   - {name: next, prereleaseChannel: next}
 publish: true
+preRun: |
+  npm ci
+  npm run build
+  npm run test
+  npm run lint
