@@ -40,6 +40,7 @@ export const validateConfig = p.object({
         prereleaseChannel: p.optional(p.string()),
     })),
     githubToken: p.optional(p.string()),
+    verbose: p.optional(p.boolean()),
 });
 
 /**

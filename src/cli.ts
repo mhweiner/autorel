@@ -22,6 +22,7 @@ program
     .option('--publish', 'Publish the package to npm, requires npm already set up and authenticated. (arg: publish)')
     .option('--github-token <value>', 'GitHub token to use for creating the release. By default, we use GITHUB_TOKEN environment variable (arg: githubToken)')
     .option('--skip-release', 'Skips creating a release on GitHub. (arg: skipRelease)')
+    .option('--verbose', 'Enables verbose mode. (arg: verbose)')
     .parse(process.argv);
 
 const options = program.opts();

@@ -178,13 +178,20 @@ If you're interested in contributing built-in support for other systems, please 
 
 ## Configuration
 
-When run in CLI mode, `autorel` can be configured via CLI arguments or a `yaml` file. CLI arguments take precedence over the `yaml` file. 
+When run in CLI mode, `autorel` can be configured via CLI arguments or a `yaml` file. CLI arguments take precedence over the `yaml` file. All parameters are optional.
 
-However, omitting the `--publish` flag will still publish to NPM if `publish: true` is set in the `yaml` file, and the same for other binary flags.
+However, omitting optional binary flags, such as the `--publish`, `--dry-run`, `--skip-release`, and `--verbose` flags will still publish to NPM if set in the `yaml` file.
 
-When used as a library, you pass the configuration directly to the `autorel` function.
+When used as a library, you pass the configuration directly to the `autorel` function. When used this way, it will not automatically load any default configuration&mdash;you can use the `defaultConfig` object to get the default configuration:
 
-All arguments are optional.
+```typescript
+import {autorel, defaultConfig} from 'autorel';
+
+const autorelConfig = {
+  ...defaultConfig,
+  publish: true,
+};
+```
 
 > ❗️ The `yaml` configuration file must be named `.autorel.yaml` and be in the root of your project.
 
@@ -204,6 +211,14 @@ Whether to run in dry-run mode. This will not push the tag, create the release, 
 
 - CLI: `--dry-run`
 - Argument: `dryRun: boolean`
+- Default: `false`
+
+### verbose
+
+Whether to run in verbose mode. This will output more information about the release process.
+
+- CLI: `--verbose`
+- Argument: `verbose: boolean`
 - Default: `false`
 
 ### skipRelease

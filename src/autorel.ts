@@ -39,6 +39,13 @@ export async function autorel(args: Config): Promise<string|undefined> {
 
     }
 
+    if (args.verbose) {
+
+        logger.info('Verbose mode is enabled.');
+        process.env.AUTOREL_DEBUG = 'true';
+
+    }
+
     const prereleaseChannel = getPrereleaseChannel(args);
     const isDryRun = !!args.dryRun;
     const isPrerelease = !!prereleaseChannel;
