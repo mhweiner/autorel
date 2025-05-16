@@ -1,8 +1,6 @@
 /* eslint-disable max-lines-per-function */
 import * as git from './services/git';
 import * as semver from './semver';
-import logger from './services/logger';
-import {bold, gray} from 'colorette';
 
 export function getTags(prereleaseChannel?: string): {
     highestTag: string|undefined
@@ -25,11 +23,6 @@ export function getTags(prereleaseChannel?: string): {
     const tagFromWhichToFindCommits = highestChannelTag
         ? semver.highestTag([highestChannelTag, highestStableTag ?? 'v0.0.0'])
         : highestStableTag;
-
-    !!highestChannelTag && logger.info(`The last pre-release channel version (${prereleaseChannel}) is: ${bold(highestChannelTag)}`);
-    logger.info(`The last stable/production version is: ${highestStableTag ? bold(highestStableTag) : gray('none')}`);
-    logger.info(`The current/highest version is: ${highestTag ? bold(highestTag) : gray('none')}`);
-    logger.info(`Fetching commits since ${tagFromWhichToFindCommits ?? 'the beginning of the repository'}...`);
 
     return {
         highestTag,

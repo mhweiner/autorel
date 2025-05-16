@@ -58,7 +58,12 @@ export async function autorel(args: Config): Promise<string|undefined> {
         tagFromWhichToFindCommits,
     } = getTags(prereleaseChannel);
 
-    logger.info(`-> Fetching git commits since ${tagFromWhichToFindCommits}...`);
+    !!highestChannelTag && logger.info(`The last pre-release channel version (${prereleaseChannel}) is: ${bold(highestChannelTag)}`);
+    logger.info(`The last stable/production version is: ${highestStableTag ? bold(highestStableTag) : gray('none')}`);
+    logger.info(`The current/highest version is: ${highestTag ? bold(highestTag) : gray('none')}`);
+
+    // Fetch commits
+    logger.info(`-> Fetching git commits since ${tagFromWhichToFindCommits ?? 'the beginning of the repository'}...`);
     const commits = git.getCommitsFromTag(tagFromWhichToFindCommits);
 
     logger.info(`Found ${bold(commits.length.toString())} commit(s).`);

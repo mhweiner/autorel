@@ -1,7 +1,6 @@
 import {test} from 'hoare';
 import {mock, stub} from 'cjs-mock';
 import * as mod from './getTags'; // for typing only
-import {mockLogger} from './services/mockLogger';
 
 test('uses stable tag as base when prerelease tag exists but is lower', (assert) => {
 
@@ -11,7 +10,6 @@ test('uses stable tag as base when prerelease tag exists but is lower', (assert)
     };
     const m: typeof mod = mock('./getTags', {
         './services/git': gitStub,
-        './services/logger': mockLogger,
     });
 
     const result = m.getTags('beta');
@@ -33,7 +31,6 @@ test('uses stable tag as base even when newer unrelated prerelease tag exists', 
     };
     const m: typeof mod = mock('./getTags', {
         './services/git': gitStub,
-        './services/logger': mockLogger,
     });
 
     const result = m.getTags('beta');
@@ -55,7 +52,6 @@ test('uses stable tag as base when prerelease channel is lower than stable', (as
     };
     const m: typeof mod = mock('./getTags', {
         './services/git': gitStub,
-        './services/logger': mockLogger,
     });
 
     const result = m.getTags('gamma');
@@ -77,7 +73,6 @@ test('uses highest stable tag when no prerelease channel is given', (assert) => 
     };
     const m: typeof mod = mock('./getTags', {
         './services/git': gitStub,
-        './services/logger': mockLogger,
     });
 
     const result = m.getTags();
@@ -99,7 +94,6 @@ test('uses channel tag as base if it is higher than last stable tag', (assert) =
     };
     const m: typeof mod = mock('./getTags', {
         './services/git': gitStub,
-        './services/logger': mockLogger,
     });
 
     const result = m.getTags('alpha');
@@ -121,7 +115,6 @@ test('uses channel tag as base if there are no stable tags', (assert) => {
     };
     const m: typeof mod = mock('./getTags', {
         './services/git': gitStub,
-        './services/logger': mockLogger,
     });
 
     const result = m.getTags('alpha');
@@ -143,7 +136,6 @@ test('starts from beginning of repo if no stable tag exists and no channel tag e
     };
     const m: typeof mod = mock('./getTags', {
         './services/git': gitStub,
-        './services/logger': mockLogger,
     });
 
     const result = m.getTags('c');
@@ -165,7 +157,6 @@ test('starts from beginning of repo if no stable tag exists is stable release', 
     };
     const m: typeof mod = mock('./getTags', {
         './services/git': gitStub,
-        './services/logger': mockLogger,
     });
 
     const result = m.getTags();
@@ -187,7 +178,6 @@ test('returns correct tags with only channel tags', (assert) => {
     };
     const m: typeof mod = mock('./getTags', {
         './services/git': gitStub,
-        './services/logger': mockLogger,
     });
 
     const result = m.getTags('c');
