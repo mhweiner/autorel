@@ -135,7 +135,7 @@ export async function autorel(args: Config): Promise<string|undefined> {
         git.createAndPushTag(nextTag);
         addToRollback(async () => {
 
-            logger.info('Rolling back git tag...');
+            logger.info('<- Rolling back git tag...');
             git.deleteTagFromLocalAndRemote(nextTag);
 
         });
