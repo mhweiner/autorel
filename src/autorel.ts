@@ -179,18 +179,26 @@ export async function autorel(args: Config): Promise<string|undefined> {
 
             const oldVersion = packageJson.read().version;
 
+            // temporarily set the version to the next tag
             packageJson.setVersion(nextTag.replace('v', ''));
-            addToRollback(async () => {
 
-                logger.info('<- Rolling back package.json...');
+            const [publishErr] = toResult(() => npm.publishPackage(prereleaseChannel));
+
+            if (publishErr) {
+
+                // put the version back to the old version before throwing the error
                 packageJson.setVersion(oldVersion);
+                throw publishErr;
 
-            });
+            }
 
-            npm.publishPackage(prereleaseChannel);
+            // put the version back to the old version
+            packageJson.setVersion(oldVersion);
+
             addToRollback(async () => {
 
                 logger.info('<- Rolling back npm publish...');
+                packageJson.setVersion(oldVersion);
                 await npm.unpublishPackage(`${packageJson.read().name}@${nextTag}`);
 
             });

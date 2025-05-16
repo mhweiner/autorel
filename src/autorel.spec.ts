@@ -172,7 +172,7 @@ test('if release, creates tags, publishes to npm, creates github release w/ chan
                 name: 'test',
                 version: '1.0.0',
             }),
-            setVersion: stub('setVersion').expects('1.0.2'),
+            setVersion: stub('setVersion'),
         },
         getTags: {
             getTags: stub('getTags').expects(undefined).returns({
@@ -210,6 +210,12 @@ test('if release, creates tags, publishes to npm, creates github release w/ chan
     assert.equal(stubs.github.createRelease.getCalls().length, 1, 'calls createRelease');
     assert.equal(stubs.npm.publishPackage.getCalls().length, 1, 'calls publishPackage once');
     assert.equal(stubs.sh.bash.getCalls().length, 1, 'calls bash once');
+
+    // setVersion is called once before the release, and then once after to put it back
+    assert.equal(stubs.packageJson.setVersion.getCalls(), [
+        ['1.0.2'],
+        ['1.0.0'],
+    ], 'setVersion is called once before the release, and then once after');
 
     // does not call any of the following
     assert.equal(stubs.git.deleteTagFromLocalAndRemote.getCalls().length, 0, 'does not call deleteTagFromLocalAndRemote');
@@ -251,7 +257,7 @@ test('skips github release if skipRelease=true', async (assert) => {
                 name: 'test',
                 version: '1.0.0',
             }),
-            setVersion: stub('setVersion').expects('1.0.2'),
+            setVersion: stub('setVersion'),
         },
         getTags: {
             getTags: stub('getTags').expects(undefined).returns({
@@ -288,6 +294,12 @@ test('skips github release if skipRelease=true', async (assert) => {
     assert.equal(stubs.git.createAndPushTag.getCalls().length, 1, 'calls createAndPushTag once');
     assert.equal(stubs.npm.publishPackage.getCalls().length, 1, 'calls publishPackage once');
     assert.equal(stubs.sh.bash.getCalls().length, 1, 'calls bash once');
+
+    // setVersion is called once before the release, and then once after to put it back
+    assert.equal(stubs.packageJson.setVersion.getCalls(), [
+        ['1.0.2'],
+        ['1.0.0'],
+    ], 'setVersion is called once before the release, and then once after');
 
     // does not call any of the following
     assert.equal(stubs.git.deleteTagFromLocalAndRemote.getCalls().length, 0, 'does not call deleteTagFromLocalAndRemote');
@@ -338,7 +350,7 @@ test('skips npm publish if publish=false (default behavior)', async (assert) => 
                 name: 'test',
                 version: '1.0.0',
             }),
-            setVersion: stub('setVersion').expects('1.0.2'),
+            setVersion: stub('setVersion'),
         },
         getTags: {
             getTags: stub('getTags').expects(undefined).returns({
@@ -381,6 +393,7 @@ test('skips npm publish if publish=false (default behavior)', async (assert) => 
     assert.equal(stubs.git.deleteTagFromLocalAndRemote.getCalls().length, 0, 'does not call deleteTagFromLocalAndRemote');
     assert.equal(stubs.github.deleteReleaseById.getCalls().length, 0, 'does not call deleteReleaseById');
     assert.equal(stubs.sh.$.getCalls().length, 0, 'does not call $'); // because it's mocked out
+    assert.equal(stubs.packageJson.setVersion.getCalls().length, 0, 'does not call setVersion');
 
 });
 
@@ -414,9 +427,9 @@ test('starts with v0.0.0 as base if no git tags', async (assert) => {
         packageJson: {
             read: stub('read').returns({
                 name: 'test',
-                version: 'v0.0.0',
+                version: '0.0.0',
             }),
-            setVersion: stub('setVersion').expects('0.1.0'),
+            setVersion: stub('setVersion'),
         },
         getTags: {
             getTags: stub('getTags').expects(undefined).returns({
@@ -459,6 +472,8 @@ test('starts with v0.0.0 as base if no git tags', async (assert) => {
     assert.equal(stubs.github.createRelease.getCalls().length, 0, 'does not call createRelease');
     assert.equal(stubs.npm.publishPackage.getCalls().length, 0, 'does not call publishPackage');
     assert.equal(stubs.sh.bash.getCalls().length, 0, 'does not call bash');
+    assert.equal(stubs.packageJson.setVersion.getCalls().length, 0, 'does not call setVersion');
+    assert.equal(stubs.packageJson.read.getCalls().length, 0, 'does not call read');
 
 });
 
@@ -494,7 +509,7 @@ test('runs user-defined bash script at the end of release process', async (asser
                 name: 'test',
                 version: '1.0.0',
             }),
-            setVersion: stub('setVersion').expects('1.0.2'),
+            setVersion: stub('setVersion'),
         },
         getTags: {
             getTags: stub('getTags').expects(undefined).returns({
@@ -537,6 +552,8 @@ test('runs user-defined bash script at the end of release process', async (asser
     assert.equal(stubs.sh.$.getCalls().length, 0, 'does not call $'); // because it's mocked out
     assert.equal(stubs.github.createRelease.getCalls().length, 0, 'does not call createRelease');
     assert.equal(stubs.npm.publishPackage.getCalls().length, 0, 'does not call publishPackage');
+    assert.equal(stubs.packageJson.setVersion.getCalls().length, 0, 'does not call setVersion');
+    assert.equal(stubs.packageJson.read.getCalls().length, 0, 'does not call read');
 
 });
 
@@ -651,7 +668,7 @@ test('starts with v0.0.0 as base if no git tags and prerelease channel is provid
                 name: 'test',
                 version: 'v0.0.0',
             }),
-            setVersion: stub('setVersion').expects('0.1.0-alpha.1'),
+            setVersion: stub('setVersion'),
         },
         getTags: {
             getTags: stub('getTags').expects('alpha').returns({
@@ -695,6 +712,8 @@ test('starts with v0.0.0 as base if no git tags and prerelease channel is provid
     assert.equal(stubs.github.createRelease.getCalls().length, 0, 'does not call createRelease');
     assert.equal(stubs.npm.publishPackage.getCalls().length, 0, 'does not call publishPackage');
     assert.equal(stubs.sh.bash.getCalls().length, 0, 'does not call bash');
+    assert.equal(stubs.packageJson.setVersion.getCalls().length, 0, 'does not call setVersion');
+    assert.equal(stubs.packageJson.read.getCalls().length, 0, 'does not call read');
 
 });
 
@@ -727,7 +746,7 @@ test('release (no npm/github release) with prereleaseChannel (same channel to ch
         },
         packageJson: {
             read: stub('read'),
-            setVersion: stub('setVersion').expects('1.0.2'),
+            setVersion: stub('setVersion'),
         },
         getTags: {
             getTags: stub('getTags').expects('beta').returns({
@@ -773,6 +792,7 @@ test('release (no npm/github release) with prereleaseChannel (same channel to ch
     assert.equal(stubs.github.deleteReleaseById.getCalls().length, 0, 'does not call deleteReleaseById');
     assert.equal(stubs.packageJson.setVersion.getCalls().length, 0, 'does not call setVersion');
     assert.equal(stubs.packageJson.read.getCalls().length, 0, 'does not call read');
+    assert.equal(stubs.packageJson.setVersion.getCalls().length, 0, 'does not call write');
 
 });
 
@@ -816,7 +836,7 @@ test('if release, creates tags, publishes to npm, creates github release w/ chan
                 name: 'test',
                 version: '1.0.1',
             }),
-            setVersion: stub('setVersion').expects('1.0.2-alpha.1'),
+            setVersion: stub('setVersion'),
         },
         getTags: {
             getTags: stub('getTags').expects('alpha').returns({
@@ -854,6 +874,12 @@ test('if release, creates tags, publishes to npm, creates github release w/ chan
     assert.equal(stubs.github.createRelease.getCalls().length, 1, 'calls createRelease');
     assert.equal(stubs.npm.publishPackage.getCalls().length, 1, 'calls publishPackage once');
     assert.equal(stubs.sh.bash.getCalls().length, 1, 'calls bash once');
+
+    // setVersion is called once before the release, and then once after to put it back
+    assert.equal(stubs.packageJson.setVersion.getCalls(), [
+        ['1.0.2-alpha.1'],
+        ['1.0.1'],
+    ], 'setVersion is called once before the release, and then once after');
 
     // does not call any of the following
     assert.equal(stubs.git.deleteTagFromLocalAndRemote.getCalls().length, 0, 'does not call deleteTagFromLocalAndRemote');
@@ -897,7 +923,7 @@ test('throws if githubToken is not present, and rolls back tag', async (assert) 
                 name: 'test',
                 version: '0.0.0',
             }),
-            setVersion: stub('setVersion').expects('1.0.2'),
+            setVersion: stub('setVersion'),
         },
         getTags: {
             getTags: stub('getTags').expects(undefined).returns({
@@ -987,7 +1013,7 @@ test('if npm publish fails, rolls back tag and github release', async (assert) =
                 name: 'test',
                 version: '1.0.0',
             }),
-            setVersion: stub('setVersion').expects('1.0.2'),
+            setVersion: stub('setVersion'),
         },
         getTags: {
             getTags: stub('getTags').expects(undefined).returns({
@@ -1025,6 +1051,12 @@ test('if npm publish fails, rolls back tag and github release', async (assert) =
     assert.equal(stubs.git.createAndPushTag.getCalls().length, 1, 'calls createAndPushTag once');
     assert.equal(stubs.github.createRelease.getCalls().length, 1, 'calls createRelease once');
     assert.equal(stubs.npm.publishPackage.getCalls().length, 1, 'calls publishPackage once');
+
+    // setVersion is called once before the release, and then once after to put it back
+    assert.equal(stubs.packageJson.setVersion.getCalls(), [
+        ['1.0.2'],
+        ['1.0.0'],
+    ], 'setVersion is called once before the release, and then once after');
 
     // rollback calls
     assert.equal(stubs.git.deleteTagFromLocalAndRemote.getCalls().length, 1, 'calls deleteTagFromLocalAndRemote once');
@@ -1079,7 +1111,7 @@ test('if `run` fails, rolls back tag, github release, and npm publish if', async
                 name: 'test',
                 version: '1.0.0',
             }),
-            setVersion: stub('setVersion').expects('1.0.2'),
+            setVersion: stub('setVersion'),
         },
         getTags: {
             getTags: stub('getTags').expects(undefined).returns({
@@ -1118,6 +1150,13 @@ test('if `run` fails, rolls back tag, github release, and npm publish if', async
     assert.equal(stubs.github.createRelease.getCalls().length, 1, 'calls createRelease once');
     assert.equal(stubs.npm.publishPackage.getCalls().length, 1, 'calls publishPackage once');
     assert.equal(stubs.sh.bash.getCalls().length, 1, 'bash is called once');
+
+    // setVersion is called once before the release, and then once after to put it back
+    assert.equal(stubs.packageJson.setVersion.getCalls(), [
+        ['1.0.2'],
+        ['1.0.0'],
+        ['1.0.0'],
+    ], 'setVersion is called once before the release, and then once after');
 
     // rollback calls
     assert.equal(stubs.git.deleteTagFromLocalAndRemote.getCalls().length, 1, 'calls deleteTagFromLocalAndRemote once');

@@ -1,6 +1,6 @@
 {
   "name": "autorel",
-  "version": "4.0.3",
+  "version": "0.0.0-autorel",
   "description": "Automate semantic releases based on conventional commits. Similar to semantic-release but much simpler.",
   "license": "MIT",
   "author": "Marc H. Weiner <mhweiner234@gmail.com> (https://mhweiner.com)",

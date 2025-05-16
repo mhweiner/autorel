@@ -22,7 +22,7 @@ jobs:
       - run: npm ci
       - run: npm test
       - run: npm run lint
-      - run: AUTOREL_DEBUG=1 ./bin/cli.js
+      - run: ./bin/cli.js --verbose
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
