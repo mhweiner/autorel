@@ -107,7 +107,12 @@ export async function autorel(args: Config): Promise<string|undefined> {
 
     logger.debug(`The changelog is:\n${changelog}`);
 
-    if (args.dryRun) return;
+    if (args.dryRun) {
+
+        logger.info('🤘🎸 All done!');
+        return;
+
+    }
 
     // User-defined scripts for things like running tests, building the project, etc.
     if (args.preRun) {
