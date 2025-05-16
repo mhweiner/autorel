@@ -42,18 +42,19 @@ Use Autorel to save time, prevent broken releases, and ship with confidence.
 
 - [Example Usage (CLI)](#example-usage-cli)
 - [Example Usage (Library)](docs/usage-library.md)
-- [System Requirements](#system-requirements)
-- [Commit Messages](#commit-messages)
+- [Configuring GitHub Permissions](#configuring-github-permissions)
 - [Usage with GitHub Actions](#usage-with-github-actions)
+- [Commit Messages](#commit-messages)
 - [Usage with Other Repositories (not GitHub)](#usage-with-other-repositories-not-github)
 - [Usage with Other Languages (not Node.js)](#usage-with-other-languages-not-nodejs)
 - [Configuration](docs/configuration.md)
 - [Sample YAML Configuration](docs/configuration.md#sample-yaml-configuration)
 - [Types](#types)
-- [Debug Mode](#debug-mode)
+- [Verbose Mode](#verbose-mode)
 - [About package.json versions](#about-packagejson-versions)
 - [FAQ](docs/faq.md)
-- [Support, Feedback, and Contributions](#support-feedback-and-contributions)
+- [System Requirements](#system-requirements)
+- [Contributing](#contributing)
 - [License](#license)
 
 ## Example Usage (CLI)
@@ -76,40 +77,23 @@ npm i -g autorel
 autorel --publish
 ```
 
-### ⚠️ Avoiding Breaking Changes
-
-If using the `npx` command, you may want to append the version number to prevent breaking changes in the future. You can do this by appending `@^` followed by the major version number, ie. `npx autorel@^2`.
+> ⚠️ If using the `npx` command, you may want to append the version number to prevent breaking changes in the future. You can do this by appending `@^` followed by the major version number, ie. `npx autorel@^2`.
 
 ## Example Usage (Library)
 
-1. Install `autorel` as a dependency
+See [Using `autorel` as a library](/docs/usage-library.md)
 
-    ```bash
-    npm i autorel
-    ```
+## Configuring GitHub Permissions
 
-2. Import and use in your project to build custom release tooling
+In order for `autorel` to create releases and publish to GitHub's npm registry, you'll need to make sure you have the appropriate access/permissions.
 
-    ```typescript
-    import {autorel, defaultConfig} from 'autorel';
+If you're using GitHub Actions, see [Using `autorel` with GitHub Actions](/docs/github-actions.md#permissions) for more information.
 
-    const autorelConfig = {
-      ...defaultConfig,
-      publish: true,
-    };
+If you're running it locally (or using a different CI/CD system), you can pass your [GitHub Personal Access Token (PAT)](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) either by setting the `GITHUB_TOKEN` environment variable or by passing the `--github-token (githubToken: string)` flag.
 
-    autorel(autorelConfig).then((nextVersion) => {
-        console.log(`Next version is ${nextVersion}`); // ie, "Next version is 1.0.1"
-    });
-    ```
+## Usage with GitHub Actions
 
-## System Requirements
-
-- Linux or MacOS (Windows is not officially supported)
-- Node.js 14+
-- NPM 7+
-- Git 2.13+
-- Bash
+Autorel 💜 GitHub Actions. See [Using `autorel` with GitHub Actions](/docs/github-actions.md)
 
 ## Commit Messages
 
@@ -123,10 +107,6 @@ Here are some examples of commit messages and the resulting [SemVer](https://sem
 
 You can find more examples in the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) documentation.
 
-## Usage with GitHub Actions
-
-Autorel 💜 GitHub Actions. See [Using `autorel` with GitHub Actions](/docs/github-actions.md)
-
 ## Configuration
 
 See [Configuration](docs/configuration.md) for reference and examples.
@@ -135,7 +115,7 @@ See [Configuration](docs/configuration.md) for reference and examples.
 
 You can find the types defined at [src/index.ts](src/index.ts).
 
-## Verbose Mode (Debug Mode)
+## Verbose Mode
 
 To enable verbose mode, set `--verbose (verbose: true)` or environment variable `AUTOREL_DEBUG=1`:
 
@@ -164,6 +144,14 @@ If you're interested in contributing built-in support for other systems, please 
 Simply omit the `--publish` flag (arg: `publish: false`, which is default) to skip publishing to NPM. Then, you can use either the `--run` flag (arg: `run: string`) or `runScript: string` arg to run any command or script after the version bump with the new version number available as an environment variable [see below](#run).
 
 If you're interested in contributing built-in support for other systems, please open an issue or PR.
+
+## System Requirements
+
+- Linux or MacOS (Windows is not officially supported)
+- Node.js 14+
+- npm 7+
+- Git 2.13+
+- Bash
 
 ## Contributing
 

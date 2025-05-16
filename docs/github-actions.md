@@ -1,12 +1,6 @@
 # Using `autorel` with GitHub Actions
 
-You can use `autorel` with GitHub Actions to automate your releases. 
-
-> ❗️ You must set `fetch-depth: 0` and `fetch-tags: true` in `actions/checkout@v4` (or later) or autorel will not work correctly.
-
-> ❗️ You must be authenticated with NPM to publish. To do so via GitHub Actions, see [this](https://docs.github.com/en/actions/guides/publishing-nodejs-packages#publishing-packages-to-the-npm-registry).
-
-Here is a sample configuration:
+You can use `autorel` with GitHub Actions to automate your releases. Here is a sample configuration:
 
 ```yaml
 name: Release
@@ -34,3 +28,16 @@ jobs:
 ```
 
 It's also recommended you create a `.autorel.yaml` file in the root of your project to [configure](/docs/configuration.md) `autorel`.
+
+> ❗️ You must set `fetch-depth: 0` and `fetch-tags: true` in `actions/checkout@v4` (or later) or autorel will not work correctly.
+
+> ❗️ You must be authenticated with npm to publish. To do so via GitHub Actions, see [this](https://docs.github.com/en/actions/guides/publishing-nodejs-packages#publishing-packages-to-the-npm-registry).
+
+
+## Permissions
+
+In order for `autorel` to create releases and publish to GitHub's npm registry via GitHub Actions, you'll need to make sure you have the appropriate permissions in your GitHub repository settings.
+
+In your repository settings, navigate to the "Actions" section and click on "General" in the left sidebar. Then, scroll down to the "Workflow permissions" section and select "Read and write permissions" for "Contents" and "Packages".
+
+To learn more, see [Controlling permissions for GITHUB_TOKEN](https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/controlling-permissions-for-github_token).
