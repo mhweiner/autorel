@@ -41,16 +41,8 @@ Use Autorel to save time, prevent broken releases, and ship with confidence.
 ## Table of Contents
 
 - [Example Usage (CLI)](#example-usage-cli)
-- [Example Usage (Library)](docs/usage-library.md)
-- [Configuring GitHub Permissions](#configuring-github-permissions)
-- [Usage with GitHub Actions](#usage-with-github-actions)
+- [Usage](/docs/usage.md)
 - [Commit Messages](#commit-messages)
-- [Usage with Other Repositories (not GitHub)](#usage-with-other-repositories-not-github)
-- [Usage with Other Languages (not Node.js)](#usage-with-other-languages-not-nodejs)
-- [Configuration](docs/configuration.md)
-- [Sample YAML Configuration](docs/configuration.md#sample-yaml-configuration)
-- [Types](#types)
-- [Verbose Mode](#verbose-mode)
 - [About package.json versions](#about-packagejson-versions)
 - [FAQ](docs/faq.md)
 - [System Requirements](#system-requirements)
@@ -79,21 +71,9 @@ autorel --publish
 
 > ⚠️ If using the `npx` command, you may want to append the version number to prevent breaking changes in the future. You can do this by appending `@^` followed by the major version number, ie. `npx autorel@^2`.
 
-## Example Usage (Library)
+## Configuration
 
-See [Using `autorel` as a library](/docs/usage-library.md)
-
-## Configuring GitHub Permissions
-
-In order for `autorel` to create releases and publish to GitHub's npm registry, you'll need to make sure you have the appropriate access/permissions.
-
-If you're using GitHub Actions, see [Using `autorel` with GitHub Actions](/docs/github-actions.md#permissions) for more information.
-
-If you're running it locally (or using a different CI/CD system), you can pass your [GitHub Personal Access Token (PAT)](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) either by setting the `GITHUB_TOKEN` environment variable or by passing the `--github-token (githubToken: string)` flag.
-
-## Usage with GitHub Actions
-
-Autorel 💜 GitHub Actions. See [Using `autorel` with GitHub Actions](/docs/github-actions.md)
+See [Configuration](docs/configuration.md) for reference and examples.
 
 ## Commit Messages
 
@@ -106,44 +86,6 @@ Here are some examples of commit messages and the resulting [SemVer](https://sem
 - `feat!: add breaking change` -> `1.0.0` (major)
 
 You can find more examples in the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) documentation.
-
-## Configuration
-
-See [Configuration](docs/configuration.md) for reference and examples.
-
-## Types
-
-You can find the types defined at [src/index.ts](src/index.ts).
-
-## Verbose Mode
-
-To enable verbose mode, set `--verbose (verbose: true)` or environment variable `AUTOREL_DEBUG=1`:
-
-```bash
-npx autorel --verbose
-```
-
-## About package.json versions
-
-If using our npm publishing feature, the package.json file's version will be updated in memory before being pushed to npm, as this is the only place where it's actually required. The change will not be pushed to the repository, as it is not necessary and could cause conflicts. See [this post](https://semantic-release.gitbook.io/semantic-release/support/faq)
-
-If you need access to the new version number in your CI/CD pipeline, you can use the `NEXT_VERSION` or `NEXT_TAG` environment variables.
-
-## Usage with Other Repositories (not GitHub)
-
-`autorel` is designed to work with any CI/CD system, not just GitHub Actions. You can use it with GitLab, Bitbucket, Jenkins, or any other system that supports running shell commands and meets our [system requirements](#system-requirements).
-
-Simply use the `--skip-release` flag (arg: `skipRelease: true`) to skip creating a release on GitHub. Then, you can use the `--run` flag (arg: `run: string`) to run any command or script after the version bump with the new version number available as an environment variable [see below](#run).
-
-If you're interested in contributing built-in support for other systems, please open an issue or PR.
-
-## Usage with Other Languages (not Node.js)
-
-`autorel` is designed to work with any language or platform. You can use it with Python, Ruby, Go, Java, or any other language.
-
-Simply omit the `--publish` flag (arg: `publish: false`, which is default) to skip publishing to NPM. Then, you can use either the `--run` flag (arg: `run: string`) or `runScript: string` arg to run any command or script after the version bump with the new version number available as an environment variable [see below](#run).
-
-If you're interested in contributing built-in support for other systems, please open an issue or PR.
 
 ## System Requirements
 
