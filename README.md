@@ -86,6 +86,8 @@ Here are some examples of commit messages and the resulting [SemVer](https://sem
 - `feat: add new feature` -> `0.1.0` (minor)
 - `feat!: add breaking change` -> `1.0.0` (major)
 
+See our [default configuration](/src/defaults.ts) for more details on how commit types are mapped to version bumps.
+
 You can find more examples in the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) documentation.
 
 ## System Requirements

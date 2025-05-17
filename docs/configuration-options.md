@@ -150,8 +150,17 @@ The title to use for the breaking changes section in the release notes.
 
 The commit types to use for both the release notes and version bumping.
 
+For example, in the [default configuration](/src/defaults.ts), the following commits would result in:
+
+- `feat`: `minor`
+- `fix`: `patch`
+- `perf`: `patch`
+- `revert`: `patch`
+
+And all other commit types will result in no release.
+
 - Argument: `commitTypes: CommitType[]`
-- Defaults: [src/defaults.ts](src/defaults.ts)
+- Defaults: [/src/defaults.ts](/src/defaults.ts)
 
 ### branches (YAML/library only)
 
