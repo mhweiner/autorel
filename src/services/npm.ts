@@ -5,7 +5,7 @@ import {$} from './sh';
  */
 export function publishPackage(channel?: string): void {
 
-    $`npm publish --tag ${channel ?? 'latest'}`;
+    $`npm publish --tag ${channel ?? 'latest'} --loglevel warn`;
 
 }
 
@@ -14,6 +14,6 @@ export function publishPackage(channel?: string): void {
  */
 export async function unpublishPackage(packageAndVersion: string): Promise<void> {
 
-    $`npm unpublish ${packageAndVersion}`;
+    $`npm unpublish ${packageAndVersion} --loglevel warn`;
 
 }
