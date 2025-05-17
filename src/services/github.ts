@@ -45,13 +45,11 @@ export async function deleteReleaseById(params: {
     releaseId: number
 }): Promise<void> {
 
-    const {token, owner, repository, releaseId} = params;
-
-    const url = `https://api.github.com/repos/${owner}/${repository}/releases/${releaseId}`;
+    const url = `https://api.github.com/repos/${params.owner}/${params.repository}/releases/${params.releaseId}`;
     const options = {
         headers: {
             Accept: 'application/vnd.github+json',
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${params.token}`,
             'X-GitHub-Api-Version': '2022-11-28',
             'User-Agent': 'autorel (https://npmjs.com/autorel)',
         },

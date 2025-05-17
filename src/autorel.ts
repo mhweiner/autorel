@@ -162,7 +162,7 @@ export async function autorel(args: Config): Promise<string|undefined> {
 
                 logger.info('<- Rolling back GitHub release...');
                 await github.deleteReleaseById({
-                    token: process.env.GITHUB_TOKEN!,
+                    token: args.githubToken!,
                     owner,
                     repository,
                     releaseId,
