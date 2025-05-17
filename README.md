@@ -43,7 +43,6 @@ Use Autorel to save time, prevent broken releases, and ship with confidence.
 - [Example Usage (CLI)](#example-usage-cli)
 - [Usage](/docs/usage.md)
 - [Commit Messages](#commit-messages)
-- [About package.json versions](#about-packagejson-versions)
 - [FAQ](docs/faq.md)
 - [System Requirements](#system-requirements)
 - [Contributing](#contributing)
@@ -62,18 +61,20 @@ This will:
 3. Update package.json and publish the release to NPM (does not commit the change to the repository, see below)
 4. Run the command `echo "Next version is ${NEXT_VERSION}"`
 
-You can also install `autorel` globally and run it directly:
+However, we recommend you simply call `npx autorel@^2` in your CI/CD pipeline (or locally) and set your configuration in the `.autorel.yaml` file like so:
 
-```bash
-npm i -g autorel
-autorel --publish
+```yaml
+# .autorel.yaml
+publish: true
+run: |
+  echo "Next version is ${NEXT_VERSION}"
 ```
 
 > ⚠️ If using the `npx` command, you may want to append the version number to prevent breaking changes in the future. You can do this by appending `@^` followed by the major version number, ie. `npx autorel@^2`.
 
-## Configuration
+## Usage and Configuration
 
-See [Configuration](docs/configuration.md) for reference and examples.
+See [Usage](/docs/usage.md) and [Configuration Options](/docs/configuration-options.md) for more information.
 
 ## Commit Messages
 
