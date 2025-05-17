@@ -8,7 +8,7 @@ If you want to use `autorel` as a library, see [this](./usage-library.md).
 
 > ❗️ The `yaml` configuration file must be named `.autorel.yaml` and be in the root of your project.
 
-[See sample YAML configuration](#sample-yaml-configuration)
+[See sample YAML configuration](/docs/usage.md#sample-yaml-configuration)
 
 ---
 - [publish](#publish)
