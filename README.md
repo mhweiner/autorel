@@ -78,15 +78,17 @@ See [Usage](/docs/usage.md) and [Configuration Options](/docs/configuration-opti
 
 ## Commit Messages
 
-Commit messages are parsed to determine the version bump. They must follow the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) standard specification.
+Commit messages are parsed to automatically determine the version bump and generate the changelog.
 
-Here are some examples of commit messages and the resulting [SemVer](https://semver.org) version bump (with the default configuration):
+They must follow the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) standard specification.
+
+Here are some examples of commit messages and the resulting version bump (with the default configuration):
 
 - `fix: fix a bug` -> `0.0.1` (patch)
 - `feat: add new feature` -> `0.1.0` (minor)
 - `feat!: add breaking change` -> `1.0.0` (major)
 
-See our [default configuration](/src/defaults.ts) for more details on how commit types are mapped to version bumps.
+See our [default configuration](/src/defaults.ts) for more details on how commit types are mapped to version bumps and the changelog.
 
 You can find more examples in the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) documentation.
 
