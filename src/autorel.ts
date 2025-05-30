@@ -15,17 +15,16 @@ import {transaction} from './transaction';
 import {bash} from './services/sh';
 import {inspect} from 'node:util';
 import {toResult, ValidationError} from 'typura';
+import {serializeError} from 'jsout/dist/serializeError';
 
 const onRollback = (err: Error) => {
 
-    logger.error('An error occurred during release, rolling back...');
-    logger.error(inspect(err, {depth: null, colors: false}));
+    logger.error(`An error occurred during release, rolling back...\n${inspect(serializeError(err), {depth: 5})}`);
 
 };
 const onRollbackError = (err: Error) => {
 
-    logger.error('An error occurred during rollback:');
-    logger.error(inspect(err, {depth: null, colors: false}));
+    logger.error(`An error occurred during rollback:\n${inspect(serializeError(err), {depth: 5})}`);
 
 };
 
@@ -35,7 +34,7 @@ export async function autorel(args: Config): Promise<string|undefined> {
 
     if (validationErr instanceof ValidationError) {
 
-        throw new Error(`Invalid configuration:\n${inspect(validationErr.messages, {depth: null, colors: false})}`);
+        throw new Error(`Invalid configuration:\n${inspect(validationErr.messages, {depth: 5})}`);
 
     }
 
