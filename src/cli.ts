@@ -2,6 +2,9 @@ import {Command} from 'commander';
 import {bold, gray, white} from 'colorette';
 import {autorel} from '.';
 import {getConfig} from './config';
+import logger from './services/logger';
+import {serializeError} from 'jsout/dist/serializeError';
+import {formatSerializedError} from 'jsout/dist/formatters/formatSerializedError';
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
 const packageJson = require('../package.json');
@@ -39,9 +42,9 @@ if (options) {
 
 const config = getConfig(options);
 
-autorel(config).catch((error) => {
+autorel(config).catch((err) => {
 
-    console.error('[autorel] Release failed:', error);
+    logger.error(`Release failed:\n${formatSerializedError(serializeError(err))}`);
     process.exit(1);
 
 });

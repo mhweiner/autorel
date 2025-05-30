@@ -15,10 +15,26 @@ export function $(strings: TemplateStringsArray, ...values: any[]): string {
 
     out.debug(`> ${command}`);
 
-    const escapedCommand = command.replace(/(["$`\\])/g, '\\$1');
-    const output = execSync(`bash -c "${escapedCommand}"`, {encoding: 'utf8'});
+    try {
 
-    return output.trim();
+        const escapedCommand = command.replace(/(["$`\\])/g, '\\$1');
+        const output = execSync(`bash -c "${escapedCommand}"`, {encoding: 'utf8'});
+
+        return output.trim();
+
+    } catch (error: any) {
+
+        // Extract the most relevant error information
+        const errorMessage = error.stderr || error.message;
+        const cleanError = errorMessage
+            .split('\n')
+            .filter((line: string) => line.trim() && !line.includes('at '))
+            .join('\n')
+            .trim();
+
+        throw new Error(cleanError);
+
+    }
 
 }
 
