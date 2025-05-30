@@ -16,15 +16,16 @@ import {bash} from './services/sh';
 import {inspect} from 'node:util';
 import {toResult, ValidationError} from 'typura';
 import {serializeError} from 'jsout/dist/serializeError';
+import {formatSerializedError} from 'jsout/dist/formatters/formatSerializedError';
 
 const onRollback = (err: Error) => {
 
-    logger.error(`An error occurred during release, rolling back...\n${inspect(serializeError(err), {depth: 5})}`);
+    logger.error(`An error occurred during release, rolling back...\n${formatSerializedError(serializeError(err))}`);
 
 };
 const onRollbackError = (err: Error) => {
 
-    logger.error(`An error occurred during rollback:\n${inspect(serializeError(err), {depth: 5})}`);
+    logger.error(`An error occurred during rollback:\n${formatSerializedError(serializeError(err))}`);
 
 };
 
