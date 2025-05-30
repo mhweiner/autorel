@@ -178,28 +178,27 @@ export async function autorel(args: Config): Promise<string|undefined> {
             logger.info('-> Publishing to npm registry...');
 
             const oldVersion = packageJson.read().version;
+            const packageName = packageJson.read().name;
 
-            // temporarily set the version to the next tag
             packageJson.setVersion(nextTag.replace('v', ''));
 
             const [publishErr] = toResult(() => npm.publishPackage(prereleaseChannel));
 
-            if (publishErr) {
-
-                // put the version back to the old version before throwing the error
-                packageJson.setVersion(oldVersion);
-                throw publishErr;
-
-            }
-
-            // put the version back to the old version
             packageJson.setVersion(oldVersion);
+
+            if (publishErr) throw publishErr;
 
             addToRollback(async () => {
 
                 logger.info('<- Rolling back npm publish...');
-                packageJson.setVersion(oldVersion);
-                await npm.unpublishPackage(`${packageJson.read().name}@${nextTag}`);
+                const [rollbackErr] = toResult(() => npm.unpublishPackage(packageName, nextTag.replace('v', '')));
+
+                if (rollbackErr) {
+
+                    logger.error(`An error occurred during rollback:\n${formatSerializedError(serializeError(rollbackErr))}`);
+                    logger.warn(`Unforunately, were unable to rollback the npm publish. You must manually unpublish the package ${packageName}@${nextTag.replace('v', '')} from the npm registry.`);
+
+                }
 
             });
 
