@@ -1069,7 +1069,7 @@ test('if npm publish fails, rolls back tag and github release', async (assert) =
 
 });
 
-test('if `run` fails, rolls back tag, github release, and npm publish if', async (assert) => {
+test('if `run` fails, rolls back tag, github release, and npm publish', async (assert) => {
 
     const stubs = {
         getPrereleaseChannel: {getPrereleaseChannel: stub().returns(undefined)},
@@ -1154,7 +1154,6 @@ test('if `run` fails, rolls back tag, github release, and npm publish if', async
     // setVersion is called once before the release, and then once after to put it back
     assert.equal(stubs.packageJson.setVersion.getCalls(), [
         ['1.0.2'],
-        ['1.0.0'],
         ['1.0.0'],
     ], 'setVersion is called once before the release, and then once after');
 
