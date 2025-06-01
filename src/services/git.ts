@@ -31,7 +31,7 @@ export function deleteTagFromLocalAndRemote(tag: string): void {
  */
 export function getRecentTags(): string[] {
 
-    const tags = $`git tag --sort=-v:refname | head -n 100`;
+    const tags = $`git tag --sort=-v:refname | head -n 1000`;
 
     return tags.split('\n').filter((tag) => tag.trim() !== '');
 
