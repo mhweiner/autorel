@@ -1,7 +1,7 @@
 <picture>
-    <source srcset="docs/autorel-logo-light.svg" media="(prefers-color-scheme: light)">
-    <source srcset="docs/autorel-logo-dark.svg" media="(prefers-color-scheme: dark)">
-    <img src="docs/autorel-logo-light.svg" alt="Logo">
+    <source srcset="docs/autorel-logo-light-smol.svg" media="(prefers-color-scheme: light)">
+    <source srcset="docs/autorel-logo-dark-smol.svg" media="(prefers-color-scheme: dark)">
+    <img src="docs/autorel-logo-light-smol.svg" alt="Logo">
 </picture> 
 
 [![build status](https://github.com/mhweiner/autorel/actions/workflows/release.yml/badge.svg)](https://github.com/mhweiner/autorel/actions)
