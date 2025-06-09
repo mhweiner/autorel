@@ -1,5 +1,5 @@
 /* eslint-disable max-lines-per-function */
-import {test} from 'hoare';
+import {test} from 'kizu';
 import {mock, stub} from 'cjs-mock';
 import * as m from './autorel';
 import {defaultConfig} from './defaults';

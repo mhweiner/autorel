@@ -1,5 +1,5 @@
 /* eslint-disable max-lines-per-function */
-import {test} from 'hoare';
+import {test} from 'kizu';
 import {incrPatch, incrMinor, incrMajor, incrVer, incrByType} from './increment';
 import {errors} from './errors';
 import {SemVer} from './types';

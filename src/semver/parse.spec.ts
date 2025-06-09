@@ -1,4 +1,4 @@
-import {test} from 'hoare';
+import {test} from 'kizu';
 import {fromTag, isValidTag, isValidVersion, parseTags, toTag} from './parse';
 import {SemVer} from './types';
 

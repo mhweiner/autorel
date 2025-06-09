@@ -1,4 +1,4 @@
-import {test} from 'hoare';
+import {test} from 'kizu';
 import {bash, $} from './sh';
 
 test('bash: single line', (assert) => {

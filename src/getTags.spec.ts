@@ -1,4 +1,4 @@
-import {test} from 'hoare';
+import {test} from 'kizu';
 import {mock, stub} from 'cjs-mock';
 import * as mod from './getTags'; // for typing only
 

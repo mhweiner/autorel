@@ -1,4 +1,4 @@
-import {test} from 'hoare';
+import {test} from 'kizu';
 import {generateChangelog} from './changelog';
 import {ConventionalCommit} from './conventionalcommits';
 import {CommitType} from '.';

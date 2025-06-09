@@ -1,5 +1,5 @@
 /* eslint-disable max-lines-per-function */
-import {test} from 'hoare';
+import {test} from 'kizu';
 import {compareVersions, highestChannelTag, highestStableTag, highestTag, highestVersion} from './compare';
 import {fromTag} from './parse';
 

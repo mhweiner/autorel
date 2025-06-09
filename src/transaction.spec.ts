@@ -1,4 +1,4 @@
-import {test} from 'hoare';
+import {test} from 'kizu';
 import {Action, transaction} from './transaction';
 import {stub} from 'cjs-mock';
 import {toResultAsync} from './lib/toResult';

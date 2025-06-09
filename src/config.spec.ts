@@ -1,5 +1,5 @@
 /* eslint-disable max-lines-per-function */
-import {test} from 'hoare';
+import {test} from 'kizu';
 import {mock} from 'cjs-mock';
 import * as mod from './config';
 import {mockLogger} from './services/mockLogger';

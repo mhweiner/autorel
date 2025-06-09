@@ -1,4 +1,4 @@
-import {test} from 'hoare';
+import {test} from 'kizu';
 import {getPrereleaseChannel} from './getPrereleaseChannel';
 import {defaultConfig} from './defaults';
 import {mock} from 'cjs-mock';
