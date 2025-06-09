@@ -1,4 +1,4 @@
-<img src="docs/autorel.svg" alt="AutoRel" title="AutoRel">
+<img src="docs/autorel-logo.svg" alt="AutoRel" title="AutoRel">
 
 [![build status](https://github.com/mhweiner/autorel/actions/workflows/release.yml/badge.svg)](https://github.com/mhweiner/autorel/actions)
 [![SemVer](https://img.shields.io/badge/SemVer-2.0.0-blue)]()
