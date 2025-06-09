@@ -9,7 +9,7 @@
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org)
 [![AutoRel](https://img.shields.io/badge/AutoRel-1bd499)](https://github.com/mhweiner/autorel)
 
-**Autorel** is a fast, simple, and reliable tool for automating releases based on commit messages.
+🚀 **Autorel** is a fast, simple, and reliable tool for automating releases based on commit messages.
 
 It follows [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) and [Semantic Versioning](https://semver.org/) to do things like:
 
@@ -19,7 +19,7 @@ It follows [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/
 - Publish to npm registry (or other package managers)
 - Run custom scripts or commands with the new version number available as an environment variable
 
-🚀 Like `semantic-release` or `release-please`, but faster, more reliable, and easier to use.
+Like `semantic-release` or `release-please`, but faster, more reliable, and easier to use.
 
 Supports GitHub Actions and npm (Node.js) natively. You can add custom scripts for other languages and systems (or contribute built-in support).
 
