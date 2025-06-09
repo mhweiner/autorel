@@ -1,15 +1,11 @@
-<picture>
-    <source srcset="docs/autorel-logo-light-smol.svg" media="(prefers-color-scheme: light)">
-    <source srcset="docs/autorel-logo-dark-smol.svg" media="(prefers-color-scheme: dark)">
-    <img src="docs/autorel-logo-light-smol.svg" alt="Logo">
-</picture> 
+<img src="docs/autorel.svg" alt="AutoRel" title="AutoRel">
 
 [![build status](https://github.com/mhweiner/autorel/actions/workflows/release.yml/badge.svg)](https://github.com/mhweiner/autorel/actions)
 [![SemVer](https://img.shields.io/badge/SemVer-2.0.0-blue)]()
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org)
 [![AutoRel](https://img.shields.io/badge/%F0%9F%9A%80%20AutoRel-2D4DDE)](https://github.com/mhweiner/autorel)
 
-🚀 **AutoRel** is a fast, simple, and reliable tool for automating releases based on commit messages.
+AutoRel is a fast, simple, and reliable tool for automating releases based on commit messages.
 
 It follows [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) and [Semantic Versioning](https://semver.org/) to do things like:
 
