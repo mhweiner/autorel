@@ -7,9 +7,9 @@
 [![build status](https://github.com/mhweiner/autorel/actions/workflows/release.yml/badge.svg)](https://github.com/mhweiner/autorel/actions)
 [![SemVer](https://img.shields.io/badge/SemVer-2.0.0-blue)]()
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org)
-[![AutoRel](https://img.shields.io/badge/AutoRel-1bd499)](https://github.com/mhweiner/autorel)
+[![AutoRel](https://img.shields.io/badge/%F0%9F%9A%80%20AutoRel-2D4DDE)](https://github.com/mhweiner/autorel)
 
-🚀 **Autorel** is a fast, simple, and reliable tool for automating releases based on commit messages.
+🚀 **AutoRel** is a fast, simple, and reliable tool for automating releases based on commit messages.
 
 It follows [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) and [Semantic Versioning](https://semver.org/) to do things like:
 
@@ -23,7 +23,7 @@ Like `semantic-release` or `release-please`, but faster, more reliable, and easi
 
 Supports GitHub Actions and npm (Node.js) natively. You can add custom scripts for other languages and systems (or contribute built-in support).
 
-Use Autorel to save time, prevent broken releases, and ship with confidence.
+Use AutoRel to save time, prevent broken releases, and ship with confidence.
 
 **✅ Conventional Commit & SemVer Compliant** 
 - 100% compliant with Conventional Commits and SemVer out of the box, including "!" for breaking changes
@@ -40,7 +40,7 @@ Use Autorel to save time, prevent broken releases, and ship with confidence.
 - No need to install or configure a separate CI/CD system
 - Less broken builds and more time to focus on your code!
 
-[Read our FAQ on why you should use `autorel` and how it compares to other tools](docs/faq.md)
+[Read our FAQ on why you should use AutoRel and how it compares to other tools](docs/faq.md)
 
 ## Table of Contents
 
