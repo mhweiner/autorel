@@ -2,7 +2,7 @@
     <source srcset="docs/autorel-logo-light.svg" media="(prefers-color-scheme: light)">
     <source srcset="docs/autorel-logo-dark.svg" media="(prefers-color-scheme: dark)">
     <img src="docs/autorel-logo-light.svg" alt="Logo">
-</picture>
+</picture> 
 
 [![build status](https://github.com/mhweiner/autorel/actions/workflows/release.yml/badge.svg)](https://github.com/mhweiner/autorel/actions)
 [![SemVer](https://img.shields.io/badge/SemVer-2.0.0-blue)]()
