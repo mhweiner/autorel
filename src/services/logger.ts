@@ -1,4 +1,4 @@
-import {gray, red, redBright, yellow} from 'colorette';
+import {gray, redBright, yellow} from 'colorette';
 
 const prefix = '[autorel] ';
 
