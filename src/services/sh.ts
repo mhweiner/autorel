@@ -46,8 +46,27 @@ export function $(strings: TemplateStringsArray, ...values: any[]): string {
  */
 export function bash(cmd: string): void {
 
-    const escapedCommand = cmd.replace(/(["$`\\])/g, '\\$1');
+    try {
 
-    execSync(`bash -e -c "${escapedCommand}"`, {encoding: 'utf8', stdio: 'inherit'});
+        // Remove any trailing newlines and normalize line endings
+        const normalizedCmd = cmd.trimEnd().replace(/\r\n/g, '\n');
+        const escapedCommand = normalizedCmd.replace(/(["$`\\])/g, '\\$1');
+
+        execSync(`bash -e -c "${escapedCommand}"`, {encoding: 'utf8', stdio: 'inherit'});
+
+    } catch (error: any) {
+
+        // Extract the most relevant error information
+        const errorMessage = error.stderr || error.message;
+
+        const cleanError = errorMessage
+            .split('\n')
+            .filter((line: string) => line.trim() && !line.includes('at '))
+            .join('\n')
+            .trim();
+
+        throw new Error(cleanError);
+
+    }
 
 }

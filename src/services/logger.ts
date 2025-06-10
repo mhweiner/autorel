@@ -1,4 +1,4 @@
-import {gray, red, yellow} from 'colorette';
+import {gray, red, redBright, yellow} from 'colorette';
 
 const prefix = '[autorel] ';
 
@@ -22,7 +22,7 @@ function warn(message: string): void {
 
 function error(message: string): void {
 
-    console.error(red(`${prefix}Error: ${message}`));
+    console.error(redBright(`${prefix}Error: ${message}`));
 
 }
 
