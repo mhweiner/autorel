@@ -11,10 +11,11 @@ const packageJson = require('../package.json');
 const program = new Command();
 
 console.log('------------------------------');
-console.log(`${bold(white('autorel'))} ${gray(`v${packageJson.version}`)}`);
+console.log(`🚀 ${bold(white('AutoRel'))} ${gray(`v${packageJson.version}`)}`);
 console.log('------------------------------');
 
 program
+    .name('autorel')
     .version(packageJson.version, '-v, --version')
     .description('An example CLI for managing a directory')
     .option('--dry-run', 'Do a dry run (arg: dryRun)')
