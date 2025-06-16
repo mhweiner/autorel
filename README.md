@@ -106,12 +106,12 @@ You can find more examples in the [Conventional Commits](https://www.conventiona
 - 🐛 Open an [issue](https://github.com/mhweiner/autorel/issues) for bugs or suggestions.
 - 🤝 Submit a PR to `main` — all tests must pass.
 
-## Other useful libraries
+## Related Projects
 
 - [brek](https://github.com/mhweiner/brek): powerful yet simple configuration library for Node.js. It’s structured, typed, and designed for dynamic configuration loading, making it perfect for securely managing secrets (e.g., AWS Secrets Manager).
-- [hoare](https://github.com/mhweiner/hoare): An easy-to-use, fast, and defensive JS/TS test runner designed to help you to write simple, readable, and maintainable tests.
-- [jsout](https://github.com/mhweiner/jsout): A Syslog-compatible, small, and simple logger for Typescript/Javascript projects.
+- [kizu](https://github.com/mhweiner/kizu): An easy-to-use, fast, and defensive JS/TS test runner designed to help you to write simple, readable, and maintainable tests.
 - [cjs-mock](https://github.com/mhweiner/cjs-mock): NodeJS module mocking for CJS (CommonJS) modules for unit testing purposes.
+- [jsout](https://github.com/mhweiner/jsout): A Syslog-compatible, simple, and DevOps-friendly logger for Typescript/Javascript projects. Works great with aggregators like [Aeroview](https://aeroview.io) and [CloudWatch](https://aws.amazon.com/cloudwatch/).
 
 ## License
 
