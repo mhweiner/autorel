@@ -14,9 +14,9 @@ import {getTags} from './getTags';
 import {transaction} from './transaction';
 import {bash} from './services/sh';
 import {inspect} from 'node:util';
-import {toResult, ValidationError} from 'typura';
 import {serializeError} from 'jsout/dist/serializeError';
 import {formatSerializedError} from 'jsout/dist/formatters/formatSerializedError';
+import {toResult} from './lib/toResult';
 
 const onRollback = (err: Error) => {
 
@@ -31,11 +31,11 @@ const onRollbackError = (err: Error) => {
 
 export async function autorel(args: Config): Promise<string|undefined> {
 
-    const [validationErr] = toResult(() => validateConfig(args));
+    const configValidationResult = validateConfig(args);
 
-    if (validationErr instanceof ValidationError) {
+    if (!configValidationResult.isValid) {
 
-        throw new Error(`Invalid configuration:\n${inspect(validationErr.messages, {depth: 5})}`);
+        throw new Error(`Invalid configuration:\n${inspect(configValidationResult.errors, {depth: 5})}`);
 
     }
 

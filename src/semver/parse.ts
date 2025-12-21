@@ -1,5 +1,5 @@
 import {SemVer} from './types';
-import {predicates as p, toResult} from 'typura';
+import {predicates as p} from 'runtyp';
 
 const isValidSemVer = p.object({
     major: p.number(),
@@ -11,11 +11,11 @@ const isValidSemVer = p.object({
 
 export function toTag(version: SemVer): string {
 
-    const [validationErr] = toResult(() => isValidSemVer(version));
+    const result = isValidSemVer(version);
 
-    if (validationErr) {
+    if (!result.isValid) {
 
-        throw new Error('Invalid SemVer object', {cause: validationErr});
+        throw new Error('Invalid SemVer object', {cause: result.errors});
 
     }
 
@@ -71,11 +71,11 @@ export function isValidTag(ver: string): boolean {
 
 export function isValidVersion(version: SemVer): boolean {
 
-    const [err, tag] = toResult(() => toTag(version));
+    const result = isValidSemVer(version);
 
-    if (err) return false;
+    if (!result.isValid) return false;
 
-    return !!fromTag(tag);
+    return !!fromTag(toTag(version));
 
 }
 

@@ -3,9 +3,9 @@ import {test} from 'kizu';
 import {mock} from 'cjs-mock';
 import * as mod from './config';
 import {mockLogger} from './services/mockLogger';
-import {toResult} from 'typura';
 import {defaultConfig} from './defaults';
 import {Config} from '.';
+import {toResult} from './lib/toResult';
 
 test('getConfig: no .autorel.yaml', async (assert) => {
 

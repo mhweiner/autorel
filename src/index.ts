@@ -1,4 +1,4 @@
-import {Infer} from 'typura';
+import {Infer} from 'runtyp';
 import {commitType, validateConfig} from './config';
 
 export type CommitType = Infer<typeof commitType>;

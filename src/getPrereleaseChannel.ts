@@ -29,7 +29,7 @@ export function getPrereleaseChannel(config: Config): string|undefined {
     if (!branch) throw new Error('Could not get the current branch. Please make sure you are in a git repository.');
     if (!config.branches.length) throw new Error('Branches are not defined in the configuration. See https://github.com/mhweiner/autorel?tab=readme-ov-file#configuration');
 
-    const matchingBranch = config.branches.find((b) => b.name === branch);
+    const matchingBranch = config.branches.find((b: {name: string}) => b.name === branch);
 
     if (!matchingBranch) return undefined;
 

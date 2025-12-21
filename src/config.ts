@@ -1,10 +1,11 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as yaml from 'js-yaml';
-import {predicates as p, toResult} from 'typura';
+import {predicates as p} from 'runtyp';
 import output from './services/logger';
 import {Config} from '.';
 import {defaultConfig} from './defaults';
+import {toResult} from './lib/toResult';
 
 const useVersionRegex = /^v?(?<major>0|[1-9]\d*)\.(?<minor>0|[1-9]\d*)\.(?<patch>0|[1-9]\d*)(?:-(?<channel>[0-9a-zA-Z-]+)(?:\.(?<build>[0-9a-zA-Z-]+))?)?(?:\+(?<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/;
 
