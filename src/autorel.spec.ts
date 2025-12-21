@@ -26,6 +26,7 @@ test('does not run release when releaseType is none and useVersion is undefined'
             deleteReleaseById: stub(),
         },
         npm: {
+            versionExists: stub().returns(false),
             publishPackage: stub(),
             unpublishPackage: stub(),
         },
@@ -85,6 +86,7 @@ test('does not run preRun script or do release if dryRun is set', async (assert)
             deleteReleaseById: stub(),
         },
         npm: {
+            versionExists: stub().returns(false),
             publishPackage: stub(),
             unpublishPackage: stub(),
         },
@@ -160,6 +162,7 @@ test('if release, creates tags, publishes to npm, creates github release w/ chan
             deleteReleaseById: stub('deleteReleaseById'),
         },
         npm: {
+            versionExists: stub('versionExists').returns(false),
             publishPackage: stub('publishPackage').expects(undefined),
             unpublishPackage: stub('unpublishPackage'),
         },
@@ -245,6 +248,7 @@ test('skips github release if skipRelease=true', async (assert) => {
             deleteReleaseById: stub('deleteReleaseById'),
         },
         npm: {
+            versionExists: stub().returns(false),
             publishPackage: stub().expects(undefined),
             unpublishPackage: stub(),
         },
@@ -338,6 +342,7 @@ test('skips npm publish if publish=false (default behavior)', async (assert) => 
             deleteReleaseById: stub('deleteReleaseById'),
         },
         npm: {
+            versionExists: stub('versionExists').returns(false),
             publishPackage: stub('publishPackage'),
             unpublishPackage: stub('unpublishPackage'),
         },
@@ -417,6 +422,7 @@ test('starts with v0.0.0 as base if no git tags', async (assert) => {
             deleteReleaseById: stub('deleteReleaseById'),
         },
         npm: {
+            versionExists: stub('versionExists').returns(false),
             publishPackage: stub('publishPackage'),
             unpublishPackage: stub('unpublishPackage'),
         },
@@ -497,6 +503,7 @@ test('runs user-defined bash script at the end of release process', async (asser
             deleteReleaseById: stub('deleteReleaseById'),
         },
         npm: {
+            versionExists: stub('versionExists').returns(false),
             publishPackage: stub('publishPackage'),
             unpublishPackage: stub('unpublishPackage'),
         },
@@ -577,6 +584,7 @@ test('breaking commit results in returning major version', async (assert) => {
             deleteReleaseById: stub('deleteReleaseById'),
         },
         npm: {
+            versionExists: stub('versionExists').returns(false),
             publishPackage: stub('publishPackage'),
             unpublishPackage: stub('unpublishPackage'),
         },
@@ -656,6 +664,7 @@ test('starts with v0.0.0 as base if no git tags and prerelease channel is provid
             deleteReleaseById: stub('deleteReleaseById'),
         },
         npm: {
+            versionExists: stub('versionExists').returns(false),
             publishPackage: stub('publishPackage'),
             unpublishPackage: stub('unpublishPackage'),
         },
@@ -737,6 +746,7 @@ test('release (no npm/github release) with prereleaseChannel (same channel to ch
             deleteReleaseById: stub('deleteReleaseById'),
         },
         npm: {
+            versionExists: stub('versionExists').returns(false),
             publishPackage: stub('publishPackage').expects(undefined),
             unpublishPackage: stub('unpublishPackage'),
         },
@@ -824,6 +834,7 @@ test('if release, creates tags, publishes to npm, creates github release w/ chan
             deleteReleaseById: stub('deleteReleaseById'),
         },
         npm: {
+            versionExists: stub('versionExists').returns(false),
             publishPackage: stub('publishPackage').expects('alpha'),
             unpublishPackage: stub('unpublishPackage'),
         },
@@ -911,6 +922,7 @@ test('throws if githubToken is not present, and rolls back tag', async (assert) 
             deleteReleaseById: stub('deleteReleaseById'),
         },
         npm: {
+            versionExists: stub('versionExists').returns(false),
             publishPackage: stub('publishPackage'),
             unpublishPackage: stub('unpublishPackage'),
         },
@@ -999,6 +1011,7 @@ test('if npm publish fails, rolls back tag and github release', async (assert) =
             deleteReleaseById: stub('deleteReleaseById'),
         },
         npm: {
+            versionExists: stub('versionExists').returns(false),
             publishPackage: stub('publishPackage')
                 .expects(undefined)
                 .throws(new Error('npm publish failed')),
@@ -1097,6 +1110,7 @@ test('if `run` fails, rolls back tag, github release, and npm publish', async (a
             deleteReleaseById: stub('deleteReleaseById'),
         },
         npm: {
+            versionExists: stub('versionExists').returns(false),
             publishPackage: stub('publishPackage').expects(undefined),
             unpublishPackage: stub('unpublishPackage'),
         },
@@ -1185,6 +1199,7 @@ test('aborts release if user-defined preRun script fails', async (assert) => {
             deleteReleaseById: stub(),
         },
         npm: {
+            versionExists: stub().returns(false),
             publishPackage: stub(),
             unpublishPackage: stub(),
         },

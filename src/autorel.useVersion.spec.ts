@@ -46,6 +46,7 @@ test('useVersion accepts v prefix or not', async (assert) => {
             deleteReleaseById: stub('deleteReleaseById'),
         },
         npm: {
+            versionExists: stub('versionExists').returns(false),
             publishPackage: stub('publishPackage').expects(undefined),
             unpublishPackage: stub('unpublishPackage'),
         },
@@ -134,6 +135,7 @@ test('publishes using useVersion even if no release is needed', async (assert) =
             deleteReleaseById: stub('deleteReleaseById'),
         },
         npm: {
+            versionExists: stub('versionExists').returns(false),
             publishPackage: stub('publishPackage').expects(undefined),
             unpublishPackage: stub('unpublishPackage'),
         },
@@ -222,6 +224,7 @@ test('publishes using useVersion even if no release is needed (prerelease)', asy
             deleteReleaseById: stub('deleteReleaseById'),
         },
         npm: {
+            versionExists: stub('versionExists').returns(false),
             publishPackage: stub('publishPackage').expects('alpha'),
             unpublishPackage: stub('unpublishPackage'),
         },

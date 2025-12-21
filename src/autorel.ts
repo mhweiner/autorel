@@ -175,32 +175,44 @@ export async function autorel(args: Config): Promise<string|undefined> {
         // update package.json and publish to npm registry
         if (args.publish) {
 
-            logger.info('-> Publishing to npm registry...');
-
             const oldVersion = packageJson.read().version;
             const packageName = packageJson.read().name;
+            const versionToPublish = nextTag.replace('v', '');
 
-            packageJson.setVersion(nextTag.replace('v', ''));
+            // Check if version already exists
+            if (npm.versionExists(packageName, versionToPublish)) {
 
-            const [publishErr] = toResult(() => npm.publishPackage(prereleaseChannel));
+                logger.warn(`Version ${bold(versionToPublish)} already exists in npm registry. Skipping publish.`);
+                logger.warn('This typically occurs when a previous release failed during rollback and the package could not be unpublished.');
 
-            packageJson.setVersion(oldVersion);
+            } else {
 
-            if (publishErr) throw publishErr;
+                logger.info('-> Publishing to npm registry...');
 
-            addToRollback(async () => {
+                packageJson.setVersion(versionToPublish);
 
-                logger.info('<- Rolling back npm publish...');
-                const [rollbackErr] = toResult(() => npm.unpublishPackage(packageName, nextTag.replace('v', '')));
+                const [publishErr] = toResult(() => npm.publishPackage(prereleaseChannel));
 
-                if (rollbackErr) {
+                packageJson.setVersion(oldVersion);
 
-                    logger.error(`An error occurred during rollback:\n${formatSerializedError(serializeError(rollbackErr))}`);
-                    logger.warn(`Unforunately, were unable to rollback the npm publish. You must manually unpublish the package ${packageName}@${nextTag.replace('v', '')} from the npm registry.`);
+                if (publishErr) throw publishErr;
 
-                }
+                addToRollback(async () => {
 
-            });
+                    logger.info('<- Rolling back npm publish...');
+                    const unpublishSucceeded = npm.unpublishPackage(packageName, versionToPublish);
+
+                    if (!unpublishSucceeded) {
+
+                        logger.warn(`Unable to unpublish package ${packageName}@${versionToPublish} from npm registry.`);
+                        logger.warn('The registry may not allow unpublishing, or the package may have already been unpublished.');
+                        logger.warn('Subsequent releases will automatically detect and skip this version if it already exists.');
+
+                    }
+
+                });
+
+            }
 
         }
 
@@ -217,7 +229,7 @@ export async function autorel(args: Config): Promise<string|undefined> {
         } else if (args.runScript) {
 
             // TODO: delete this block in the next major version
-            logger.warn('🚨 Warning: The "runScript" option is deprecated. Please use "run" instead. It will be removed in the next major version.');
+            logger.warn('The "runScript" option is deprecated. Please use "run" instead. It will be removed in the next major version.');
             logger.info('-> Running post-release bash script...');
             bash(args.runScript);
 

@@ -16,7 +16,7 @@ function debug(message: string): void {
 
 function warn(message: string): void {
 
-    info(yellow(`Warning: ${message}`));
+    info(yellow(`⚠️ Warning: ${message}`));
 
 }
 
