@@ -55,7 +55,7 @@ export async function autorel(args: Config): Promise<string|undefined> {
     !isPrerelease && logger.info('This is a production release.');
     !!args.useVersion && logger.info(`Will release specified version: ${bold(args.useVersion.replace('v', ''))}`);
 
-    logger.info('-> Fetching git tags...');
+    logger.info('➤ Fetching git tags...');
     git.gitFetch();
 
     const {
@@ -70,7 +70,7 @@ export async function autorel(args: Config): Promise<string|undefined> {
     logger.info(`The current/highest version is: ${highestTag ? bold(highestTag) : gray('none')}`);
 
     // Fetch commits
-    logger.info(`-> Fetching git commits since ${tagFromWhichToFindCommits ?? 'the beginning of the repository'}...`);
+    logger.info(`➤ Fetching git commits since ${tagFromWhichToFindCommits ?? 'the beginning of the repository'}...`);
     const commits = git.getCommitsFromTag(tagFromWhichToFindCommits);
 
     logger.info(`Found ${bold(commits.length.toString())} commit(s).`);
@@ -109,7 +109,7 @@ export async function autorel(args: Config): Promise<string|undefined> {
 
     logger.info(`The next version is: ${bold(nextTag)}`);
 
-    logger.info('-> Generating changelog...');
+    logger.info('➤ Generating changelog...');
     const changelog = generateChangelog(parsedCommits, commitTypeMap, args.breakingChangeTitle);
 
     logger.debug(`The changelog is:\n${changelog}`);
@@ -124,7 +124,7 @@ export async function autorel(args: Config): Promise<string|undefined> {
     // User-defined scripts for things like running tests, building the project, etc.
     if (args.preRun) {
 
-        logger.info('-> Running pre-release bash script...');
+        logger.info('➤ Running pre-release bash script...');
         bash(args.preRun);
 
     }
@@ -135,7 +135,7 @@ export async function autorel(args: Config): Promise<string|undefined> {
         git.createAndPushTag(nextTag);
         addToRollback(async () => {
 
-            logger.info('<- Rolling back git tag...');
+            logger.info('↻ Rolling back git tag...');
             git.deleteTagFromLocalAndRemote(nextTag);
 
         });
@@ -143,7 +143,7 @@ export async function autorel(args: Config): Promise<string|undefined> {
         // create GitHub release
         if (!args.skipRelease) {
 
-            logger.info('-> Creating GitHub release...');
+            logger.info('➤ Creating GitHub release...');
             if (!args.githubToken) throw new Error('GitHub token is required to publish a release. Please set the GITHUB_TOKEN environment variable or pass it as an argument.');
 
             const {owner, repository} = git.getRepo();
@@ -160,7 +160,7 @@ export async function autorel(args: Config): Promise<string|undefined> {
 
             addToRollback(async () => {
 
-                logger.info('<- Rolling back GitHub release...');
+                logger.info('↻ Rolling back GitHub release...');
                 await github.deleteReleaseById({
                     token: args.githubToken!,
                     owner,
@@ -187,7 +187,7 @@ export async function autorel(args: Config): Promise<string|undefined> {
 
             } else {
 
-                logger.info('-> Publishing to npm registry...');
+                logger.info('➤ Publishing to npm registry...');
 
                 packageJson.setVersion(versionToPublish);
 
@@ -199,7 +199,7 @@ export async function autorel(args: Config): Promise<string|undefined> {
 
                 addToRollback(async () => {
 
-                    logger.info('<- Rolling back npm publish...');
+                    logger.info('↻ Rolling back npm publish...');
                     const unpublishSucceeded = npm.unpublishPackage(packageName, versionToPublish);
 
                     if (!unpublishSucceeded) {
@@ -223,14 +223,14 @@ export async function autorel(args: Config): Promise<string|undefined> {
         // run user-defined release scripts
         if (args.run) {
 
-            logger.info('-> Running release bash script...');
+            logger.info('➤ Running release bash script...');
             bash(args.run);
 
         } else if (args.runScript) {
 
             // TODO: delete this block in the next major version
             logger.warn('The "runScript" option is deprecated. Please use "run" instead. It will be removed in the next major version.');
-            logger.info('-> Running post-release bash script...');
+            logger.info('➤ Running post-release bash script...');
             bash(args.runScript);
 
         }
