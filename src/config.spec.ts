@@ -34,7 +34,7 @@ test('getConfig: valid .autorel.yaml', async (assert) => {
         readFileSync: () => `
             branches:
                 - {name: 'main'}
-                - {name: 'develop', prereleaseChannel: 'beta'}
+                - {name: 'develop', preRelease: 'beta'}
             skipRelease: true
             publish: true
             dryRun: true
@@ -49,7 +49,7 @@ test('getConfig: valid .autorel.yaml', async (assert) => {
         ...defaultConfig,
         branches: [
             {name: 'main'},
-            {name: 'develop', prereleaseChannel: 'beta'},
+            {name: 'develop', preRelease: 'beta'},
         ],
         skipRelease: true,
         publish: true,
@@ -110,7 +110,7 @@ test('getConfig: valid .autorel.yaml with cli overrides', async (assert) => {
         readFileSync: () => `
             branches:
                 - {name: 'main'}
-                - {name: 'develop', prereleaseChannel: 'beta'}
+                - {name: 'develop', preRelease: 'beta'}
         `,
     };
     const configMod: typeof mod = mock('./config', {
@@ -120,7 +120,7 @@ test('getConfig: valid .autorel.yaml with cli overrides', async (assert) => {
     });
     const cliOptions = { // all falsy values are removed
         run: 'test',
-        prereleaseChannel: 'alpha',
+        preRelease: 'alpha',
         useVersion: '1.2.3',
         publish: true,
         skipRelease: true,
@@ -130,10 +130,10 @@ test('getConfig: valid .autorel.yaml with cli overrides', async (assert) => {
         ...defaultConfig,
         branches: [
             {name: 'main'},
-            {name: 'develop', prereleaseChannel: 'beta'},
+            {name: 'develop', preRelease: 'beta'},
         ],
         run: 'test',
-        prereleaseChannel: 'alpha',
+        preRelease: 'alpha',
         useVersion: '1.2.3',
         publish: true,
         skipRelease: true,
@@ -162,7 +162,7 @@ test('getConfig: valid .autorel.yaml with empty cli overrides (2)', async (asser
         - {type: ci, title: 🔧 Continuous Integration, release: patch}
         branches:
         - {name: main}
-        - {name: next, prereleaseChannel: next}
+        - {name: next, preRelease: next}
         dryRun: true
         publish: true
         `,
@@ -191,12 +191,57 @@ test('getConfig: valid .autorel.yaml with empty cli overrides (2)', async (asser
             {type: 'build', title: '🏗 Build System', release: 'patch'},
             {type: 'ci', title: '🔧 Continuous Integration', release: 'patch'},
         ],
-        branches: [{name: 'main'}, {name: 'next', prereleaseChannel: 'next'}],
+        branches: [{name: 'main'}, {name: 'next', preRelease: 'next'}],
         publish: true,
         dryRun: true,
     };
 
     assert.equal(configMod.getConfig(cliOptions), expectedConfig, 'should return the parsed configuration');
+
+});
+
+// TODO: remove this test in the next major version
+test('getConfig: backward compatibility with deprecated prereleaseChannel', async (assert) => {
+
+    const mockFs = {
+        existsSync: () => true,
+        readFileSync: () => `
+            prereleaseChannel: 'alpha'
+            branches:
+                - {name: 'main'}
+                - {name: 'develop', prereleaseChannel: 'beta'}
+        `,
+    };
+    const mockLoggerWithWarn = {
+        ...mockLogger,
+        warn: (message: string) => {
+
+            // Track that warn was called
+            (mockLoggerWithWarn as any).warnCalled = true;
+            (mockLoggerWithWarn as any).warnMessage = message;
+            mockLogger.info();
+
+        },
+    };
+    const configMod: typeof mod = mock('./config', {
+        'node:fs': mockFs,
+        'node:path': {resolve: (p: string) => p},
+        './services/logger': mockLoggerWithWarn,
+    });
+    const expectedConfig = {
+        ...defaultConfig,
+        preRelease: 'alpha',
+        branches: [
+            {name: 'main'},
+            {name: 'develop', preRelease: 'beta'},
+        ],
+    };
+
+    const result = configMod.getConfig();
+
+    assert.equal(result, expectedConfig, 'should normalize prereleaseChannel to preRelease');
+    assert.equal((mockLoggerWithWarn as any).warnCalled, true, 'should call warn for deprecated option');
+    assert.equal((mockLoggerWithWarn as any).warnMessage?.includes('prereleaseChannel'), true, 'warn message should mention prereleaseChannel');
 
 });
 

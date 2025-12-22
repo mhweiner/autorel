@@ -6,7 +6,7 @@ import * as git from './services/git';
  * Determines the prerelease channel to use for the current release.
  *
  * It follows this order of precedence:
- * 1. Use `config.prereleaseChannel` if explicitly defined.
+ * 1. Use `config.preRelease` if explicitly defined.
  * 2. Otherwise, detect the current git branch and look for a matching entry
  *    in `config.branches` to infer the prerelease channel.
  *
@@ -21,8 +21,8 @@ import * as git from './services/git';
 export function getPrereleaseChannel(config: Config): string|undefined {
 
     if (config.useVersion) return fromTag(`v${config.useVersion.replace('v', '')}`)?.channel;
-    if (config.prereleaseChannel) return String(config.prereleaseChannel);
-    if (config.prereleaseChannel === null || config.prereleaseChannel === false) return undefined;
+    if (config.preRelease) return String(config.preRelease);
+    if (config.preRelease === null || config.preRelease === false) return undefined;
 
     const branch = git.getCurrentBranch();
 
@@ -33,6 +33,6 @@ export function getPrereleaseChannel(config: Config): string|undefined {
 
     if (!matchingBranch) return undefined;
 
-    return matchingBranch.prereleaseChannel ?? undefined;
+    return matchingBranch.preRelease ?? undefined;
 
 }

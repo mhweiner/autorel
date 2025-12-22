@@ -703,7 +703,7 @@ test('starts with v0.0.0 as base if no git tags and prerelease channel is provid
         ...defaultConfig,
         publish: false,
         skipRelease: true,
-        prereleaseChannel: 'alpha',
+        preRelease: 'alpha',
     });
 
     assert.equal(result, '0.1.0-alpha.1', 'returns next version');
@@ -726,7 +726,7 @@ test('starts with v0.0.0 as base if no git tags and prerelease channel is provid
 
 });
 
-test('release (no npm/github release) with prereleaseChannel (same channel to channel)', async (assert) => {
+test('release (no npm/github release) with preRelease (same channel to channel)', async (assert) => {
 
     const stubs = {
         getPrereleaseChannel: {getPrereleaseChannel: stub().returns('beta')},

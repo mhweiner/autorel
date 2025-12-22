@@ -4,34 +4,34 @@ import {defaultConfig} from './defaults';
 import {mock} from 'cjs-mock';
 import * as mockMod from './getPrereleaseChannel';
 
-test('returns config.prereleaseChannel if defined (ie, "beta", null, false, etc.)', (assert) => {
+test('returns config.preRelease if defined (ie, "beta", null, false, etc.)', (assert) => {
 
     assert.equal(getPrereleaseChannel({
         ...defaultConfig,
-        prereleaseChannel: 'beta',
-    }), 'beta', 'returns prereleaseChannel from config.prereleaseChannel');
+        preRelease: 'beta',
+    }), 'beta', 'returns preRelease from config.preRelease');
     assert.equal(getPrereleaseChannel({
         ...defaultConfig,
-        prereleaseChannel: null,
-    }), undefined, 'returns prereleaseChannel from config.prereleaseChannel');
+        preRelease: null,
+    }), undefined, 'returns preRelease from config.preRelease');
     assert.equal(getPrereleaseChannel({
         ...defaultConfig,
-        prereleaseChannel: false,
-    }), undefined, 'returns prereleaseChannel from config.prereleaseChannel');
+        preRelease: false,
+    }), undefined, 'returns preRelease from config.preRelease');
 
 });
 
-test('returns channel from config.useVersion if defined, overriding config.prereleaseChannel', (assert) => {
+test('returns channel from config.useVersion if defined, overriding config.preRelease', (assert) => {
 
     assert.equal(getPrereleaseChannel({
         ...defaultConfig,
-        prereleaseChannel: 'beta',
+        preRelease: 'beta',
         branches: [],
         useVersion: '1.2.3-alpha.1',
     }), 'alpha');
     assert.equal(getPrereleaseChannel({
         ...defaultConfig,
-        prereleaseChannel: 'beta',
+        preRelease: 'beta',
         branches: [],
         useVersion: 'v1.2.3-dev.1',
     }), 'dev');
@@ -52,7 +52,7 @@ test('throws if current branch cannot be determined', (assert) => {
     });
     const config = {
         ...defaultConfig,
-        branches: [{name: 'main', prereleaseChannel: 'alpha'}],
+        branches: [{name: 'main', preRelease: 'alpha'}],
     };
 
     assert.throws(() => m.getPrereleaseChannel(config), /Could not get the current branch/);
@@ -91,7 +91,7 @@ test('returns undefined if branch does not match any configured branch', (assert
 
 });
 
-test('returns matching prereleaseChannel from config.branches', (assert) => {
+test('returns matching preRelease from config.branches', (assert) => {
 
     const m: typeof mockMod = mock('./getPrereleaseChannel', {
         './services/git': {
@@ -100,14 +100,14 @@ test('returns matching prereleaseChannel from config.branches', (assert) => {
     });
     const config = {
         ...defaultConfig,
-        branches: [{name: 'develop', prereleaseChannel: 'alpha'}],
+        branches: [{name: 'develop', preRelease: 'alpha'}],
     };
 
     assert.equal(m.getPrereleaseChannel(config), 'alpha');
 
 });
 
-test('returns undefined if matching branch has no prereleaseChannel', (assert) => {
+test('returns undefined if matching branch has no preRelease', (assert) => {
 
     const m: typeof mockMod = mock('./getPrereleaseChannel', {
         './services/git': {

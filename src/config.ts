@@ -26,6 +26,11 @@ export const validateConfig = p.object({
     run: p.optional(p.string()),
     preRun: p.optional(p.string()),
     runScript: p.optional(p.string()),
+    preRelease: p.optional(p.union([
+        p.string(),
+        p.literal(null),
+        p.literal(false),
+    ], 'must be a string, null, or false')),
     prereleaseChannel: p.optional(p.union([
         p.string(),
         p.literal(null),
@@ -38,6 +43,7 @@ export const validateConfig = p.object({
     commitTypes: p.array(commitType),
     branches: p.array(p.object({
         name: p.string(),
+        preRelease: p.optional(p.string()),
         prereleaseChannel: p.optional(p.string()),
     })),
     githubToken: p.optional(p.string()),
@@ -87,6 +93,7 @@ function readAutorelYaml(filePath = '.autorel.yaml'): any {
 
 }
 
+// eslint-disable-next-line max-lines-per-function
 export function getConfig(overrides?: Partial<Config>): any {
 
     const yamlConfig = readAutorelYaml();
@@ -95,6 +102,52 @@ export function getConfig(overrides?: Partial<Config>): any {
         ...yamlConfig,
         ...overrides ?? {},
     };
+
+    // Normalize deprecated prereleaseChannel to preRelease
+    if (mergedConfig.prereleaseChannel !== undefined) {
+
+        if (mergedConfig.preRelease === undefined) {
+
+            output.warn('The "prereleaseChannel" option is deprecated. Please use "preRelease" instead.');
+            mergedConfig.preRelease = mergedConfig.prereleaseChannel;
+
+        } else {
+
+            output.warn('Both "preRelease" and "prereleaseChannel" are specified. Using "preRelease" and ignoring "prereleaseChannel".');
+
+        }
+
+        delete mergedConfig.prereleaseChannel;
+
+    }
+
+    // Normalize deprecated prereleaseChannel in branches to preRelease
+    if (mergedConfig.branches) {
+
+        mergedConfig.branches = mergedConfig.branches.map((branch: any) => {
+
+            if (branch.prereleaseChannel !== undefined) {
+
+                if (branch.preRelease === undefined) {
+
+                    output.warn(`The "prereleaseChannel" option in branches is deprecated. Please use "preRelease" instead. (branch: ${branch.name})`);
+                    branch.preRelease = branch.prereleaseChannel;
+
+                } else {
+
+                    output.warn(`Both "preRelease" and "prereleaseChannel" are specified for branch "${branch.name}". Using "preRelease" and ignoring "prereleaseChannel".`);
+
+                }
+
+                delete branch.prereleaseChannel;
+
+            }
+
+            return branch;
+
+        });
+
+    }
 
     output.debug('---\nConfig:');
     output.debug(`Default: ${JSON.stringify(defaultConfig, null, 2)}`);
