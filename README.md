@@ -1,6 +1,6 @@
 # 🚀 autorel
 
-[![build status](https://img.shields.io/github/actions/workflow/status/mhweiner/autorel/release.yml)](https://github.com/mhweiner/autorel/actions) [![SemVer](https://img.shields.io/badge/SemVer-2.0.0-blue)]() [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org) [![autorel](https://img.shields.io/badge/%F0%9F%9A%80%20autorel-2D4DDE)](https://github.com/mhweiner/autorel)
+[![SemVer](https://img.shields.io/badge/SemVer-2.0.0-blue)]() [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org) [![autorel](https://img.shields.io/badge/%F0%9F%9A%80%20autorel-2D4DDE)](https://github.com/mhweiner/autorel)
 
 Autorel is a fast, simple, and reliable tool for automating releases based on commit messages. Similar to `semantic-release` or `release-please`, but faster, more reliable, and easier to use. Use autorel to save time, prevent broken releases, and ship with confidence.
 
