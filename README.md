@@ -269,7 +269,7 @@ autorel --publish --run 'npm version ${NEXT_VERSION} --no-git-tag-version && doc
 
 **Why this approach?**
 - The version in `package.json` is only needed for npm publishing
-- Committing version changes can cause merge conflicts
+- Committing version changes can cause merge conflicts and create unnecessary noise in your repository
 - The git tag is the source of truth for your version
 - Package.json is automatically restored, so there's nothing to rollback
 
