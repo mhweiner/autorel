@@ -1,14 +1,25 @@
 ## Configuration Options
 
-When run in CLI mode, `autorel` can be configured via CLI arguments or a `yaml` file. CLI arguments take precedence over the `yaml` file. All parameters are optional.
+This document provides a complete reference for all autorel configuration options.
 
-However, omitting optional binary flags, such as the `--publish`, `--dry-run`, `--skip-release`, and `--verbose` flags will still publish to NPM if set in the `yaml` file.
+### Configuration Methods
 
-If you want to use `autorel` as a library, see [this](./usage-library.md).
+Autorel can be configured in three ways:
 
-> ❗️ The `yaml` configuration file must be named `.autorel.yaml` and be in the root of your project.
+1. **CLI Arguments** - Pass options directly via command-line flags
+2. **YAML File** - Create a `.autorel.yaml` file in your project root (recommended for CI/CD)
+3. **Library API** - Pass configuration when using autorel as a library
 
-[See sample YAML configuration](/docs/usage.md#sample-yaml-configuration)
+**Priority:** CLI arguments take precedence over YAML file settings. All parameters are optional.
+
+> ❗️ **Important:** The YAML configuration file must be named `.autorel.yaml` and be placed in the root of your project.
+
+> **Note:** CLI arguments override YAML settings. For boolean flags like `--publish`, passing the flag sets it to `true` and overrides YAML. Omitting the flag uses the YAML value (or defaults to `false`).
+
+### Quick Links
+
+- [Sample YAML configuration](../README.md#example-usage) - See the Configuration Options section
+- [Using autorel as a library](../README.md#using-as-a-library)
 
 ---
 - [publish](#publish)
@@ -18,7 +29,7 @@ If you want to use `autorel` as a library, see [this](./usage-library.md).
 - [run](#run)
 - [preRun](#prerun)
 - [preRelease](#prerelease)
-- [useVersion](#usever)
+- [useVersion](#useversion)
 - [githubToken](#githubtoken)
 - [breakingChangeTitle](#breakingchangetitle)
 - [commitTypes](#committypes)
@@ -27,7 +38,7 @@ If you want to use `autorel` as a library, see [this](./usage-library.md).
 
 ### publish
 
-Whether to publish the release to NPM. If `true`, you must be authenticated with NPM. To do so via GitHub Actions, see [this](https://docs.github.com/en/actions/guides/publishing-nodejs-packages#publishing-packages-to-the-npm-registry).
+Whether to publish the release to npm. If `true`, you must be authenticated with npm. To do so via GitHub Actions, see [this](https://docs.github.com/en/actions/guides/publishing-nodejs-packages#publishing-packages-to-the-npm-registry).
 
 - CLI: `--publish`
 - Argument: `publish: boolean`
@@ -35,7 +46,7 @@ Whether to publish the release to NPM. If `true`, you must be authenticated with
 
 ### dryRun
 
-Whether to run in dry-run mode. This will not push the tag, create the release, publish to NPM, or run the command.
+Whether to run in dry-run mode. This will not push the tag, create the release, publish to npm, or run the command.
 
 - CLI: `--dry-run`
 - Argument: `dryRun: boolean`
@@ -88,7 +99,7 @@ run: |
   aws s3 sync . s3://my-bucket
 ```
 
-- CLI: `--run`
+- CLI: `--run <command>`
 - Argument: `run: string`
 - Default: `undefined`
 
@@ -98,7 +109,13 @@ A `bash` command/script to run before the release is started. All scripts are ru
 
 This could save you time and money by not running unnecessary steps in your CI/CD pipeline. It will not run if no release is determined to be necessary, and it will not run in dry-run mode.
 
-This is run *after* determining the new version number but *before* pushing tags, creating the release on GitHub, updating the package.json, or publishing to NPM. 
+This is run *after* determining the new version number but *before* pushing tags, creating the release on GitHub, updating the package.json, or publishing to npm. 
+
+Example CLI usage:
+
+```bash
+autorel --pre-run 'npm test && npm run build'
+```
 
 Example YAML usage: 
 
@@ -110,7 +127,7 @@ preRun: |
   npm run lint
 ```
 
-- CLI: `--pre-run`
+- CLI: `--pre-run <command>`
 - Argument: `preRun: string`
 - Default: `undefined`
 
@@ -118,9 +135,10 @@ preRun: |
 
 > ❗️ This is typically set via the `branches` configuration (recommended), but can be overridden here.
 
-The pre-release channel to use. This will be appended to the version number. For example, if the version is `1.0.0` and the pre-release is `alpha`, the version will be `1.0.0-alpha.1`. For "production" releases, the "latest" tag will be used for NPM.
+The pre-release channel to use. This will be appended to the version number. For example, if the version is `1.0.0` and the pre-release is `alpha`, the version will be `1.0.0-alpha.1`. For "production" releases, the "latest" tag will be used for npm.
 
-- CLI: `--pre-release`
+- CLI: `--pre-release <channel>`
+- Example: `--pre-release alpha`
 - Argument: `preRelease: string`
 - Default: `undefined`
 
@@ -128,7 +146,8 @@ The pre-release channel to use. This will be appended to the version number. For
 
 The version to use for the release INSTEAD of the version being generated. Always results in a release being created unless `noRelease` is `true`. **Advanced usage only, not recommended for most users.**
 
-- CLI: `--use-version`
+- CLI: `--use-version <version>`
+- Example: `--use-version 2.0.0`
 - Argument: `useVersion: string`
 - Default: `undefined`
 
@@ -136,7 +155,18 @@ The version to use for the release INSTEAD of the version being generated. Alway
 
 ### githubToken
 
-The GitHub token to use for creating the release. If not provided, it will use the `GITHUB_TOKEN` environment variable. This is only used if `skipRelease` is `false`.
+The GitHub token to use for creating releases on GitHub. 
+
+- If not provided, autorel will use the `GITHUB_TOKEN` environment variable
+- This is only used if `skipRelease` is `false`
+- The token needs the `repo` scope to create releases
+
+**For GitHub Actions:** The `GITHUB_TOKEN` is automatically provided by GitHub Actions, so you typically don't need to set this.
+
+- CLI: `--github-token <token>`
+- Example: `--github-token ghp_xxxxxxxxxxxx`
+- Argument: `githubToken: string`
+- Default: `process.env.GITHUB_TOKEN`
 
 
 ### breakingChangeTitle (YAML/library only)
@@ -170,7 +200,7 @@ The branches to use for the release along with their pre-release channel. If not
 - {name: 'main'}
 ```
 
-The above will release to the `latest` channel on NPM. If you want to release to a different channel (making it a pre-release), you can specify it like so:
+The above will release to the `latest` channel on npm. If you want to release to a different channel (making it a pre-release), you can specify it like so:
 
 ```yaml
 branches:
@@ -179,7 +209,7 @@ branches:
   - {name: 'staging', prereleaseChannel: 'beta'}
 ```
 
-The above will release to the `latest` channel (production) on NPM for the `main` branch, the `alpha` pre-release channel for the `develop` branch, and the `beta` pre-release channel for the `staging` branch.
+The above will release to the `latest` channel (production) on npm for the `main` branch, the `alpha` pre-release channel for the `develop` branch, and the `beta` pre-release channel for the `staging` branch.
 
 - Argument: `branches: ReleaseBranch[]`
 
