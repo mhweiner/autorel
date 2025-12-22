@@ -159,7 +159,7 @@ Create a `.autorel.yaml` file in your project root:
 # Define the branches and their respective channels
 branches:
   - {name: 'main'}
-  - {name: 'next', prereleaseChannel: 'next'}
+  - {name: 'next', preRelease: 'next'}
 
 # Enable publishing to npm
 publish: true

@@ -64,17 +64,17 @@ This will:
 
 **Note:** This is advanced usage. The recommended approach is to let autorel calculate versions from your commit messages.
 
-### What's the difference between `--pre-release` and `prereleaseChannel` in branches config?
+### What's the difference between `--pre-release` and `preRelease` in branches config?
 
 - **`--pre-release` (CLI flag)**: Overrides branch configuration and forces a pre-release channel for this run
-- **`prereleaseChannel` (in branches config)**: Automatically uses the pre-release channel based on which branch you're on
+- **`preRelease` (in branches config)**: Automatically uses the pre-release channel based on which branch you're on
 
 **Example:**
 
 ```yaml
 branches:
   - {name: 'main'}  # Production releases
-  - {name: 'develop', prereleaseChannel: 'alpha'}  # Alpha pre-releases
+  - {name: 'develop', preRelease: 'alpha'}  # Alpha pre-releases
 ```
 
 When you run autorel on `develop`, it automatically uses the `alpha` channel. When you run it on `main`, it creates a production release.

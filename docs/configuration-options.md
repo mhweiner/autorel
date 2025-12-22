@@ -205,8 +205,8 @@ The above will release to the `latest` channel on npm. If you want to release to
 ```yaml
 branches:
   - {name: 'main'}
-  - {name: 'develop', prereleaseChannel: 'alpha'}
-  - {name: 'staging', prereleaseChannel: 'beta'}
+  - {name: 'develop', preRelease: 'alpha'}
+  - {name: 'staging', preRelease: 'beta'}
 ```
 
 The above will release to the `latest` channel (production) on npm for the `main` branch, the `alpha` pre-release channel for the `develop` branch, and the `beta` pre-release channel for the `staging` branch.
