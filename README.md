@@ -292,7 +292,7 @@ Here are examples of commit messages and the resulting version bump (using defau
 By default, the following commit types trigger releases:
 - `feat`: minor version bump
 - `fix`, `perf`, `revert`: patch version bump
-- `feat!` or any commit with `!`: major version bump (breaking change)
+- Any commit with `!` after the type (e.g., `feat!:`) or `BREAKING CHANGE:`/`BREAKING CHANGES:` in the footer: major version bump
 
 Other commit types (like `docs`, `style`, `refactor`, `test`, `build`, `ci`) don't trigger releases but are included in changelogs.
 
