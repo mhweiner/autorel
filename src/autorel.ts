@@ -140,23 +140,51 @@ export async function autorel(args: Config): Promise<string|undefined> {
 
         });
 
-        // create GitHub release
+        // create or update GitHub release
         if (!args.skipRelease) {
 
-            logger.info('➤ Creating GitHub release...');
             if (!args.githubToken) throw new Error('GitHub token is required to publish a release. Please set the GITHUB_TOKEN environment variable or pass it as an argument.');
 
             const {owner, repository} = git.getRepo();
 
-            const releaseId = await github.createRelease({
+            const existingRelease = await github.getReleaseByTag({
                 token: args.githubToken,
                 owner,
                 repository,
                 tag: nextTag,
-                name: nextTag,
-                body: changelog,
-                prerelease: isPrerelease,
             });
+
+            let releaseId: number;
+
+            if (existingRelease) {
+
+                logger.info('➤ Updating existing GitHub release...');
+                await github.updateRelease({
+                    token: args.githubToken,
+                    owner,
+                    repository,
+                    releaseId: existingRelease.id,
+                    name: nextTag,
+                    body: changelog,
+                    prerelease: isPrerelease,
+                });
+                releaseId = existingRelease.id;
+
+            } else {
+
+                logger.info('➤ Creating GitHub release...');
+                releaseId = await github.createRelease({
+                    token: args.githubToken,
+                    owner,
+                    repository,
+                    tag: nextTag,
+                    name: nextTag,
+                    body: changelog,
+                    draft: false,
+                    prerelease: isPrerelease,
+                });
+
+            }
 
             addToRollback(async () => {
 

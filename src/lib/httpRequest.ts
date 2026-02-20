@@ -4,7 +4,7 @@ import https from 'node:https';
 import {URL} from 'node:url';
 import {toResultAsync} from './toResult';
 
-export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
+export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
 export class Non200Response extends Error {
 
