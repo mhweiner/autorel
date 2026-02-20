@@ -235,14 +235,11 @@ jobs:
 - run: npx autorel@^2 --publish --run "deploy-service $$NEXT_VERSION"
 ```
 
-In Actions the step `run:` is expanded by the runner *before* autorel runs, so a single `$` would be expanded when the variable is still unset. `$$` becomes a literal `$`, so the shell that runs your script gets `$NEXT_VERSION` after autorel has set it.
-
-If you don't reference the version in the command—your script reads `process.env.NEXT_VERSION` or `$NEXT_VERSION`, or the command is in `.autorel.yaml`—you don't need `$$`. `NEXT_TAG` is also available (e.g. for Docker tags that use `v`).
+In Actions the step `run:` is expanded by the runner *before* autorel runs, so a single `$` would be expanded when the variable is still unset. `$$` becomes a literal `$`, so the shell that runs your script gets `$NEXT_VERSION` after autorel has set it. `NEXT_TAG` is also available (e.g. for Docker tags that use `v`).
 
 ## Authentication & Permissions
 
 ### GitHub Token
-Autorel sets `NEXT_VERSION` and `NEXT_TAG` in the environment right before it runs your `--run` script. In Actions, the step `run:` is expanded by the runner *before* autorel runs, so `${NEXT_VERSION}` is expanded when it’s still unset
 To create releases on GitHub, autorel needs a GitHub token:
 
 - **GitHub Actions:** The `GITHUB_TOKEN` is automatically provided (no setup needed)
