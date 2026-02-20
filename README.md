@@ -9,6 +9,8 @@ Autorel is a fast, simple, and reliable tool for automating releases based on co
 npx autorel@^2 --pre-release alpha --publish --run 'echo "Next version is ${NEXT_VERSION}"'
 ```
 
+> **GitHub Actions:** If you use `NEXT_VERSION` or `NEXT_TAG` in your `--run` command, use `$$NEXT_VERSION` (double dollar) and set `fetch-depth: 0` and `fetch-tags: true` in checkout—see [GitHub Actions Setup](#github-actions-setup).
+
 It follows [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) and [Semantic Versioning](https://semver.org/) to automatically:
 
 - Run pre-release tasks (tests, builds, etc.)
@@ -229,17 +231,15 @@ jobs:
 
 ### Using `--run` with the version in GitHub Actions
 
-**In GitHub Actions, use a double dollar (`$$`) in your `--run` command** so the version is passed to your script. For example:
+**Only if you put `NEXT_VERSION` or `NEXT_TAG` in your `--run` command** (e.g. as an argument to your script), use a double dollar so the version is passed through. For example:
 
 ```yaml
 - run: npx autorel@^2 --publish --run "deploy-service $$NEXT_VERSION"
 ```
 
-`NEXT_TAG` is also available (e.g. for Docker tags that use `v`).
+In Actions the step `run:` is expanded by the runner *before* autorel runs, so a single `$` would be expanded when the variable is still unset. `$$` becomes a literal `$`, so the shell that runs your script gets `$NEXT_VERSION` after autorel has set it.
 
-**Why?** Autorel sets `NEXT_VERSION` and `NEXT_TAG` in the environment right before it runs your `--run` script. In Actions, the step `run:` is expanded by the runner *before* autorel runs, so `${NEXT_VERSION}` is expanded when it’s still unset and your script gets no version. Using `$$` makes Actions pass through a literal `$`; then the shell that runs your script expands `$NEXT_VERSION` after autorel has set it.
-
-Alternatively, omit the version from the command and have your script read `$NEXT_VERSION` or `process.env.NEXT_VERSION` from the environment.
+If you don't reference the version in the command—your script just reads `process.env.NEXT_VERSION` or `$NEXT_VERSION` from the environment—you don't need `$$`. `NEXT_TAG` is also available (e.g. for Docker tags that use `v`).
 
 ## Authentication & Permissions
 
