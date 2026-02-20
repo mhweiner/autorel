@@ -227,8 +227,6 @@ jobs:
 
 > ❗️ **For npm publishing:** You must be authenticated with npm. See the [npm authentication guide](https://docs.github.com/en/actions/guides/publishing-nodejs-packages#publishing-packages-to-the-npm-registry) for setup instructions.
 
-**Recommended:** Create a `.autorel.yaml` file in your project root instead of passing CLI arguments. This keeps your workflow file cleaner. See [Configuration Options](/docs/configuration-options.md) for all available settings.
-
 ### Using `--run` with the version in GitHub Actions
 
 **In GitHub Actions, use a double dollar (`$$`) in your `--run` command** so the version is passed to your script. For example:
