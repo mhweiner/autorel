@@ -6,7 +6,7 @@
 Autorel is a fast, simple, and reliable tool for automating releases based on commit messages. Similar to `semantic-release` or `release-please`, but faster, more reliable, and easier to use. Use autorel to save time, prevent broken releases, and ship with confidence.
 
 ```bash
-npx autorel@^2 --pre-release alpha --publish --run 'echo "Next version is ${NEXT_VERSION}"'
+npx autorel@^2 --pre-release alpha --publish --run 'echo "Next version is ${NEXT_VERSION}"' 
 ```
 
 It follows [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) and [Semantic Versioning](https://semver.org/) to automatically:
