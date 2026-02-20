@@ -235,7 +235,9 @@ jobs:
 - run: npx autorel@^2 --publish --run "deploy-service $$NEXT_VERSION"
 ```
 
-In Actions the step `run:` is expanded by the runner *before* autorel runs, so a single `$` would be expanded when the variable is still unset. `$$` becomes a literal `$`, so the shell that runs your script gets `$NEXT_VERSION` after autorel has set it. You can also use `.autorel.yaml` or a script (e.g. `--run "./blah.sh"`); they run in a shell where the version is already set, so `$NEXT_VERSION` / `$NEXT_TAG` work as usual. `NEXT_TAG` is also available (e.g. for Docker tags that use `v`).
+In Actions the step `run:` is expanded by the runner *before* autorel runs, so a single `$` would be expanded when the variable is still unset. `$$` becomes a literal `$`, so the shell that runs your script gets `$NEXT_VERSION` after autorel has set it.
+
+You can also use `.autorel.yaml` or a script (e.g. `--run "./blah.sh"`); they run in a shell where the version is already set, so `$NEXT_VERSION` / `$NEXT_TAG` work as usual. `NEXT_TAG` is also available (e.g. for Docker tags that use `v`).
 
 ## Authentication & Permissions
 
