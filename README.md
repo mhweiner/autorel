@@ -9,7 +9,7 @@ Autorel is a fast, simple, and reliable tool for automating releases based on co
 npx autorel@^2 --pre-release alpha --publish --run 'echo "Next version is ${NEXT_VERSION}"'
 ```
 
-> **GitHub Actions:** If you use `NEXT_VERSION` or `NEXT_TAG` in your `--run` command, use `$$NEXT_VERSION` (double dollar) and set `fetch-depth: 0` and `fetch-tags: true` in checkout—see [GitHub Actions Setup](#github-actions-setup).
+For GitHub Actions, see [GitHub Actions Setup](#github-actions-setup).
 
 It follows [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) and [Semantic Versioning](https://semver.org/) to automatically:
 
