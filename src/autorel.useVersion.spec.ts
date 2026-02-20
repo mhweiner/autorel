@@ -34,6 +34,7 @@ test('useVersion accepts v prefix or not', async (assert) => {
             deleteTagFromLocalAndRemote: stub(),
         },
         github: {
+            getReleaseByTag: stub().returns(null),
             createRelease: stub('createRelease').expects({
                 token: 'GITHUB_TOKEN_TEST',
                 owner: 'owner',
@@ -41,8 +42,10 @@ test('useVersion accepts v prefix or not', async (assert) => {
                 tag: 'v2.2.2',
                 name: 'v2.2.2',
                 body: '',
+                draft: false,
                 prerelease: false,
             }),
+            updateRelease: stub(),
             deleteReleaseById: stub('deleteReleaseById'),
         },
         npm: {
@@ -123,6 +126,7 @@ test('publishes using useVersion even if no release is needed', async (assert) =
             deleteTagFromLocalAndRemote: stub(),
         },
         github: {
+            getReleaseByTag: stub().returns(null),
             createRelease: stub('createRelease').expects({
                 token: 'GITHUB_TOKEN_TEST',
                 owner: 'owner',
@@ -130,8 +134,10 @@ test('publishes using useVersion even if no release is needed', async (assert) =
                 tag: 'v2.2.2',
                 name: 'v2.2.2',
                 body: '',
+                draft: false,
                 prerelease: false,
             }),
+            updateRelease: stub(),
             deleteReleaseById: stub('deleteReleaseById'),
         },
         npm: {
@@ -212,6 +218,7 @@ test('publishes using useVersion even if no release is needed (prerelease)', asy
             deleteTagFromLocalAndRemote: stub(),
         },
         github: {
+            getReleaseByTag: stub().returns(null),
             createRelease: stub('createRelease').expects({
                 token: 'GITHUB_TOKEN_TEST',
                 owner: 'owner',
@@ -219,8 +226,10 @@ test('publishes using useVersion even if no release is needed (prerelease)', asy
                 tag: 'v2.2.2-alpha.1',
                 name: 'v2.2.2-alpha.1',
                 body: '',
+                draft: false,
                 prerelease: true,
             }),
+            updateRelease: stub(),
             deleteReleaseById: stub('deleteReleaseById'),
         },
         npm: {
