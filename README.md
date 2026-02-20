@@ -9,8 +9,6 @@ Autorel is a fast, simple, and reliable tool for automating releases based on co
 npx autorel@^2 --pre-release alpha --publish --run 'echo "Next version is ${NEXT_VERSION}"'
 ```
 
-For GitHub Actions, see [GitHub Actions Setup](#github-actions-setup).
-
 It follows [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) and [Semantic Versioning](https://semver.org/) to automatically:
 
 - Run pre-release tasks (tests, builds, etc.)
@@ -244,6 +242,7 @@ If you don't reference the version in the command—your script just reads `proc
 ## Authentication & Permissions
 
 ### GitHub Token
+Autorel sets `NEXT_VERSION` and `NEXT_TAG` in the environment right before it runs your `--run` script. In Actions, the step `run:` is expanded by the runner *before* autorel runs, so `${NEXT_VERSION}` is expanded when it’s still unset
 To create releases on GitHub, autorel needs a GitHub token:
 
 - **GitHub Actions:** The `GITHUB_TOKEN` is automatically provided (no setup needed)
