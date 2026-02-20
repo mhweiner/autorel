@@ -244,7 +244,6 @@ If you don't reference the version in the command—your script just reads `proc
 ## Authentication & Permissions
 
 ### GitHub Token
-
 To create releases on GitHub, autorel needs a GitHub token:
 
 - **GitHub Actions:** The `GITHUB_TOKEN` is automatically provided (no setup needed)
