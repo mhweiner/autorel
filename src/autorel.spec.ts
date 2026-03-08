@@ -22,7 +22,9 @@ test('does not run release when releaseType is none and useVersion is undefined'
             deleteTagFromLocalAndRemote: stub(),
         },
         github: {
+            getReleaseByTag: stub().returns(null),
             createRelease: stub(),
+            updateRelease: stub(),
             deleteReleaseById: stub(),
         },
         npm: {
@@ -82,7 +84,9 @@ test('does not run preRun script or do release if dryRun is set', async (assert)
             deleteTagFromLocalAndRemote: stub(),
         },
         github: {
+            getReleaseByTag: stub().returns(null),
             createRelease: stub(),
+            updateRelease: stub(),
             deleteReleaseById: stub(),
         },
         npm: {
@@ -150,6 +154,7 @@ test('if release, creates tags, publishes to npm, creates github release w/ chan
             deleteTagFromLocalAndRemote: stub('deleteTagFromLocalAndRemote'),
         },
         github: {
+            getReleaseByTag: stub().returns(null),
             createRelease: stub('createRelease').expects({
                 token: 'GITHUB_TOKEN_TEST',
                 owner: 'owner',
@@ -157,8 +162,10 @@ test('if release, creates tags, publishes to npm, creates github release w/ chan
                 tag: 'v1.0.2',
                 name: 'v1.0.2',
                 body: '## 🐛 Bug Fixes\n\n- thing (123)',
+                draft: false,
                 prerelease: false,
             }),
+            updateRelease: stub(),
             deleteReleaseById: stub('deleteReleaseById'),
         },
         npm: {
@@ -244,7 +251,9 @@ test('skips github release if skipRelease=true', async (assert) => {
             deleteTagFromLocalAndRemote: stub('deleteTagFromLocalAndRemote'),
         },
         github: {
+            getReleaseByTag: stub().returns(null),
             createRelease: stub('createRelease').expects({}),
+            updateRelease: stub(),
             deleteReleaseById: stub('deleteReleaseById'),
         },
         npm: {
@@ -330,6 +339,7 @@ test('skips npm publish if publish=false (default behavior)', async (assert) => 
             deleteTagFromLocalAndRemote: stub('deleteTagFromLocalAndRemote'),
         },
         github: {
+            getReleaseByTag: stub().returns(null),
             createRelease: stub('createRelease').expects({
                 token: 'GITHUB_TOKEN_TEST',
                 owner: 'owner',
@@ -337,8 +347,10 @@ test('skips npm publish if publish=false (default behavior)', async (assert) => 
                 tag: 'v1.0.2',
                 name: 'v1.0.2',
                 body: '## 🐛 Bug Fixes\n\n- thing (123)',
+                draft: false,
                 prerelease: false,
             }),
+            updateRelease: stub(),
             deleteReleaseById: stub('deleteReleaseById'),
         },
         npm: {
@@ -418,7 +430,9 @@ test('starts with v0.0.0 as base if no git tags', async (assert) => {
             deleteTagFromLocalAndRemote: stub('deleteTagFromLocalAndRemote'),
         },
         github: {
+            getReleaseByTag: stub().returns(null),
             createRelease: stub('createRelease'),
+            updateRelease: stub(),
             deleteReleaseById: stub('deleteReleaseById'),
         },
         npm: {
@@ -499,7 +513,9 @@ test('runs user-defined bash script at the end of release process', async (asser
             deleteTagFromLocalAndRemote: stub('deleteTagFromLocalAndRemote'),
         },
         github: {
+            getReleaseByTag: stub().returns(null),
             createRelease: stub('createRelease'),
+            updateRelease: stub(),
             deleteReleaseById: stub('deleteReleaseById'),
         },
         npm: {
@@ -580,7 +596,9 @@ test('breaking commit results in returning major version', async (assert) => {
             deleteTagFromLocalAndRemote: stub('deleteTagFromLocalAndRemote'),
         },
         github: {
+            getReleaseByTag: stub().returns(null),
             createRelease: stub('createRelease'),
+            updateRelease: stub(),
             deleteReleaseById: stub('deleteReleaseById'),
         },
         npm: {
@@ -660,7 +678,9 @@ test('starts with v0.0.0 as base if no git tags and prerelease channel is provid
             deleteTagFromLocalAndRemote: stub('deleteTagFromLocalAndRemote'),
         },
         github: {
+            getReleaseByTag: stub().returns(null),
             createRelease: stub('createRelease'),
+            updateRelease: stub(),
             deleteReleaseById: stub('deleteReleaseById'),
         },
         npm: {
@@ -742,7 +762,9 @@ test('release (no npm/github release) with preRelease (same channel to channel)'
             deleteTagFromLocalAndRemote: stub('deleteTagFromLocalAndRemote'),
         },
         github: {
+            getReleaseByTag: stub().returns(null),
             createRelease: stub('createRelease'),
+            updateRelease: stub(),
             deleteReleaseById: stub('deleteReleaseById'),
         },
         npm: {
@@ -822,6 +844,7 @@ test('if release, creates tags, publishes to npm, creates github release w/ chan
             deleteTagFromLocalAndRemote: stub('deleteTagFromLocalAndRemote'),
         },
         github: {
+            getReleaseByTag: stub().returns(null),
             createRelease: stub('createRelease').expects({
                 token: 'GITHUB_TOKEN_TEST',
                 owner: 'owner',
@@ -829,8 +852,10 @@ test('if release, creates tags, publishes to npm, creates github release w/ chan
                 tag: 'v1.0.2-alpha.1',
                 name: 'v1.0.2-alpha.1',
                 body: '## 🐛 Bug Fixes\n\n- thing (123)',
+                draft: false,
                 prerelease: true,
             }),
+            updateRelease: stub(),
             deleteReleaseById: stub('deleteReleaseById'),
         },
         npm: {
@@ -918,7 +943,9 @@ test('throws if githubToken is not present, and rolls back tag', async (assert) 
             deleteTagFromLocalAndRemote: stub('deleteTagFromLocalAndRemote').expects('v1.0.2'),
         },
         github: {
+            getReleaseByTag: stub().returns(null),
             createRelease: stub('createRelease'),
+            updateRelease: stub(),
             deleteReleaseById: stub('deleteReleaseById'),
         },
         npm: {
@@ -999,6 +1026,7 @@ test('if npm publish fails, rolls back tag and github release', async (assert) =
             deleteTagFromLocalAndRemote: stub('deleteTagFromLocalAndRemote'),
         },
         github: {
+            getReleaseByTag: stub().returns(null),
             createRelease: stub('createRelease').expects({
                 token: 'GITHUB_TOKEN_TEST',
                 owner: 'owner',
@@ -1006,8 +1034,10 @@ test('if npm publish fails, rolls back tag and github release', async (assert) =
                 tag: 'v1.0.2',
                 name: 'v1.0.2',
                 body: '## 🐛 Bug Fixes\n\n- thing (123)',
+                draft: false,
                 prerelease: false,
             }),
+            updateRelease: stub(),
             deleteReleaseById: stub('deleteReleaseById'),
         },
         npm: {
@@ -1098,6 +1128,7 @@ test('if `run` fails, rolls back tag, github release, and npm publish', async (a
             deleteTagFromLocalAndRemote: stub('deleteTagFromLocalAndRemote'),
         },
         github: {
+            getReleaseByTag: stub().returns(null),
             createRelease: stub('createRelease').expects({
                 token: 'GITHUB_TOKEN_TEST',
                 owner: 'owner',
@@ -1105,8 +1136,10 @@ test('if `run` fails, rolls back tag, github release, and npm publish', async (a
                 tag: 'v1.0.2',
                 name: 'v1.0.2',
                 body: '## 🐛 Bug Fixes\n\n- thing (123)',
+                draft: false,
                 prerelease: false,
             }),
+            updateRelease: stub(),
             deleteReleaseById: stub('deleteReleaseById'),
         },
         npm: {

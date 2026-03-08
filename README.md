@@ -6,7 +6,7 @@
 Autorel is a fast, simple, and reliable tool for automating releases based on commit messages. Similar to `semantic-release` or `release-please`, but faster, more reliable, and easier to use. Use autorel to save time, prevent broken releases, and ship with confidence.
 
 ```bash
-npx autorel@^2 --pre-release alpha --publish --run 'echo "Next version is ${NEXT_VERSION}"'
+npx autorel@^2 --pre-release alpha --publish --run 'echo "Next version is ${NEXT_VERSION}"' 
 ```
 
 It follows [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) and [Semantic Versioning](https://semver.org/) to automatically:
@@ -227,12 +227,21 @@ jobs:
 
 > ❗️ **For npm publishing:** You must be authenticated with npm. See the [npm authentication guide](https://docs.github.com/en/actions/guides/publishing-nodejs-packages#publishing-packages-to-the-npm-registry) for setup instructions.
 
-**Recommended:** Create a `.autorel.yaml` file in your project root instead of passing CLI arguments. This keeps your workflow file cleaner. See [Configuration Options](/docs/configuration-options.md) for all available settings.
+### Using `--run` with the version in GitHub Actions
+
+**Only if you put `NEXT_VERSION` or `NEXT_TAG` in your `--run` command** (e.g. as an argument to your script), use a double dollar so the version is passed through. For example:
+
+```yaml
+- run: npx autorel@^2 --publish --run "deploy-service $$NEXT_VERSION"
+```
+
+In Actions the step `run:` is expanded by the runner *before* autorel runs, so a single `$` would be expanded when the variable is still unset. `$$` becomes a literal `$`, so the shell that runs your script gets `$NEXT_VERSION` after autorel has set it.
+
+You can also use `.autorel.yaml` or a script (e.g. `--run "./blah.sh"`); they run in a shell where the version is already set, so `$NEXT_VERSION` / `$NEXT_TAG` work as usual. `NEXT_TAG` is also available (e.g. for Docker tags that use `v`).
 
 ## Authentication & Permissions
 
 ### GitHub Token
-
 To create releases on GitHub, autorel needs a GitHub token:
 
 - **GitHub Actions:** The `GITHUB_TOKEN` is automatically provided (no setup needed)
