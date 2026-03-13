@@ -200,48 +200,4 @@ test('getConfig: valid .autorel.yaml with empty cli overrides (2)', async (asser
 
 });
 
-// TODO: remove this test in the next major version
-test('getConfig: backward compatibility with deprecated prereleaseChannel', async (assert) => {
-
-    const mockFs = {
-        existsSync: () => true,
-        readFileSync: () => `
-            prereleaseChannel: 'alpha'
-            branches:
-                - {name: 'main'}
-                - {name: 'develop', prereleaseChannel: 'beta'}
-        `,
-    };
-    const mockLoggerWithWarn = {
-        ...mockLogger,
-        warn: (message: string) => {
-
-            // Track that warn was called
-            (mockLoggerWithWarn as any).warnCalled = true;
-            (mockLoggerWithWarn as any).warnMessage = message;
-            mockLogger.info();
-
-        },
-    };
-    const configMod: typeof mod = mock('./config', {
-        'node:fs': mockFs,
-        'node:path': {resolve: (p: string) => p},
-        './services/logger': mockLoggerWithWarn,
-    });
-    const expectedConfig = {
-        ...defaultConfig,
-        preRelease: 'alpha',
-        branches: [
-            {name: 'main'},
-            {name: 'develop', preRelease: 'beta'},
-        ],
-    };
-
-    const result = configMod.getConfig();
-
-    assert.equal(result, expectedConfig, 'should normalize prereleaseChannel to preRelease');
-    assert.equal((mockLoggerWithWarn as any).warnCalled, true, 'should call warn for deprecated option');
-    assert.equal((mockLoggerWithWarn as any).warnMessage?.includes('prereleaseChannel'), true, 'warn message should mention prereleaseChannel');
-
-});
 

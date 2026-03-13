@@ -557,7 +557,7 @@ test('runs user-defined bash script at the end of release process', async (asser
         ...defaultConfig,
         publish: false,
         skipRelease: true,
-        runScript: 'echo "hello world"',
+        run: 'echo "hello world"',
     });
 
     assert.equal(result, '1.0.2', 'returns next version');
@@ -637,7 +637,7 @@ test('breaking commit results in returning major version', async (assert) => {
         ...defaultConfig,
         publish: false,
         skipRelease: true,
-        runScript: 'echo "hello world"',
+        run: 'echo "hello world"',
     });
 
     assert.equal(result, '2.0.0', 'returns next version');

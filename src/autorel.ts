@@ -254,13 +254,6 @@ export async function autorel(args: Config): Promise<string|undefined> {
             logger.info('➤ Running release bash script...');
             bash(args.run);
 
-        } else if (args.runScript) {
-
-            // TODO: delete this block in the next major version
-            logger.warn('The "runScript" option is deprecated. Please use "run" instead. It will be removed in the next major version.');
-            logger.info('➤ Running post-release bash script...');
-            bash(args.runScript);
-
         }
 
         logger.info('🤘🎸 All done!');
