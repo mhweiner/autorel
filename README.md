@@ -229,15 +229,17 @@ jobs:
 
 ### Using `--run` with the version in GitHub Actions
 
-**Only if you put `NEXT_VERSION` or `NEXT_TAG` in your `--run` command** (e.g. as an argument to your script), use a double dollar so the version is passed through. For example:
+When passing `$NEXT_VERSION` or `$NEXT_TAG` in your `--run` command, wrap the `--run` argument in **single quotes** so the shell doesn't expand the variable before autorel has a chance to set it:
 
 ```yaml
-- run: npx autorel@^2 --publish --run "deploy-service $$NEXT_VERSION"
+- run: npx autorel@^2 --publish --run 'deploy-service $NEXT_VERSION'
 ```
 
-In Actions the step `run:` is expanded by the runner *before* autorel runs, so a single `$` would be expanded when the variable is still unset. `$$` becomes a literal `$`, so the shell that runs your script gets `$NEXT_VERSION` after autorel has set it.
+With single quotes, `$NEXT_VERSION` is passed as a literal string to autorel. Autorel sets the environment variable and then executes your command in a sub-shell where it resolves correctly.
 
-You can also use `.autorel.yaml` or a script (e.g. `--run "./blah.sh"`); they run in a shell where the version is already set, so `$NEXT_VERSION` / `$NEXT_TAG` work as usual. `NEXT_TAG` is also available (e.g. for Docker tags that use `v`).
+> ⚠️ **Do not use double quotes** around the `--run` argument — the shell would expand `$NEXT_VERSION` to an empty string before autorel runs.
+
+You can also use `.autorel.yaml` or a wrapper script (e.g. `--run "./deploy.sh"`); they run in a shell where the version is already set, so `$NEXT_VERSION` / `$NEXT_TAG` work as usual.
 
 ## Authentication & Permissions
 
