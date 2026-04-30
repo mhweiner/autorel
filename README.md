@@ -89,7 +89,7 @@ When autorel runs, it follows this sequence:
 4. **Run pre-release tasks** - Executes `preRun` scripts (tests, builds, etc.) if configured
 5. **Create git tag** - Tags the current commit with the new version
 6. **Create GitHub release** - Creates a release on GitHub with changelog (unless `--skip-release`)
-7. **Update package.json** - Updates version temporarily in memory (not committed to repo)
+7. **Update package.json** - Updates package.json "version" field locally (not an additional commit)
 8. **Publish to npm** - Publishes package if `--publish` is set
 9. **Restore package.json** - Immediately restores package.json to original version (always happens, even if publish fails)
 10. **Run post-release scripts** - Executes `run` scripts with `NEXT_VERSION` and `NEXT_TAG` environment variables
@@ -262,7 +262,7 @@ To publish packages to npm, you need authentication:
 ### About package.json Versions
 
 When using npm publishing, autorel:
-1. Temporarily updates `package.json` version in memory
+1. Updates `package.json` version locally (not commited)
 2. Publishes to npm with that version
 3. **Immediately restores** `package.json` to the original version (even if publish fails)
 4. Then runs post-release scripts (`--run`)
