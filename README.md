@@ -87,12 +87,13 @@ When autorel runs, it follows this sequence:
 2. **Determine version** - Calculates the next version based on Conventional Commits
 3. **Check if release needed** - If no commits require a release, exits successfully (no changes made)
 4. **Run pre-release tasks** - Executes `preRun` scripts (tests, builds, etc.) if configured
-5. **Create git tag** - Tags the current commit with the new version
-6. **Create GitHub release** - Creates a release on GitHub with changelog (unless `--skip-release`)
-7. **Update package.json** - Updates package.json "version" field locally (not an additional commit)
-8. **Publish to npm** - Publishes package if `--publish` is set
-9. **Restore package.json** - Immediately restores package.json to original version (always happens, even if publish fails)
-10. **Run post-release scripts** - Executes `run` scripts with `NEXT_VERSION` and `NEXT_TAG` environment variables
+5. **Run deploy scripts (optional)** - With `--run-before-release`, executes `run` scripts **before** tagging (with `NEXT_VERSION` / `NEXT_TAG` set). Use for deploy steps that must succeed before a version is published.
+6. **Create git tag** - Tags the current commit with the new version
+7. **Create GitHub release** - Creates a release on GitHub with changelog (unless `--skip-release`)
+8. **Update package.json** - Updates package.json "version" field locally (not an additional commit)
+9. **Publish to npm** - Publishes package if `--publish` is set
+10. **Restore package.json** - Immediately restores package.json to original version (always happens, even if publish fails)
+11. **Run post-release scripts** - Executes `run` scripts after tag/release/publish (default; skipped when `--run-before-release` is set)
 
 ### When No Release is Needed
 
@@ -386,11 +387,27 @@ TypeScript types are available. You can find the type definitions at [src/index.
 import type {Config, CommitType} from 'autorel';
 ```
 
+### Deploy before tag (`--run-before-release`)
+
+By default, `--run` executes **after** the git tag, GitHub release, and npm publish. For deploy steps (Docker build, ECS rollout, etc.), you often want the tag to mean "this version is live".
+
+Use `--run-before-release` to run `--run` after the version is calculated (with `NEXT_VERSION` / `NEXT_TAG` set) but **before** any tag or release is created. If the script fails, no tag or GitHub release is created — no rollback needed.
+
+```bash
+npx autorel@^2 --run-before-release --run 'deploy-service prod my-service $NEXT_VERSION .'
+```
+
+In GitHub Actions (single quotes so autorel sets the variable):
+
+```yaml
+- run: npx autorel@^2 --run-before-release --run 'deploy-service "$ENV_NAME" "$SERVICE_NAME" "$NEXT_VERSION" "$PWD"'
+```
+
 ### Environment Variables in Scripts
 
 The `NEXT_VERSION` and `NEXT_TAG` environment variables are available in:
-- ✅ `run` scripts (after release is complete)
-- ❌ `preRun` scripts (version not yet determined)
+- ✅ `run` scripts (after release is complete, or before tag/release with `--run-before-release`)
+- ❌ `preRun` scripts (version is determined but env vars are not set until after `preRun`)
 
 **Note:** Package.json is restored to the original version before `run` scripts execute. If you need the new version in package.json for your script, use the environment variables or update package.json manually in your script.
 
