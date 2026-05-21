@@ -103,6 +103,29 @@ run: |
 - Argument: `run: string`
 - Default: `undefined`
 
+### runBeforeRelease
+
+When `true`, runs the `run` script **before** creating the git tag, GitHub release, or npm publish (instead of after). `NEXT_VERSION` and `NEXT_TAG` are set before the script runs. If the script fails, no tag or release is created.
+
+Use for deploy steps where the version should only be published after the deploy succeeds (e.g. ECS rollouts).
+
+Example CLI usage:
+
+```bash
+autorel --run-before-release --run 'deploy-service prod my-service ${NEXT_VERSION} .'
+```
+
+Example YAML usage:
+
+```yaml
+runBeforeRelease: true
+run: deploy-service prod my-service ${NEXT_VERSION} .
+```
+
+- CLI: `--run-before-release`
+- Argument: `runBeforeRelease: boolean`
+- Default: `false`
+
 ### preRun
 
 A `bash` command/script to run before the release is started. All scripts are run in "-e" mode, meaning they will exit on the first error. Here's where you can do things like run tests or do build steps.
