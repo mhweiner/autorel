@@ -24,6 +24,7 @@ export const commitType = p.object({
 export const validateConfig = p.object({
     dryRun: p.optional(p.boolean()),
     run: p.optional(p.string()),
+    runBeforeRelease: p.optional(p.boolean()),
     preRun: p.optional(p.string()),
     runScript: p.optional(p.string()),
     preRelease: p.optional(p.union([

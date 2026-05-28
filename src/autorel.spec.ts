@@ -1278,3 +1278,148 @@ test('aborts release if user-defined preRun script fails', async (assert) => {
 
 });
 
+test('with runBeforeRelease, runs user script before tag and does not run it again after release', async (assert) => {
+
+    const stubs = {
+        getPrereleaseChannel: {getPrereleaseChannel: stub().returns(undefined)},
+        git: {
+            gitFetch: stub('gitFetch'),
+            getCommitsFromTag: stub('getCommitsFromTag')
+                .expects('v1.0.1')
+                .returns([
+                    {message: 'fix: thing', hash: '123'},
+                ]),
+            getRepo: stub('getRepo').returns({owner: 'owner', repository: 'repo'}),
+            createAndPushTag: stub('createAndPushTag').expects('v1.0.2'),
+            deleteTagFromLocalAndRemote: stub('deleteTagFromLocalAndRemote'),
+        },
+        github: {
+            getReleaseByTag: stub().returns(null),
+            createRelease: stub('createRelease'),
+            updateRelease: stub(),
+            deleteReleaseById: stub('deleteReleaseById'),
+        },
+        npm: {
+            versionExists: stub('versionExists').returns(false),
+            publishPackage: stub('publishPackage'),
+            unpublishPackage: stub('unpublishPackage'),
+        },
+        sh: {
+            bash: stub('bash').expects('echo "deploy"'),
+            $: stub(),
+        },
+        packageJson: {
+            read: stub('read').returns({
+                name: 'test',
+                version: '1.0.0',
+            }),
+            setVersion: stub('setVersion'),
+        },
+        getTags: {
+            getTags: stub('getTags').expects(undefined).returns({
+                highestTag: 'v1.0.1',
+                highestChannelTag: undefined,
+                highestStableTag: 'v1.0.1',
+                tagFromWhichToFindCommits: 'v1.0.1',
+            }),
+        },
+    };
+    const mockMod: typeof m = mock('./autorel', {
+        './getPrereleaseChannel': stubs.getPrereleaseChannel,
+        './services/git': stubs.git,
+        './services/github': stubs.github,
+        './services/npm': stubs.npm,
+        './services/packageJson': stubs.packageJson,
+        './services/sh': stubs.sh,
+        './getTags': stubs.getTags,
+        './services/logger': mockLogger,
+    });
+
+    const [err, result] = await toResultAsync(mockMod.autorel({
+        ...defaultConfig,
+        runBeforeRelease: true,
+        run: 'echo "deploy"',
+        githubToken: 'GITHUB_TOKEN_TEST',
+    }));
+
+    assert.equal(err, undefined, 'does not throw');
+    assert.equal(result, '1.0.2', 'returns next version');
+    assert.equal(stubs.sh.bash.getCalls().length, 1, 'bash is called once');
+    assert.equal(stubs.git.createAndPushTag.getCalls().length, 1, 'calls createAndPushTag once');
+
+});
+
+test('with runBeforeRelease, aborts before tag if user script fails', async (assert) => {
+
+    const stubs = {
+        getPrereleaseChannel: {getPrereleaseChannel: stub().returns(undefined)},
+        git: {
+            gitFetch: stub('gitFetch'),
+            getCommitsFromTag: stub('getCommitsFromTag')
+                .expects('v1.0.1')
+                .returns([
+                    {message: 'fix: thing', hash: '123'},
+                ]),
+            getRepo: stub('getRepo').returns({owner: 'owner', repository: 'repo'}),
+            createAndPushTag: stub('createAndPushTag'),
+            deleteTagFromLocalAndRemote: stub('deleteTagFromLocalAndRemote'),
+        },
+        github: {
+            getReleaseByTag: stub().returns(null),
+            createRelease: stub('createRelease'),
+            updateRelease: stub(),
+            deleteReleaseById: stub('deleteReleaseById'),
+        },
+        npm: {
+            versionExists: stub('versionExists').returns(false),
+            publishPackage: stub('publishPackage'),
+            unpublishPackage: stub('unpublishPackage'),
+        },
+        sh: {
+            bash: stub('bash')
+                .expects('echo "deploy"')
+                .throws(new Error('deploy failed')),
+            $: stub(),
+        },
+        packageJson: {
+            read: stub('read').returns({
+                name: 'test',
+                version: '1.0.0',
+            }),
+            setVersion: stub('setVersion'),
+        },
+        getTags: {
+            getTags: stub('getTags').expects(undefined).returns({
+                highestTag: 'v1.0.1',
+                highestChannelTag: undefined,
+                highestStableTag: 'v1.0.1',
+                tagFromWhichToFindCommits: 'v1.0.1',
+            }),
+        },
+    };
+    const mockMod: typeof m = mock('./autorel', {
+        './getPrereleaseChannel': stubs.getPrereleaseChannel,
+        './services/git': stubs.git,
+        './services/github': stubs.github,
+        './services/npm': stubs.npm,
+        './services/packageJson': stubs.packageJson,
+        './services/sh': stubs.sh,
+        './getTags': stubs.getTags,
+        './services/logger': mockLogger,
+    });
+
+    const [err, result] = await toResultAsync(mockMod.autorel({
+        ...defaultConfig,
+        runBeforeRelease: true,
+        run: 'echo "deploy"',
+        githubToken: 'GITHUB_TOKEN_TEST',
+    }));
+
+    assert.equal(result, undefined, 'returns undefined because it failed');
+    assert.errorsEquivalent(err, new Error('deploy failed'), 'throws error');
+    assert.equal(stubs.git.createAndPushTag.getCalls().length, 0, 'does not call createAndPushTag');
+    assert.equal(stubs.github.createRelease.getCalls().length, 0, 'does not call createRelease');
+    assert.equal(stubs.git.deleteTagFromLocalAndRemote.getCalls().length, 0, 'does not roll back tag');
+
+});
+

@@ -121,6 +121,9 @@ export async function autorel(args: Config): Promise<string|undefined> {
 
     }
 
+    process.env.NEXT_VERSION = nextTag.replace('v', '');
+    process.env.NEXT_TAG = nextTag;
+
     // User-defined scripts for things like running tests, building the project, etc.
     if (args.preRun) {
 
@@ -128,6 +131,21 @@ export async function autorel(args: Config): Promise<string|undefined> {
         bash(args.preRun);
 
     }
+
+    if (args.runBeforeRelease) {
+
+        if (!args.run) {
+
+            throw new Error('--run-before-release requires --run (or run: in .autorel.yaml).');
+
+        }
+
+        logger.info('➤ Running release bash script (before tag/release)...');
+        bash(args.run);
+
+    }
+
+    const runAfterRelease = !!args.run && !args.runBeforeRelease;
 
     // The rest goes in a transaction so we can rollback if something goes wrong
     await transaction(async (addToRollback) => {
@@ -244,15 +262,11 @@ export async function autorel(args: Config): Promise<string|undefined> {
 
         }
 
-        // set env variables to be available in the scripts
-        process.env.NEXT_VERSION = nextTag.replace('v', '');
-        process.env.NEXT_TAG = nextTag;
-
-        // run user-defined release scripts
-        if (args.run) {
+        // run user-defined release scripts (default: after tag/release/publish)
+        if (runAfterRelease) {
 
             logger.info('➤ Running release bash script...');
-            bash(args.run);
+            bash(args.run!);
 
         } else if (args.runScript) {
 
