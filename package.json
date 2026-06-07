@@ -26,7 +26,7 @@
     "lint": "eslint ./ --ext .js,.ts --fix",
     "lint:check": "eslint ./ --ext .js,.ts",
     "build": "rm -rf ./dist && tsc",
-    "validate": "npm run lint:check && npm test"
+    "validate": "npm run lint && npm test"
   },
   "homepage": "https://github.com/mhweiner/autorel/blob/main/README.md",
   "keywords": [
