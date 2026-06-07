@@ -23,8 +23,10 @@
   "scripts": {
     "prepare": "npm run build",
     "test": "npm run build && c8 kizu --fail-only 'src/**/*.spec.ts' && c8 report -r text -r html",
-    "lint": "eslint ./ --ext .js,.ts",
-    "build": "rm -rf ./dist && tsc"
+    "lint": "eslint ./ --ext .js,.ts --fix",
+    "lint:check": "eslint ./ --ext .js,.ts",
+    "build": "rm -rf ./dist && tsc",
+    "validate": "npm run lint:check && npm test"
   },
   "homepage": "https://github.com/mhweiner/autorel/blob/main/README.md",
   "keywords": [
