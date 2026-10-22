@@ -1,4 +1,10 @@
-# 🚀 autorel
+<div align="center">
+  <picture>
+    <source srcset="assets/autorel-dark.svg" media="(prefers-color-scheme: dark)" />
+    <source srcset="assets/autorel-light.svg" media="(prefers-color-scheme: light)" />
+    <img src="assets/autorel-light.svg" height="56" alt="autorel" />
+  </picture>
+</div>
 
 ![Build Status](https://github.com/mhweiner/autorel/actions/workflows/release.yml/badge.svg)
  [![SemVer](https://img.shields.io/badge/SemVer-2.0.0-blue)]() [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org) [![autorel](https://img.shields.io/badge/%F0%9F%9A%80%20autorel-2D4DDE)](https://github.com/mhweiner/autorel)
